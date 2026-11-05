@@ -1,0 +1,27 @@
+cmake_minimum_required(VERSION 3.16)
+project(PlusPicoFeatureTests C CXX)
+set(CMAKE_CXX_STANDARD 20)
+set(RICKYOS_TEST_DEVICE plus)
+set(PLUS_GTEST_SOURCE "" CACHE PATH "Existing GoogleTest source tree (no implicit download)")
+if(PLUS_GTEST_SOURCE)
+  set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+  set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+  add_subdirectory("${PLUS_GTEST_SOURCE}" googletest)
+else()
+  find_package(GTest CONFIG REQUIRED)
+endif()
+enable_testing()
+include(GoogleTest)
+get_filename_component(PORT_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+set(REPO_ROOT "${PORT_ROOT}/firmware/rickyos-plus-1.2/upstream")
+add_library(crosspoint_test_common INTERFACE)
+target_include_directories(crosspoint_test_common INTERFACE
+  "${REPO_ROOT}" "${REPO_ROOT}/lib" "${REPO_ROOT}/lib/Memory"
+  "${PORT_ROOT}/firmware/rickyos-plus-1.2/components/rickyos_application/port")
+target_compile_options(crosspoint_test_common INTERFACE -Wall -Wextra -pedantic)
+target_compile_definitions(crosspoint_test_common INTERFACE
+  RICKYOS_PRODUCT=1 FREEINK_DEVICE_METALIO_PLUS=1 ENABLE_CHINESE_VERSION=1
+  CROSSMUX_UI_PROFILE_HIGH_DPI=1 HYPHENATION_ENGLISH_ONLY=1)
+add_subdirectory("${REPO_ROOT}/test/css_parser" css_parser)
+add_subdirectory("${REPO_ROOT}/test/chapter_html_slim_parser" chapter_html_slim_parser)
+add_subdirectory("${REPO_ROOT}/test/dictionary_resource" dictionary_resource)

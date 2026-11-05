@@ -1,0 +1,557 @@
+<title>RickyOS 1.2 设计稿</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400&display=swap">
+<style>/* Layout: a reading column of notes over a grid of device frames; each frame is a true 684x1216 screen scaled down. */
+:root {
+  --pg-bg: #e9ebec;
+  --pg-card: #f7f8f8;
+  --pg-fg: #16191b;
+  --pg-soft: #4c5357;
+  --pg-line: #c9cdd0;
+  --pg-accent: #16191b;
+  --f-ui: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --f-read: "Noto Serif SC", "Songti SC", "STSong", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --pg-bg: #141618; --pg-card: #1c1f22; --pg-fg: #e7eaec; --pg-soft: #a6adb2; --pg-line: #33383c; --pg-accent: #e7eaec; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --pg-bg: #141618; --pg-card: #1c1f22; --pg-fg: #e7eaec; --pg-soft: #a6adb2; --pg-line: #33383c; --pg-accent: #e7eaec; color-scheme: dark; }
+
+body { background: var(--pg-bg); color: var(--pg-fg); font-family: var(--f-ui); }
+.wrap { max-width: 1320px; margin: 0 auto; padding-inline: 24px; padding-block: 40px 64px; display: flex; flex-direction: column; gap: 40px; }
+@media (max-width: 520px) { .wrap { padding-inline: 16px; } }
+
+.top { display: flex; flex-direction: column; gap: 12px; max-width: 760px; }
+.eyebrow { margin: 0; font-size: 13px; letter-spacing: .08em; color: var(--pg-soft); }
+.top h1 { margin: 0; font-size: clamp(30px, 5vw, 44px); line-height: 1.15; font-weight: 700; text-wrap: balance; }
+.lede { margin: 0; font-size: 16px; line-height: 1.75; color: var(--pg-soft); max-width: 62ch; }
+.mode { display: inline-flex; gap: 0; border: 1.5px solid var(--pg-fg); border-radius: 999px; padding: 3px; align-self: flex-start; margin-top: 8px; flex-wrap: wrap; }
+.mode button { font: inherit; font-size: 14px; border: 0; background: transparent; color: var(--pg-fg); padding: 8px 16px; border-radius: 999px; cursor: pointer; }
+.mode button.on { background: var(--pg-fg); color: var(--pg-bg); }
+.mode button:focus-visible, .dev:focus-visible, .close:focus-visible { outline: 3px solid var(--pg-soft); outline-offset: 3px; }
+
+.global h2 { margin: 0 0 16px; font-size: 20px; }
+.global dl { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.gi { background: var(--pg-card); border: 1px solid var(--pg-line); border-radius: 10px; padding: 16px; min-width: 0; }
+.gi dt { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+.gi dd { margin: 0; font-size: 14px; line-height: 1.7; color: var(--pg-soft); }
+
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 40px 28px; }
+.shot { margin: 0; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.frame { padding: 10px; background: #0d0f10; border-radius: 22px; }
+.dev { position: relative; width: 100%; aspect-ratio: 684 / 1216; overflow: hidden; border-radius: 8px; cursor: zoom-in; background: #fff; }
+.shot figcaption h3 { margin: 0 0 8px; font-size: 18px; }
+.shot ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.shot li { font-size: 14px; line-height: 1.7; color: var(--pg-soft); }
+.foot { font-size: 13px; color: var(--pg-soft); border-top: 1px solid var(--pg-line); padding-top: 16px; }
+
+dialog { border: 0; padding: 0; background: transparent; max-width: 100vw; max-height: 100vh; }
+dialog::backdrop { background: rgba(10, 12, 13, .82); }
+.zbox { position: relative; overflow: hidden; border-radius: 10px; background: #fff; }
+.close { position: fixed; top: 16px; right: 16px; font: inherit; font-size: 14px; padding: 8px 14px; border-radius: 999px; border: 0; background: #fff; color: #111; cursor: pointer; z-index: 2; }
+
+/* ---------- the device screen: fixed paper-and-ink palette, true pixels ---------- */
+.scr {
+  --ink: #000; --ink2: #444; --mute: #888; --line: #bbb; --tint: #ddd; --paper: #fff;
+  position: absolute; top: 0; left: 0; width: 684px; height: 1216px; transform-origin: 0 0;
+  box-sizing: border-box; padding: 0 40px; overflow: hidden;
+  background: var(--paper); color: var(--ink); font-family: var(--f-ui);
+  display: flex; flex-direction: column; font-size: 25px; line-height: 36px;
+}
+.bw .scr { filter: url(#onebit); }
+.scr * { box-sizing: border-box; }
+.ink2 { color: var(--ink2); }
+.disp { font-size: 48px; line-height: 56px; font-weight: 700; letter-spacing: -1px; }
+.title { font-size: 33px; line-height: 44px; font-weight: 700; }
+.head { font-size: 29px; line-height: 40px; font-weight: 500; }
+.body { font-size: 25px; line-height: 36px; }
+.cap { font-size: 21px; line-height: 28px; }
+.strong { font-weight: 500; }
+.one { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.split { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.ic { display: block; flex: none; }
+
+.sb { height: 48px; flex: none; display: flex; justify-content: space-between; align-items: center; font-size: 21px; line-height: 28px; }
+.bat { display: inline-flex; align-items: center; gap: 8px; }
+.batt { display: inline-block; width: 32px; height: 16px; border: 2px solid var(--ink); border-radius: 4px; padding: 2px; position: relative; }
+.batt::after { content: ""; position: absolute; right: -6px; top: 4px; width: 3px; height: 6px; background: var(--ink); border-radius: 0 2px 2px 0; }
+.batt i { display: block; height: 100%; background: var(--ink); }
+
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 112px; border-top: 2px solid var(--ink); display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; background: var(--paper); }
+.tab { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.pill { width: 88px; height: 48px; border-radius: 24px; display: grid; place-items: center; }
+.tab.on .pill { background: var(--ink); color: var(--paper); }
+.tl { font-size: 21px; line-height: 28px; }
+.tab.on .tl { font-weight: 500; }
+
+.phead { height: 96px; flex: none; display: flex; justify-content: space-between; align-items: center; }
+.subhead { height: 88px; flex: none; display: flex; align-items: center; gap: 8px; }
+.back { width: 56px; height: 56px; margin-left: -12px; display: grid; place-items: center; }
+.ibtn { width: 56px; height: 56px; display: grid; place-items: center; margin-left: auto; }
+.ibtn.txt { display: flex; width: auto; gap: 8px; padding: 0 4px; }
+.subcap { margin-top: -12px; }
+
+.hhead { display: flex; justify-content: space-between; align-items: flex-start; padding-top: 16px; flex: none; }
+.greet { margin-top: 4px; }
+.avatar { width: 88px; height: 88px; display: block; object-fit: contain; background: var(--paper); flex: none; }
+.avatar.xl { width: 240px; height: 240px; }
+
+.peek { position: relative; margin-top: 24px; flex: none; }
+.dog { position: absolute; right: 124px; top: -78px; width: 126px; z-index: 0; }
+.card { border: 2px solid var(--ink); border-radius: 24px; background: var(--paper); position: relative; z-index: 1; }
+.cont { display: flex; gap: 24px; padding: 22px; }
+.cinfo { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.prog { height: 8px; background: var(--tint); border-radius: 4px; overflow: hidden; margin-top: 14px; flex: none; }
+.prog i { display: block; height: 100%; background: var(--ink); border-radius: 4px; }
+.prog.sm { margin-top: 8px; }
+.btn { height: 56px; min-width: 160px; padding: 0 32px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-weight: 500; align-self: flex-start; }
+.btn.primary { background: var(--ink); color: var(--paper); margin-top: auto; }
+
+.g2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.stats { margin-top: 24px; flex: none; }
+.stat { padding: 14px 22px 16px; display: flex; flex-direction: column; }
+.num { display: flex; align-items: baseline; gap: 6px; }
+.num b { font-size: 48px; line-height: 56px; font-weight: 700; letter-spacing: -1px; }
+.spark { position: absolute; right: 22px; top: 50px; display: flex; align-items: flex-end; gap: 6px; height: 32px; }
+.spark i { width: 10px; background: var(--ink2); border-radius: 2px 2px 0 0; }
+.spark i:last-child { background: var(--ink); }
+
+.sechd { display: flex; justify-content: space-between; align-items: baseline; margin-top: 30px; flex: none; }
+.recent { display: grid; grid-template-columns: repeat(4, 136px); gap: 20px; margin-top: 10px; }
+.rb, .gb { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rb .cv { margin-bottom: 6px; }
+.motto { position: absolute; left: 0; right: 0; bottom: 124px; text-align: center; }
+
+.cv { position: relative; flex: none; border: 2px solid var(--ink); display: flex; flex-direction: column; justify-content: space-between; padding: 14px 12px 10px; overflow: hidden; background: var(--paper); color: var(--ink); }
+.cvt { font-weight: 500; font-size: 25px; line-height: 32px; position: relative; z-index: 1; }
+.cvf { font-size: 21px; line-height: 28px; position: relative; z-index: 1; }
+.cv.vert .cvt { writing-mode: vertical-rl; align-self: flex-end; font-size: 29px; line-height: 36px; letter-spacing: 4px; }
+.cv-ink { background: var(--ink); color: var(--paper); }
+.cv-band::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 34%; background: var(--ink); }
+.cv-band .cvf { color: var(--paper); }
+.cv-frame::after { content: ""; position: absolute; inset: 8px; border: 2px solid var(--ink); }
+.cv-frame { justify-content: center; align-items: center; text-align: center; gap: 24px; }
+.cv-frame .cvf { position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; }
+.cv-tint { background: var(--tint) repeating-linear-gradient(135deg, transparent 0 6px, var(--line) 6px 8px); }
+.cv-tint .cvt { background: var(--tint); align-self: flex-start; padding-right: 6px; }
+.cv-tint .cvf { background: var(--tint); align-self: flex-start; padding-right: 6px; }
+
+.chips { display: flex; gap: 12px; align-items: center; height: 56px; flex: none; }
+.chip { height: 48px; padding: 0 24px; border: 2px solid var(--ink); border-radius: 24px; display: flex; align-items: center; font-size: 21px; }
+.chip.on { background: var(--ink); color: var(--paper); font-weight: 500; }
+.grid { margin-top: 28px; row-gap: 28px; }
+.gb .cv { margin-bottom: 8px; }
+.plate { background: var(--ink); color: var(--paper); box-shadow: 0 0 0 8px var(--ink); border-radius: 4px; }
+.plate .ink2 { color: var(--paper); }
+
+.page { padding-top: 28px; font-family: var(--f-read); font-size: 27px; line-height: 47px; text-align: justify; }
+.page p { margin: 0 0 22px; text-indent: 2em; }
+.rfoot { position: absolute; left: 40px; right: 40px; bottom: 28px; }
+.rfoot .split { margin-top: 8px; }
+
+.quick { margin-top: 24px; flex: none; }
+.qt { height: 136px; border: 2px solid var(--ink); border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+.qt.sel { background: var(--ink); color: var(--paper); }
+.list { margin-top: 24px; display: flex; flex-direction: column; }
+.list.tight { margin-top: 16px; }
+.row { height: 96px; display: flex; align-items: center; gap: 16px; margin: 0 -16px; padding: 0 16px; border-radius: 12px; flex: none; }
+.row.two { height: 120px; }
+.row.sel { background: var(--ink); color: var(--paper); }
+.rlead { width: 32px; flex: none; display: grid; }
+.rtext { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.rmain { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rsub { font-size: 21px; line-height: 28px; color: var(--ink2); }
+.row.sel .rsub, .row.sel .rval { color: var(--paper); }
+.rval { font-size: 21px; color: var(--ink2); white-space: nowrap; }
+.chev { width: 24px; flex: none; display: grid; }
+.tog { width: 64px; height: 36px; border-radius: 18px; border: 2px solid var(--ink); position: relative; flex: none; }
+.tog i { position: absolute; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); left: 5px; top: 5px; }
+.tog.on { background: var(--ink); }
+.tog.on i { width: 26px; height: 26px; background: var(--paper); left: auto; right: 3px; top: 3px; }
+
+.prof { display: flex; align-items: center; gap: 24px; padding: 0 24px; height: 136px; flex: none; }
+.ptext { flex: 1; min-width: 0; }
+.cards { margin-top: 32px; flex: none; }
+.scard { height: 144px; border: 2px solid var(--ink); border-radius: 24px; padding: 22px 24px; display: flex; flex-direction: column; justify-content: space-between; }
+.scard.sel { background: var(--ink); color: var(--paper); }
+
+.apps { margin-top: 24px; row-gap: 36px; }
+.app { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 12px 0 10px; border-radius: 12px; width: 152px; justify-self: center; }
+.tile { width: 112px; height: 112px; border: 2px solid var(--ink); border-radius: 12px; display: grid; place-items: center; }
+.app.sel { background: var(--ink); color: var(--paper); }
+
+.cap-card { display: flex; align-items: center; gap: 24px; padding: 0 24px; height: 136px; flex: none; }
+.ring { position: relative; width: 88px; height: 88px; flex: none; }
+.ring svg { display: block; }
+.ring span { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 500; }
+
+.emptyc { display: flex; gap: 24px; padding: 22px; }
+.drop { width: 160px; height: 220px; border: 2px solid var(--ink); border-radius: 12px; display: grid; place-items: center; flex: none; }
+.einfo { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; }
+
+.off { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+.off .title { margin-top: 20px; }
+.offcap { position: absolute; bottom: 64px; left: 0; right: 0; text-align: center; }
+
+@media (prefers-reduced-motion: no-preference) { .mode button { transition: background .15s, color .15s; } }
+</style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="onebit" color-interpolation-filters="sRGB">
+<feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0"/>
+<feComponentTransfer><feFuncR type="discrete" tableValues="0 0 0 0 1"/><feFuncG type="discrete" tableValues="0 0 0 0 1"/><feFuncB type="discrete" tableValues="0 0 0 0 1"/></feComponentTransfer>
+</filter></svg>
+<main class="wrap">
+<header class="top">
+  <p class="eyebrow">RickyOS 1.2 · 684 × 1216 · 16 级灰度墨水屏</p>
+  <h1>我理解后的十屏</h1>
+  <p class="lede">以老师 10 月 9 日的第二版为底，按设计规范和 Apple 人机界面指南的准则重画。下面每屏旁边列出和老师稿不同的地方。书名、进度、统计都是示例数据。</p>
+  <div class="mode" role="group" aria-label="刷新模式">
+    <button type="button" id="m-rest" class="on" aria-pressed="true">静止帧（16 级灰度）</button>
+    <button type="button" id="m-bw" aria-pressed="false">快刷（黑白）</button>
+  </div>
+</header>
+<section class="global"><h2>全局调整</h2><dl><div class="gi"><dt>字号</dt><dd>界面文字不小于 21 px。老师稿里状态栏、封面元信息、列表副标题都在 16 到 18 px，按 Apple 的最小字号换算偏小，统一提到 21 px。</dd></div><div class="gi"><dt>次要文字</dt><dd>只用深灰（ink-2，对比 9.7:1）。中灰对比只有 3.5:1，只留给禁用和占位。</dd></div><div class="gi"><dt>快刷</dt><dd>每个元素都要在黑白快刷里看得见。可以点上方"快刷（黑白）"切换，看每屏在 1-bit 下的样子。</dd></div><div class="gi"><dt>真实内容</dt><dd>应用名、菜单项、版本号、"SD 卡"都取自固件现状，不用示例词。</dd></div><div class="gi"><dt>一屏一主行动</dt><dd>首页"继续阅读"、空首页"开始传书"是唯一的墨底按钮，其他都是卡片、列表或次按钮。</dd></div></dl></section>
+<section class="shots"><figure class="shot" id="home"><div class="frame"><div class="dev" data-key="home"><div class="scr"><div class="sb"><span>09:41</span><span></span><span class="bat">93%<i class="batt"><i style="width:84%"></i></i></span></div>
+<header class="hhead">
+  <div><div class="disp">10月8日</div><div class="cap ink2">星期四 · 连续阅读 12 天</div>
+  <div class="body greet">Ricky，今天也读几页。</div></div>
+  <img class="avatar" src="data:image/png;base64,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" alt="">
+</header>
+<div class="peek"><img class="dog" src="data:image/png;base64,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" alt="">
+<section class="card cont">
+  <div class="cv cv-ink vert" style="width:160px;height:240px"><div class="cvt"><span>瓦</span><span>尔</span><span>登</span><span>湖</span></div><div class="cvf">EPUB</div></div>
+  <div class="cinfo">
+    <div class="cap ink2">正在读</div>
+    <div class="head">瓦尔登湖</div>
+    <div class="cap ink2">亨利·梭罗</div>
+    <div class="prog"><i style="width:62%"></i></div>
+    <div class="split cap"><span>第 9 章 · 62%</span><span class="ink2">约 2 小时</span></div>
+    <div class="btn primary">继续阅读</div>
+  </div>
+</section></div>
+<div class="g2 stats">
+  <section class="card stat"><div class="cap ink2">今日阅读</div>
+    <div class="num"><b>32</b><span class="cap">分钟</span></div>
+    <div class="prog sm"><i style="width:71%"></i></div><div class="cap ink2">目标 45 分钟</div></section>
+  <section class="card stat"><div class="cap ink2">连续阅读</div>
+    <div class="num"><b>12</b><span class="cap">天</span></div>
+    <div class="spark"><i style="height:10px"></i><i style="height:18px"></i><i style="height:8px"></i><i style="height:22px"></i><i style="height:16px"></i><i style="height:26px"></i><i style="height:32px"></i></div>
+    <div class="cap ink2">近 7 天</div></section>
+</div>
+<div class="sechd"><span class="head">最近翻过</span><span class="cap">全部 ›</span></div>
+<div class="recent">
+  <div class="rb"><div class="cv cv-paper" style="width:136px;height:204px"><div class="cvt">小王子</div><div class="cvf">EPUB</div></div><div class="cap one">小王子</div><div class="cap ink2">EPUB · 88%</div></div>
+  <div class="rb"><div class="cv cv-ink" style="width:136px;height:204px"><div class="cvt">浮生六记</div><div class="cvf">EPUB</div></div><div class="cap one">浮生六记</div><div class="cap ink2">EPUB · 48%</div></div>
+  <div class="rb"><div class="cv cv-band" style="width:136px;height:204px"><div class="cvt">人间词话</div><div class="cvf">TXT</div></div><div class="cap one">人间词话</div><div class="cap ink2">TXT · 24%</div></div>
+  <div class="rb"><div class="cv cv-frame" style="width:136px;height:204px"><div class="cvt">诗经</div><div class="cvf">EPUB</div></div><div class="cap one">诗经</div><div class="cap ink2">EPUB · 未读</div></div>
+</div>
+<div class="motto cap ink2">慢一点，读几页。</div>
+<nav class="tabbar"><div class="tab on"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg></span><span class="tl">首页</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14" />
+  <path d="M12 6v14" />
+  <path d="M8 8v12" />
+  <path d="M4 4v16" /></svg></span><span class="tl">书库</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="14" rx="1" />
+  <rect width="7" height="7" x="3" y="14" rx="1" /></svg></span><span class="tl">应用</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg></span><span class="tl">存储</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5H3" />
+  <path d="M12 19H3" />
+  <path d="M14 3v4" />
+  <path d="M16 17v4" />
+  <path d="M21 12h-9" />
+  <path d="M21 19h-5" />
+  <path d="M21 5h-7" />
+  <path d="M8 10v4" />
+  <path d="M8 12H3" /></svg></span><span class="tl">设置</span></div></nav></div></div></div><figcaption><h3>首页</h3><ul><li>统计卡把"目标 45 分钟"做成小进度条加一行字，一眼能看出完成了多少；目标在阅读统计设置里改。</li><li>连续阅读卡的柱状图标明"近 7 天"，不让图形自己猜。</li><li>最近翻过一排 4 本靠左排，比老师稿多一本；元信息只写"格式 · 进度"，字号不小于 21 px。</li><li>座右铭和次要文字一律用深灰（ink-2），不用中灰，快刷时也看得清。</li><li>主按钮用 12 圆角，和规范的按钮配方一致；全屏只有它一个墨底按钮。</li></ul></figcaption></figure><figure class="shot" id="library"><div class="frame"><div class="dev" data-key="library"><div class="scr"><div class="sb"><span>09:41</span><span></span><span class="bat">93%<i class="batt"><i style="width:84%"></i></i></span></div><header class="phead"><span class="title">书库</span><span class="cap ink2">6 本</span></header>
+<div class="chips"><span class="chip on">全部</span><span class="chip">在读</span><span class="chip">未读</span>
+<span class="ibtn"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5H3" />
+  <path d="M12 19H3" />
+  <path d="M14 3v4" />
+  <path d="M16 17v4" />
+  <path d="M21 12h-9" />
+  <path d="M21 19h-5" />
+  <path d="M21 5h-7" />
+  <path d="M8 10v4" />
+  <path d="M8 12H3" /></svg></span></div><div class="g3 grid"><div class="gb"><div class="cv cv-ink vert" style="width:188px;height:282px"><div class="cvt"><span>瓦</span><span>尔</span><span>登</span><span>湖</span></div><div class="cvf">EPUB</div></div><div class="cap one strong">瓦尔登湖</div><div class="cap ink2">EPUB · 62%</div></div><div class="gb plate"><div class="cv cv-paper vert" style="width:188px;height:282px"><div class="cvt"><span>小</span><span>王</span><span>子</span></div><div class="cvf">EPUB</div></div><div class="cap one strong">小王子</div><div class="cap ink2">EPUB · 88%</div></div><div class="gb"><div class="cv cv-ink vert" style="width:188px;height:282px"><div class="cvt"><span>浮</span><span>生</span><span>六</span><span>记</span></div><div class="cvf">EPUB</div></div><div class="cap one strong">浮生六记</div><div class="cap ink2">EPUB · 48%</div></div><div class="gb"><div class="cv cv-band" style="width:188px;height:282px"><div class="cvt">人间词话</div><div class="cvf">TXT</div></div><div class="cap one strong">人间词话</div><div class="cap ink2">TXT · 24%</div></div><div class="gb"><div class="cv cv-frame" style="width:188px;height:282px"><div class="cvt">诗经</div><div class="cvf">EPUB</div></div><div class="cap one strong">诗经</div><div class="cap ink2">EPUB · 未读</div></div><div class="gb"><div class="cv cv-tint" style="width:188px;height:282px"><div class="cvt">阅读与生活</div><div class="cvf">EPUB</div></div><div class="cap one strong">阅读与生活</div><div class="cap ink2">EPUB · 12%</div></div></div><nav class="tabbar"><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg></span><span class="tl">首页</span></div><div class="tab on"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14" />
+  <path d="M12 6v14" />
+  <path d="M8 8v12" />
+  <path d="M4 4v16" /></svg></span><span class="tl">书库</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="14" rx="1" />
+  <rect width="7" height="7" x="3" y="14" rx="1" /></svg></span><span class="tl">应用</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg></span><span class="tl">存储</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5H3" />
+  <path d="M12 19H3" />
+  <path d="M14 3v4" />
+  <path d="M16 17v4" />
+  <path d="M21 12h-9" />
+  <path d="M21 19h-5" />
+  <path d="M21 5h-7" />
+  <path d="M8 10v4" />
+  <path d="M8 12H3" /></svg></span><span class="tl">设置</span></div></nav></div></div></div><figcaption><h3>书库</h3><ul><li>三栏网格不变；焦点封面放在墨色托盘上，书名和进度跟着反白。</li><li>无封面的书用 6 种生成模板之一（墨底竖排、纸底竖排、底部墨条、细框、浅灰底），按书名固定。</li><li>筛选图标按钮的点按区补足 88 px。</li></ul></figcaption></figure><figure class="shot" id="reader"><div class="frame"><div class="dev" data-key="reader"><div class="scr"><div class="sb"><span>09:41</span><span class="ink2">瓦尔登湖 · 第 9 章</span><span class="bat">93%<i class="batt"><i style="width:84%"></i></i></span></div><article class="page">
+<p>我步入丛林，因为我希望生活得有意义，我希望活得深刻，汲取生命中所有的精华，把非生命的一切都击溃，以免当我生命终结时，发现自己从来没有活过。</p>
+<p>大部分人，即使是在这个比较自由的国度里，也仅仅由于无知和错误，满载着虚构的忧虑，忙不完的粗活，却不能采集生命的美果。</p>
+<p>其实，人不必如此劳碌。他只需付出与收获相当的劳动。何必为了生活，把自己弄成一架机器？</p>
+<p>简化，再简化。一天只做两三件事，而不是上百件。算账简化了，人生也简化了。</p>
+<p>（以下为示意文字）清晨的湖面最安静，风还没有起来，岸边的树影一动不动。走到水边坐一会儿，什么也不想，只是看着光一点点亮起来。</p>
+</article>
+<footer class="rfoot"><div class="prog"><i style="width:62%"></i></div>
+<div class="split cap ink2"><span>128 / 206</span><span>62%</span></div></footer></div></div></div><figcaption><h3>阅读</h3><ul><li>顶栏和页脚安静，只留时间、书名章节、电量和进度。</li><li>正文用用户选的阅读字体（这里用思源宋体示意），不出现小狗。</li></ul></figcaption></figure><figure class="shot" id="menu"><div class="frame"><div class="dev" data-key="menu"><div class="scr"><div class="sb"><span>09:41</span><span></span><span class="bat">93%<i class="batt"><i style="width:84%"></i></i></span></div><header class="subhead"><span class="back"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg></span>
+<span class="head">瓦尔登湖</span><span class="ibtn right"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg></span></header>
+<div class="cap ink2 subcap">第 9 章 · 128 / 206 · 62%</div>
+<div class="g4 quick">
+  <div class="qt sel"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h.01" />
+  <path d="M3 12h.01" />
+  <path d="M3 19h.01" />
+  <path d="M8 5h13" />
+  <path d="M8 12h13" />
+  <path d="M8 19h13" /></svg><span class="cap">目录</span></div>
+  <div class="qt"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v6" />
+  <path d="M15 10H9" />
+  <path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z" /></svg><span class="cap">加书签</span></div>
+  <div class="qt"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 16 2.536-7.328a1.02 1.02 1 0 1 1.928 0L22 16" />
+  <path d="M15.697 14h5.606" />
+  <path d="m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16" />
+  <path d="M3.304 13h6.392" /></svg><span class="cap">文字</span></div>
+  <div class="qt"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+  <path d="m8 13 4-7 4 7" />
+  <path d="M9.1 11h5.7" /></svg><span class="cap">查词</span></div>
+</div>
+<div class="list">
+<div class="row"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" /></svg></span><span class="rtext"><span class="rmain">夜间模式</span></span><span class="tog"><i></i></span></div>
+<div class="row"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+  <path d="M21 3v5h-5" /></svg></span><span class="rtext"><span class="rmain">阅读方向</span></span><span class="rval">竖屏</span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+<div class="row"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="10" x2="14" y1="2" y2="2" />
+  <line x1="12" x2="15" y1="14" y2="11" />
+  <circle cx="12" cy="14" r="8" /></svg></span><span class="rtext"><span class="rmain">自动翻页</span></span><span class="rval">关</span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+<div class="row"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" x2="5" y1="5" y2="19" />
+  <circle cx="6.5" cy="6.5" r="2.5" />
+  <circle cx="17.5" cy="17.5" r="2.5" /></svg></span><span class="rtext"><span class="rmain">跳转到进度</span></span><span class="rval">62%</span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+<div class="row"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z" /></svg></span><span class="rtext"><span class="rmain">书签</span></span><span class="rval">3 个</span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+<div class="row"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+  <path d="M21 3v5h-5" />
+  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+  <path d="M8 16H3v5" /></svg></span><span class="rtext"><span class="rmain">同步进度</span></span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+<div class="row"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5h13" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="M3 10a2 2 0 0 0 2 2h3" />
+  <path d="M3 5v12a2 2 0 0 0 2 2h3" /></svg></span><span class="rtext"><span class="rmain">更多</span></span><span class="rval">截屏、二维码、缓存</span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+</div></div></div></div><figcaption><h3>阅读菜单</h3><ul><li>固件现在的菜单有 15 项，"文字设置"排在最后。改成上面 4 个常用的大按钮：目录、加书签、文字、查词。</li><li>夜间模式是开关，用开关控件，不用方框勾选。</li><li>截屏、二维码、删除图书缓存这类少用的收进"更多"；删除缓存只在里面出现，并要确认。</li><li>右上角的房子图标是回首页，给手势一个看得见的替代。</li></ul></figcaption></figure><figure class="shot" id="settings"><div class="frame"><div class="dev" data-key="settings"><div class="scr"><div class="sb"><span>09:41</span><span></span><span class="bat">93%<i class="batt"><i style="width:84%"></i></i></span></div><header class="phead"><span class="title">设置</span></header>
+<section class="card prof"><img class="avatar sm" src="data:image/png;base64,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" alt="">
+<div class="ptext"><div class="head">Ricky</div><div class="cap ink2">头像、昵称和给自己的话</div></div><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></section>
+<div class="g2 cards">
+  <div class="scard sel"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
+  <line x1="12" x2="12.01" y1="18" y2="18" /></svg><span class="head">显示与待机</span></div>
+  <div class="scard"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14" />
+  <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" /></svg><span class="head">阅读</span></div>
+  <div class="scard"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h.01" />
+  <path d="M2 8.82a15 15 0 0 1 20 0" />
+  <path d="M5 12.859a10 10 0 0 1 14 0" />
+  <path d="M8.5 16.429a5 5 0 0 1 7 0" /></svg><span class="head">网络与同步</span></div>
+  <div class="scard"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v16" />
+  <path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2" />
+  <path d="M9 20h6" /></svg><span class="head">字体管理</span></div>
+  <div class="scard"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg><span class="head">书库与文件</span></div>
+  <div class="scard"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+  <circle cx="12" cy="12" r="3" /></svg><span class="head">系统</span></div>
+</div>
+<div class="list tight"><div class="row"><span class="rtext"><span class="rmain">关于本机</span></span><span class="rval">RickyOS 1.2.0</span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div><div class="row"><span class="rtext"><span class="rmain">帮助与反馈</span></span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div></div>
+<nav class="tabbar"><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg></span><span class="tl">首页</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14" />
+  <path d="M12 6v14" />
+  <path d="M8 8v12" />
+  <path d="M4 4v16" /></svg></span><span class="tl">书库</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="14" rx="1" />
+  <rect width="7" height="7" x="3" y="14" rx="1" /></svg></span><span class="tl">应用</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg></span><span class="tl">存储</span></div><div class="tab on"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5H3" />
+  <path d="M12 19H3" />
+  <path d="M14 3v4" />
+  <path d="M16 17v4" />
+  <path d="M21 12h-9" />
+  <path d="M21 19h-5" />
+  <path d="M21 5h-7" />
+  <path d="M8 10v4" />
+  <path d="M8 12H3" /></svg></span><span class="tl">设置</span></div></nav></div></div></div><figcaption><h3>设置</h3><ul><li>资料卡说明改成"头像、昵称和给自己的话"，座右铭就在这里改。</li><li>关于本机显示真实版本号 RickyOS 1.2.0（老师稿里的 27.10 是示例）。</li><li>2×3 设置卡选中整卡反白，每张卡只做一件事。</li></ul></figcaption></figure><figure class="shot" id="apps"><div class="frame"><div class="dev" data-key="apps"><div class="scr"><div class="sb"><span>09:41</span><span></span><span class="bat">93%<i class="batt"><i style="width:84%"></i></i></span></div><header class="phead"><span class="title">应用</span></header><div class="g3 apps"><div class="app sel"><span class="tile"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 16-4 4-4-4" />
+  <path d="M17 20V4" />
+  <path d="m3 8 4-4 4 4" />
+  <path d="M7 4v16" /></svg></span><span class="cap">文件传输</span></div><div class="app"><span class="tile"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14" />
+  <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" /></svg></span><span class="cap">微信读书</span></div><div class="app"><span class="tile"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16" />
+  <path d="M18 17V9" />
+  <path d="M13 17V5" />
+  <path d="M8 17v-3" /></svg></span><span class="cap">阅读统计</span></div><div class="app"><span class="tile"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2" />
+  <path d="M3 9h18" />
+  <path d="M3 15h18" />
+  <path d="M9 3v18" />
+  <path d="M15 3v18" /></svg></span><span class="cap">五子棋</span></div><div class="app"><span class="tile"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2" />
+  <line x1="8" x2="16" y1="6" y2="6" />
+  <line x1="16" x2="16" y1="14" y2="18" />
+  <path d="M16 10h.01" />
+  <path d="M12 10h.01" />
+  <path d="M8 10h.01" />
+  <path d="M12 14h.01" />
+  <path d="M8 14h.01" />
+  <path d="M12 18h.01" />
+  <path d="M8 18h.01" /></svg></span><span class="cap">计算器</span></div><div class="app"><span class="tile"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" /></svg></span><span class="cap">屏保</span></div></div><nav class="tabbar"><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg></span><span class="tl">首页</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14" />
+  <path d="M12 6v14" />
+  <path d="M8 8v12" />
+  <path d="M4 4v16" /></svg></span><span class="tl">书库</span></div><div class="tab on"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="14" rx="1" />
+  <rect width="7" height="7" x="3" y="14" rx="1" /></svg></span><span class="tl">应用</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg></span><span class="tl">存储</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5H3" />
+  <path d="M12 19H3" />
+  <path d="M14 3v4" />
+  <path d="M16 17v4" />
+  <path d="M21 12h-9" />
+  <path d="M21 19h-5" />
+  <path d="M21 5h-7" />
+  <path d="M8 10v4" />
+  <path d="M8 12H3" /></svg></span><span class="tl">设置</span></div></nav></div></div></div><figcaption><h3>应用</h3><ul><li>应用名用固件里的真实名称："待机显示"改为"屏保"（1.1.3 已定）。</li><li>瓷砖 2 px 描边、12 圆角、纸底；选中时连同名字一起反白。</li></ul></figcaption></figure><figure class="shot" id="storage"><div class="frame"><div class="dev" data-key="storage"><div class="scr"><div class="sb"><span>09:41</span><span></span><span class="bat">93%<i class="batt"><i style="width:84%"></i></i></span></div><header class="phead"><span class="title">存储</span><span class="ibtn txt"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+  <path d="M21 3v5h-5" />
+  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+  <path d="M8 16H3v5" /></svg><span class="cap">刷新</span></span></header>
+<section class="card cap-card"><div class="ring"><svg viewBox="0 0 88 88" width="88" height="88"><circle cx="44" cy="44" r="38" fill="none" stroke="var(--ink)" stroke-width="2"/><circle cx="44" cy="44" r="38" fill="none" stroke="var(--ink)" stroke-width="8" stroke-dasharray="16.7 238.8" transform="rotate(-90 44 44)" stroke-linecap="round"/></svg><span class="cap">7%</span></div>
+<div class="ptext"><div class="head">SD 卡</div><div class="cap ink2">可用 117 GB，共 126 GB</div></div><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></section>
+<div class="g2 cards">
+  <div class="scard sel"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14" />
+  <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" /></svg><span class="split"><span class="head">书籍</span><span class="cap">6</span></span></div>
+  <div class="scard"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v16" />
+  <path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2" />
+  <path d="M9 20h6" /></svg><span class="split"><span class="head">字体</span><span class="cap">2</span></span></div>
+  <div class="scard"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+  <circle cx="9" cy="9" r="2" />
+  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></svg><span class="split"><span class="head">图片</span><span class="cap">0</span></span></div>
+  <div class="scard"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3" />
+  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+  <path d="m7 10 5 5 5-5" /></svg><span class="split"><span class="head">下载</span><span class="cap">1</span></span></div>
+</div>
+<div class="list tight"><div class="row"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg></span><span class="rtext"><span class="rmain">浏览全部文件</span></span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div></div>
+<nav class="tabbar"><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg></span><span class="tl">首页</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14" />
+  <path d="M12 6v14" />
+  <path d="M8 8v12" />
+  <path d="M4 4v16" /></svg></span><span class="tl">书库</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="14" rx="1" />
+  <rect width="7" height="7" x="3" y="14" rx="1" /></svg></span><span class="tl">应用</span></div><div class="tab on"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg></span><span class="tl">存储</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5H3" />
+  <path d="M12 19H3" />
+  <path d="M14 3v4" />
+  <path d="M16 17v4" />
+  <path d="M21 12h-9" />
+  <path d="M21 19h-5" />
+  <path d="M21 5h-7" />
+  <path d="M8 10v4" />
+  <path d="M8 12H3" /></svg></span><span class="tl">设置</span></div></nav></div></div></div><figcaption><h3>存储</h3><ul><li>容量卡标题用"SD 卡"，不叫"本机存储"：书和文件都在卡上。</li><li>底部加"浏览全部文件"入口，进入文件页；分类卡只是快捷入口。</li></ul></figcaption></figure><figure class="shot" id="files"><div class="frame"><div class="dev" data-key="files"><div class="scr"><div class="sb"><span>09:41</span><span></span><span class="bat">93%<i class="batt"><i style="width:84%"></i></i></span></div><header class="subhead"><span class="back"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg></span>
+<span class="head">SD 卡</span></header><div class="cap ink2 subcap">/</div>
+<div class="list">
+<div class="row sel two"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg></span><span class="rtext"><span class="rmain">books</span><span class="rsub">文件夹 · 6 项</span></span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+<div class="row two"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg></span><span class="rtext"><span class="rmain">downloads</span><span class="rsub">文件夹 · 1 项</span></span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+<div class="row two"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg></span><span class="rtext"><span class="rmain">fonts</span><span class="rsub">文件夹 · 2 项</span></span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+<div class="row two"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg></span><span class="rtext"><span class="rmain">images</span><span class="rsub">文件夹 · 空</span></span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+<div class="row two"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" /></svg></span><span class="rtext"><span class="rmain">瓦尔登湖.epub</span><span class="rsub">EPUB · 1.2 MB</span></span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+<div class="row two"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" /></svg></span><span class="rtext"><span class="rmain">一本名字特别长的…（第三版）.epub</span><span class="rsub">EPUB · 3.4 MB</span></span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+<div class="row two"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+  <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+  <path d="M10 9H8" />
+  <path d="M16 13H8" />
+  <path d="M16 17H8" /></svg></span><span class="rtext"><span class="rmain">readme.txt</span><span class="rsub">TXT · 2 KB</span></span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+</div></div></div></div><figcaption><h3>文件</h3><ul><li>双行列表：名字 + "类型 · 大小"。文件夹写"文件夹 · N 项"，不写"目录"。</li><li>长文件名中间省略，保留开头和扩展名。</li></ul></figcaption></figure><figure class="shot" id="empty"><div class="frame"><div class="dev" data-key="empty"><div class="scr"><div class="sb"><span>09:41</span><span></span><span class="bat">93%<i class="batt"><i style="width:84%"></i></i></span></div>
+<header class="hhead">
+  <div><div class="disp">10月8日</div><div class="cap ink2">星期四</div>
+  <div class="body greet">Ricky，先放一本书进来。</div></div>
+  <img class="avatar" src="data:image/png;base64,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" alt="">
+</header>
+<div class="peek"><img class="dog" src="data:image/png;base64,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" alt="">
+<section class="card emptyc">
+  <div class="drop"><svg class="ic" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.714" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" />
+  <path d="M12 5v14" /></svg></div>
+  <div class="einfo"><div class="head">放进第一本书</div><div class="body ink2">书库还是空的。</div>
+  <div class="btn primary">开始传书</div></div>
+</section></div>
+<div class="sechd"><span class="head">可以这样传书</span></div>
+<div class="list tight">
+<div class="row"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" /></svg></span><span class="rtext"><span class="rmain">浏览器传书</span></span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+<div class="row"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v.5" />
+  <path d="M12 10v4h4" />
+  <path d="m12 14 1.535-1.605a5 5 0 0 1 8 1.5" />
+  <path d="M22 22v-4h-4" />
+  <path d="m22 18-1.535 1.605a5 5 0 0 1-8-1.5" /></svg></span><span class="rtext"><span class="rmain">WebDAV / Calibre</span></span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+<div class="row"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9" />
+  <path d="M7.8 4.7a6.14 6.14 0 0 0-.8 7.5" />
+  <circle cx="12" cy="9" r="2" />
+  <path d="M16.2 4.8c2 2 2.26 5.11.8 7.47" />
+  <path d="M19.1 1.9a9.96 9.96 0 0 1 0 14.1" />
+  <path d="M9.5 18h5" />
+  <path d="m8 22 4-11 4 11" /></svg></span><span class="rtext"><span class="rmain">创建热点</span></span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+<div class="row"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg></span><span class="rtext"><span class="rmain">SD 卡 /books</span></span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+<div class="row"><span class="rlead"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.250" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14" />
+  <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" /></svg></span><span class="rtext"><span class="rmain">微信读书</span></span><span class="chev"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.000" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></span></div>
+</div><nav class="tabbar"><div class="tab on"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg></span><span class="tl">首页</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14" />
+  <path d="M12 6v14" />
+  <path d="M8 8v12" />
+  <path d="M4 4v16" /></svg></span><span class="tl">书库</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="14" rx="1" />
+  <rect width="7" height="7" x="3" y="14" rx="1" /></svg></span><span class="tl">应用</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg></span><span class="tl">存储</span></div><div class="tab"><span class="pill"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5H3" />
+  <path d="M12 19H3" />
+  <path d="M14 3v4" />
+  <path d="M16 17v4" />
+  <path d="M21 12h-9" />
+  <path d="M21 19h-5" />
+  <path d="M21 5h-7" />
+  <path d="M8 10v4" />
+  <path d="M8 12H3" /></svg></span><span class="tl">设置</span></div></nav></div></div></div><figcaption><h3>空首页</h3><ul><li>放书占位从中灰虚线框改成 2 px 墨线框加号：老师稿里这个框在快刷时整个消失了。</li><li>传书方式只写方法名，一行一个，点按区 96 px；"TF 卡"改为"SD 卡"。</li><li>空状态只有一个主按钮"开始传书"。</li></ul></figcaption></figure><figure class="shot" id="poweroff"><div class="frame"><div class="dev" data-key="poweroff"><div class="scr"><div class="off"><img class="avatar xl" src="data:image/png;base64,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" alt="">
+<div class="title">RickyOS</div><div class="body ink2">阅读，自有节奏。</div></div>
+<div class="offcap cap">已关机 · 长按侧键开机</div></div></div></div><figcaption><h3>关机画面</h3><ul><li>老师稿叫"休眠"、写"按电源键唤醒"。固件里待机和关机是两件事：待机画面由屏保设置决定，这一屏是关机后留在屏上的画面。</li><li>底部写"已关机 · 长按侧键开机"，和 1.1.3 的关机提示一致。</li><li>不出现探头小狗。</li></ul></figcaption></figure></section>
+<footer class="foot">规范原文：仓库 docs/design-system.md（第 15 节为交互与文案准则）；数值：src/components/RickyDesignTokens.h。</footer>
+</main>
+<dialog id="zoom"><button type="button" class="close" id="zclose">关闭</button><div class="zbox" id="zbox"></div></dialog>
+<script>(function () {
+  const W = 684, H = 1216;
+  function fit() {
+    document.querySelectorAll('.shots .dev').forEach(function (dev) {
+      const s = dev.clientWidth / W;
+      dev.firstElementChild.style.transform = 'scale(' + s + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  fit();
+
+  const rest = document.getElementById('m-rest');
+  const bw = document.getElementById('m-bw');
+  function setMode(oneBit) {
+    document.body.classList.toggle('bw', oneBit);
+    rest.classList.toggle('on', !oneBit); rest.setAttribute('aria-pressed', String(!oneBit));
+    bw.classList.toggle('on', oneBit); bw.setAttribute('aria-pressed', String(oneBit));
+  }
+  rest.addEventListener('click', function () { setMode(false); });
+  bw.addEventListener('click', function () { setMode(true); });
+
+  const dlg = document.getElementById('zoom');
+  const box = document.getElementById('zbox');
+  function open(dev) {
+    const scr = dev.firstElementChild.cloneNode(true);
+    const s = Math.min((window.innerHeight - 48) / H, (window.innerWidth - 32) / W, 1);
+    scr.style.transform = 'scale(' + s + ')';
+    box.style.width = Math.round(W * s) + 'px';
+    box.style.height = Math.round(H * s) + 'px';
+    box.replaceChildren(scr);
+    if (dlg.showModal) dlg.showModal();
+  }
+  document.querySelectorAll('.shots .dev').forEach(function (dev) {
+    dev.tabIndex = 0;
+    dev.setAttribute('role', 'button');
+    dev.setAttribute('aria-label', '放大查看');
+    dev.addEventListener('click', function () { open(dev); });
+    dev.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(dev); } });
+  });
+  document.getElementById('zclose').addEventListener('click', function () { dlg.close(); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+})();
+</script>

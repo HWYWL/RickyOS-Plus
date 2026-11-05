@@ -1,0 +1,25 @@
+{
+  "file": "RickyOS-1.2.0-plus-radio-power.bin",
+  "bytes": 4894112,
+  "sha256": "ef531b75f8ac9df666dede48ecea09c70552cb93434f7402533dbdb0e41c9181",
+  "elf_sha256": "7d4db434361378b33e6326602816b7576344036055c5a6a59fb3b93db3d274d1",
+  "idf_commit": "9a97f6c5",
+  "diagnostic": true,
+  "radio_power": true,
+  "auto_join_visible_saved": true,
+  "dns_bypassed": true,
+  "fixed_peer": "36.248.13.174:443",
+  "currently_installed": false,
+  "phases": [
+    "power-default",
+    "power-same-explicit",
+    "power-cap13",
+    "power-cap5",
+    "power-original-repeat"
+  ],
+  "tcp_probes_per_phase": 2,
+  "tcp_budget_ms": 15000,
+  "join_budget_ms": 35000,
+  "tx_aggregation_default": true,
+  "fixed_rate_enabled": false
+}

@@ -1,0 +1,29 @@
+{
+  "schema": "plus-network-speed/1",
+  "network_context": "WPA3-only Mac AP, 2.4 GHz ch11, iPhone USB upstream",
+  "samples": 12,
+  "small_index_bytes": 9024,
+  "small_index_transfer_median_ms": 816.0,
+  "small_index_transfer_min_ms": 705,
+  "small_index_transfer_max_ms": 5213,
+  "full_font_downloads": [
+    {
+      "bytes": 1763452,
+      "ms": 8949,
+      "KiB_per_second": 192.4,
+      "crc_match": true
+    },
+    {
+      "bytes": 1763452,
+      "ms": 10833,
+      "KiB_per_second": 159.0,
+      "crc_match": true
+    }
+  ],
+  "bootstrap_join_ms": 3915,
+  "reconnect_median_ms": 4416.0,
+  "includes_radio_restart_for_joins": true,
+  "sustained_link_limit_measured": false,
+  "paired_WPA2_WPA3_speed_comparison": false,
+  "weread_authenticated_test_passed": false
+}

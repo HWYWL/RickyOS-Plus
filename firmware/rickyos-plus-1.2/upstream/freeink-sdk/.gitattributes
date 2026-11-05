@@ -1,0 +1,5 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Unified diff context lines require their leading space.
+libs/font/FreeInkFont/third_party/freetype/src/gzip/patches/freetype-zlib.diff whitespace=-blank-at-eol

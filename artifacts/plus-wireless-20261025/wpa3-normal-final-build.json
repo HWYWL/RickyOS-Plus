@@ -1,0 +1,16 @@
+{
+  "schema": "plus-wpa3-build/1",
+  "version": "1.2.7-wpa3",
+  "bytes": 5038496,
+  "sha256": "0d9c20d56b47ff6bded1df96bd40d9918cdeaa623568db047dc010d005d56d08",
+  "elf_sha256": "5a5d767677acaf1b6fc152d194e7d2596da90251f34a16b989445504d2f2df03",
+  "idf_commit": "9a97f6c54ec638111ce55cd36581b3c192f15207",
+  "diagnostic": false,
+  "private_test_profile_absent": true,
+  "unattended_test_symbols_absent": true,
+  "private_ap_name_and_tag_absent": true,
+  "security_adapter_linked": true,
+  "device_flashed": false,
+  "published": false,
+  "kind": "application image, not a full installer"
+}

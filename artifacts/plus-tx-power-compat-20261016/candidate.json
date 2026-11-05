@@ -1,0 +1,20 @@
+{
+  "file": "RickyOS-1.2.0-plus-tx-power-compat.bin",
+  "bytes": 4886912,
+  "sha256": "9287f68b978ee5c7ed84eee7cceb2324467722404024e16c99fd91744d7aad9b",
+  "elf_sha256": "b1006c9377586f49bc648ad9bebbde557c5202033fe6425b9de2690cb4fa4f86",
+  "idf_commit": "9a97f6c5",
+  "diagnostic": false,
+  "tx_power_compat": true,
+  "active_owner_max_quarter_dbm": 20,
+  "restore_previous_power_on_last_owner": true,
+  "dns_bypassed": false,
+  "currently_installed": true,
+  "build_log": "logs/plus-tx-power-compat-build-20261016.log",
+  "boot_verified": true,
+  "boot_log": "logs/plus-tx-power-compat-boot-20261016.log",
+  "installed_on": "2026-10-16",
+  "real_functional_acceptance_record": "artifacts/plus-tx-power-acceptance-20261016/results.json",
+  "network_stability_verified": false,
+  "scope": "Current saved AP, SD mounted, normal DNS; full-font file CRC and native SNTP. Far range/other AP not tested."
+}

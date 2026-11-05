@@ -1,0 +1,13 @@
+[83455] [INF] [ACCEPT] name=weread joined=1 route=1 join_ms=7153 rssi=-55
+[84492] [INF] [TLS] DNS result=1 for weread.qq.com -> 124.223.147.161 (v4) in 1030 ms
+[88508] [INF] [TLS] TCP result=0 for weread.qq.com:443 at 5046 ms
+[99391] [INF] [ACCEPT] name=weread round=1 event=1 error=0 ms=15934 ok=1 power_before=80 power_after=80
+[107549] [INF] [ACCEPT] name=weread joined=1 route=1 join_ms=8158 rssi=-55
+[107558] [INF] [TLS] DNS result=1 for weread.qq.com -> 124.223.147.161 (v4) in 1 ms
+[111581] [INF] [TLS] TCP result=0 for weread.qq.com:443 at 4024 ms
+[124222] [INF] [ACCEPT] name=weread round=2 event=1 error=0 ms=16671 ok=1 power_before=80 power_after=80
+[130486] [INF] [ACCEPT] name=weread joined=1 route=1 join_ms=6263 rssi=-55
+[130494] [INF] [TLS] DNS result=1 for weread.qq.com -> 124.223.147.161 (v4) in 1 ms
+[134513] [INF] [TLS] TCP result=0 for weread.qq.com:443 at 4020 ms
+[151816] [INF] [ACCEPT] name=weread round=3 event=1 error=0 ms=21329 ok=1 power_before=80 power_after=80
+[151816] [INF] [ACCEPT] weread_passed=3 expected=3

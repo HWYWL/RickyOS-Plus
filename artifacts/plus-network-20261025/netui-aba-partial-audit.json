@@ -1,0 +1,10 @@
+{
+  "report": "netui-aba-partial.json",
+  "usable_as_normal_ui_regression_evidence": false,
+  "reason": "Automatic runner could overwrite a pending pop with the next push while the render mutex was still held; prior font Activities accumulated on its stack.",
+  "observed_driver_errors_retained": true,
+  "original_manual_failure_evidence_still_valid": true,
+  "product_memory_leak_established": false,
+  "copy_tx_causal_conclusion_supported": false,
+  "corrected_runner": "Drains pending transitions with a bounded wait, verifies return to Recent before each round; host mock now defers transitions like the real render lock."
+}

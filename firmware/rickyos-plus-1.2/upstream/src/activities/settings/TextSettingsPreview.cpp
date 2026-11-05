@@ -1,0 +1,171 @@
+#include "TextSettingsPreview.h"
+
+#include <EpdFontFamily.h>
+#include <Epub/ParsedText.h>
+#include <Epub/blocks/BlockStyle.h>
+#include <Epub/blocks/TextBlock.h>
+#include <FontCacheManager.h>
+#include <GfxRenderer.h>
+#include <I18n.h>
+
+#include <algorithm>
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <utility>
+
+#include "CrossPointSettings.h"
+#include "fontIds.h"
+#include "util/ReadingGuideLine.h"
+
+namespace textsettings {
+
+PreviewLayout::PreviewLayout() = default;
+PreviewLayout::~PreviewLayout() = default;
+
+namespace {
+
+// Map the paragraph-alignment setting to the engine's CssTextAlign (BOOK_STYLE = justified)
+CssTextAlign toCssAlign(uint8_t align) {
+  if (align == CrossPointSettings::BOOK_STYLE) return CssTextAlign::Justify;
+  return static_cast<CssTextAlign>(align);
+}
+
+// Lay the sample text out through the reader engine into layout.lines
+void relayout(PreviewLayout& layout, const GfxRenderer& renderer, int fontId, int textWidth, size_t maxLines) {
+  layout.lines.clear();
+  if (layout.lines.capacity() < maxLines) layout.lines.reserve(maxLines);
+
+  BlockStyle style;
+  style.alignment = toCssAlign(SETTINGS.paragraphAlignment);
+  style.textAlignDefined = true;  // honor the user's choice; RTL auto-detected from text
+
+  ParsedText parsed(SETTINGS.extraParagraphSpacing, SETTINGS.firstLineIndent, SETTINGS.hyphenationEnabled != 0,
+                    SETTINGS.focusReadingEnabled != 0, style, false, SETTINGS.paragraphIndentSpaces);
+
+  // Feed one space-separated word at a time; addWord handles NFC/CJK/RTL/focus splitting
+  const char* text = I18N.get(StrId::STR_FONT_PREVIEW_TEXT);
+  std::string word;
+  word.reserve(strlen(text));
+  bool firstWord = true;
+  for (const char* p = text;; p++) {
+    if (*p == ' ' || *p == '\0') {
+      if (!word.empty()) {
+        parsed.addWord(word, firstWord && SETTINGS.uiTheme == CrossPointSettings::INX ? EpdFontFamily::BOLD
+                                                                                      : EpdFontFamily::REGULAR);
+        firstWord = false;
+        word.clear();
+      }
+      if (*p == '\0') break;
+    } else {
+      word.push_back(*p);
+    }
+  }
+
+  if (!parsed.layoutAndExtractLines(
+          renderer, fontId, static_cast<uint16_t>(textWidth),
+          [&layout, maxLines](std::unique_ptr<TextBlock> line, uint32_t) {
+            if (layout.lines.size() < maxLines) layout.lines.push_back(std::move(line));
+            return true;
+          },
+          true, SETTINGS.getCharacterSpacing(), SETTINGS.wordSpacing)) {
+    layout.lines.clear();
+  }
+}
+
+}  // namespace
+
+void renderPreview(const GfxRenderer& renderer, PreviewLayout& layout, int previewPadding, int labelGap, int top,
+                   int height, const char* familyName, const char* sizeName) {
+  const int left = previewPadding;
+  const int width = renderer.getScreenWidth() - (previewPadding * 2);
+  if (width <= 0 || height <= 0) return;
+
+  const int labelH = renderer.getTextHeight(UI_10_FONT_ID);
+  const int labelReserved = labelH + labelGap + previewPadding;
+
+  char labelBuf[128];
+  snprintf(labelBuf, sizeof(labelBuf), "%s \"%s, %s\"", tr(STR_PREVIEW), familyName, sizeName);
+  const int labelY = top + height - previewPadding - labelH;
+  renderer.drawText(UI_10_FONT_ID, left, labelY, labelBuf);
+
+  const int fontId = SETTINGS.getReaderFontId();
+  if (fontId == 0) return;
+
+  const int lineH = renderer.getTextHeight(fontId);
+  if (lineH <= 0) return;
+
+  // The sample column takes the reader's own side margins, held to at least half the pane.
+  int marginLeft = SETTINGS.marginLeft, marginRight = SETTINGS.marginRight;
+  if (marginLeft + marginRight > width / 2) {
+    const int sum = marginLeft + marginRight;
+    marginLeft = marginLeft * (width / 2) / sum;
+    marginRight = width / 2 - marginLeft;
+  }
+  const int textLeft = left + marginLeft;
+  const int textWidth = width - marginLeft - marginRight;
+  if (textWidth <= 0) return;
+
+  const float compression = SETTINGS.getReaderLineCompression();
+  const int lineAdvance = std::max(1, renderer.getLineHeight(fontId, compression));
+  constexpr float EXTRA_PARAGRAPH_SPACING_FACTORS[] = {0.0f, 0.5f, 0.75f, 1.0f, 1.25f, 1.5f};
+  const float spacingFactor = SETTINGS.extraParagraphSpacing < std::size(EXTRA_PARAGRAPH_SPACING_FACTORS)
+                                  ? EXTRA_PARAGRAPH_SPACING_FACTORS[SETTINGS.extraParagraphSpacing]
+                                  : 0.0f;
+  const int paragraphGap = static_cast<int>(lineAdvance * spacingFactor);
+  const int textTop = top + previewPadding;
+  const int textBottomLimit = top + height - labelReserved;
+  const int textHeight = textBottomLimit - textTop;
+  if (textHeight < lineH) return;
+  const int maxLines = std::max(1, (textHeight - paragraphGap) / (2 * lineAdvance));
+
+  // Re-lay-out (and re-prewarm glyphs) only when a layout-affecting setting or the
+  // geometry changed; else reuse the cache. The prewarm inputs are (fontId, constant
+  // sample text, styleMask<-focusReading), all of which are key fields, so a matching
+  // key means an identical prewarm call. This relies on nothing else evicting the SD
+  // glyph cache while this activity is up — true today: the only evictor is
+  // FontCacheManager::PrewarmScope, used solely by the reader/dictionary activities.
+  const PreviewKey key{.fontId = fontId,
+                       .fontPointSize = SETTINGS.fontPointSize,
+                       .marginLeft = marginLeft,
+                       .textWidth = textWidth,
+                       .maxLines = maxLines,
+                       .lineCompression = compression,
+                       .alignment = SETTINGS.paragraphAlignment,
+                       .extraParagraphSpacing = SETTINGS.extraParagraphSpacing,
+                       .firstLineIndent = SETTINGS.firstLineIndent,
+                       .paragraphIndentSpaces = SETTINGS.paragraphIndentSpaces,
+                       .characterSpacing = SETTINGS.getCharacterSpacing(),
+                       .wordSpacingPercent = SETTINGS.wordSpacing,
+                       .focusReading = SETTINGS.focusReadingEnabled != 0,
+                       .hyphenation = SETTINGS.hyphenationEnabled != 0};
+  if (key != layout.key) {
+    if (auto* fcm = renderer.getFontCacheManager()) {
+      fcm->prewarmCache(fontId, I18N.get(StrId::STR_FONT_PREVIEW_TEXT),
+                        SETTINGS.uiTheme == CrossPointSettings::INX || SETTINGS.focusReadingEnabled ? 0x03 : 0x01);
+    }
+    relayout(layout, renderer, fontId, textWidth, static_cast<size_t>(maxLines));
+    layout.key = key;
+  }
+
+  // Draw the sample twice so the paragraph gap is visible
+  GfxRenderer::SyntheticBoldScope syntheticBold(renderer, SETTINGS.fakeBold);
+  int y = textTop;
+  const int guideRow = readingGuideLine::rowOffset(lineAdvance, renderer.getFontAscenderSize(fontId),
+                                                   readingGuideLine::emFor(renderer, fontId));
+  for (int paragraph = 0; paragraph < 2; paragraph++) {
+    for (const auto& line : layout.lines) {
+      if (y + lineH > textBottomLimit) return;
+      line->render(renderer, fontId, textLeft, y);
+      const int guideY = y + guideRow + SETTINGS.readingGuideLineOffset;
+      if (SETTINGS.readingGuideLineEnabled &&
+          readingGuideLine::fitsVertically(SETTINGS.readingGuideLineStyle, guideY, textTop, textBottomLimit)) {
+        readingGuideLine::draw(renderer, textLeft, guideY, textLeft + textWidth - 1, SETTINGS.readingGuideLineStyle);
+      }
+      y += lineAdvance;
+    }
+    y += paragraphGap;
+  }
+}
+
+}  // namespace textsettings

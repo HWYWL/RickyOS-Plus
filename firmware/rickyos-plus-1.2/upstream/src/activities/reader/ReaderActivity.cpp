@@ -1,0 +1,255 @@
+#include "ReaderActivity.h"
+
+#include <FontCacheManager.h>
+#include <FsHelpers.h>
+#include <HalStorage.h>
+#include <KOReaderDocumentId.h>
+#include <Memory.h>
+#include <TrustedTime.h>
+
+#include <algorithm>
+#include <cctype>
+#include <cstdio>
+
+#include "CrossPointSettings.h"
+#include "CrossPointState.h"
+#include "EpubReaderActivity.h"
+#include "ReaderUtils.h"
+#include "RecentBooksStore.h"
+#include "SdCardFontSystem.h"
+
+ReaderActivity::ReaderActivity(const char* name, GfxRenderer& renderer, MappedInputManager& mappedInput,
+                               std::string bookPath, const bool allowFastInitialRefresh)
+    : Activity(name, renderer, mappedInput), bookPath(std::move(bookPath)) {
+  if (allowFastInitialRefresh) {
+    const int refreshFrequency = SETTINGS.getRefreshFrequency();
+    pagesUntilFullRefresh = refreshFrequency > 1 ? refreshFrequency : 2;
+  }
+}
+
+std::unique_ptr<ReaderActivity> ReaderActivity::create(GfxRenderer& renderer, MappedInputManager& mappedInput,
+                                                       std::string path, const bool allowFastInitialRefresh) {
+  // ActivityManager requires heap ownership; each branch allocates exactly one screen-lifetime object.
+  std::unique_ptr<ReaderActivity> activity =
+      makeUniqueNoThrow<EpubReaderActivity>(renderer, mappedInput, std::move(path), allowFastInitialRefresh);
+
+  if (!activity) {
+    LOG_ERR("READER", "OOM: reader activity");
+  }
+  return activity;
+}
+
+void ReaderActivity::applyInitialOrientation() { ReaderUtils::applyOrientation(renderer, SETTINGS.orientation); }
+
+void ReaderActivity::disableFastInitialRefresh() { pagesUntilFullRefresh = 0; }
+
+void ReaderActivity::notePageTurn(const bool forward, const bool succeeded) {
+  RenderLock lock(*this);
+  readerSession.noteTurn(forward, succeeded);
+}
+
+void ReaderActivity::onEnter() {
+  Activity::onEnter();
+
+  // Heap ledger for field crash reports: free vs largest block distinguishes a
+  // leak (free falls) from fragmentation (free stable, largest collapses).
+  LOG_INF("MEM", "reader enter: free=%u max_block=%u", (unsigned)ESP.getFreeHeap(), (unsigned)ESP.getMaxAllocHeap());
+
+  if (!Storage.exists(bookPath.c_str())) {
+    LOG_ERR("READER", "File does not exist: %s", bookPath.c_str());
+    finish();
+    return;
+  }
+
+  // Clear remembered book after opening it
+  if (!APP_STATE.openEpubPath.empty()) {
+    APP_STATE.openEpubPath.clear();
+    APP_STATE.saveToFile();
+  }
+
+  sdFontSystem.ensureLoaded(renderer);
+  applyInitialOrientation();
+
+  if (!loadBook()) {
+    if (!handleLoadFailure()) finish();
+    return;
+  }
+
+  requestUpdate();
+}
+
+void ReaderActivity::rememberBookOnceRendered() {
+  if (bookRemembered || !pageRendered.load(std::memory_order_acquire)) return;
+  bookRemembered = true;
+  APP_STATE.openEpubPath = bookPath;
+  APP_STATE.saveToFile();
+  RECENT_BOOKS.addBook(bookPath, getBookTitle(), getBookAuthor(), getBookThumbBmpPath());
+}
+
+void ReaderActivity::onExit() {
+  Activity::onExit();
+
+#if !defined(BOARD_HAS_PSRAM) || FREEINK_DEVICE_METALIO_PLUS
+  // Keep rebuildable font buffers from pinning the heap between reading sessions.
+  if (auto* fontCache = renderer.getFontCacheManager()) {
+    fontCache->releaseSdFontCaches();
+  }
+#if FREEINK_DEVICE_METALIO_PLUS && CROSSPOINT_VECTOR_FONTS
+  // The next reading session can warm the released glyph arena again. Keep
+  // selected faces and their shared sources valid for UI missing-glyph fallback.
+  sdFontSystem.resetReaderWarmup();
+#endif
+#else
+  // With PSRAM the glyph arenas live there, and the memory manager's font sinks still
+  // shed them under pressure. Releasing them here made every reopened book rasterize
+  // each glyph again (FreeType from the SD card: seconds per page on device).
+#endif
+
+  LOG_INF("MEM", "reader exit: free=%u max_block=%u", (unsigned)ESP.getFreeHeap(), (unsigned)ESP.getMaxAllocHeap());
+
+  flushReaderSession();
+
+  renderer.setOrientation(GfxRenderer::Orientation::Portrait);
+  APP_STATE.readerActivityLoadCount = 0;
+  APP_STATE.saveToFile();
+
+  endOfBookOptions.reset();
+  endOfBookOptionsReady.store(false, std::memory_order_release);
+}
+
+void ReaderActivity::prepareForSleep() { flushReaderSession(); }
+
+void ReaderActivity::flushReaderSession() { readerSession.reset(); }
+
+bool ReaderActivity::handleBackNavigation() {
+  return ReaderUtils::handleBackNavigation(mappedInput, activityManager, bookPath.c_str(),
+                                           {this, [](void* ctx) { static_cast<ReaderActivity*>(ctx)->onGoHome(); }});
+}
+
+void ReaderActivity::clearEndOfBookOptionsIfNeeded() {
+  if (isAtEndOfBook() || !endOfBookOptionsReady.load(std::memory_order_acquire)) return;
+
+  RenderLock lock(*this);
+  endOfBookOptionsReady.store(false, std::memory_order_release);
+  endOfBookOptions.reset();
+}
+
+bool ReaderActivity::endOfBookMenuActive() const {
+  return isAtEndOfBook() && endOfBookOptionsReady.load(std::memory_order_acquire) && endOfBookOptions->menuActive();
+}
+
+bool ReaderActivity::handleEndOfBookMenu(const bool suppressConfirmRelease) {
+  if (suppressConfirmRelease || !endOfBookMenuActive()) {
+    return false;
+  }
+
+  std::string openPath;
+  switch (endOfBookOptions->handleMenuInput(mappedInput, &openPath)) {
+    case EndOfBookOptions::Action::OpenBook:
+      activityManager.goToReader(openPath);
+      return true;
+    case EndOfBookOptions::Action::GoHome:
+      onGoHome();
+      return true;
+    case EndOfBookOptions::Action::LastPage:
+      onReturnFromEndOfBook();
+      requestUpdate();
+      return true;
+    case EndOfBookOptions::Action::Redraw:
+      requestUpdate();
+      return true;
+    case EndOfBookOptions::Action::None:
+      return false;
+  }
+
+  return false;
+}
+
+bool ReaderActivity::handleEndOfBookPageTurn(const bool prevTriggered, const bool nextTriggered) {
+  if (!isAtEndOfBook()) return false;
+
+  if (endOfBookOptionsReady.load(std::memory_order_acquire) && endOfBookOptions->menuActive()) {
+    return true;
+  }
+  if (nextTriggered) {
+    onGoHome();
+  } else if (prevTriggered) {
+    onReturnFromEndOfBook();
+    requestUpdate();
+  }
+  return true;
+}
+
+void ReaderActivity::loop() {
+  rememberBookOnceRendered();
+  clearEndOfBookOptionsIfNeeded();
+  if (handleEndOfBookMenu()) return;
+  if (handleFormatInput()) return;
+  if (handleBackNavigation()) return;
+
+  const auto touch = ReaderUtils::detectTouchPageTurn(renderer, mappedInput);
+  auto [prevTriggered, nextTriggered, fromTilt] = ReaderUtils::detectPageTurn(mappedInput);
+  prevTriggered = prevTriggered || touch.prev;
+  nextTriggered = nextTriggered || touch.next;
+  if (!prevTriggered && !nextTriggered) return;
+  if (handleEndOfBookPageTurn(prevTriggered, nextTriggered)) return;
+
+  const unsigned long heldMs = (touch.prev || touch.next) ? touch.heldMs : mappedInput.getHeldTime();
+  const bool skip =
+      !fromTilt && SETTINGS.longPressButtonBehavior == SETTINGS.CHAPTER_SKIP && heldMs >= ReaderUtils::SKIP_HOLD_MS;
+
+  if (prevTriggered) {
+    if (skip) {
+      const bool succeeded = skipPages(-10);
+      notePageTurn(false, succeeded);
+    } else {
+      const bool succeeded = pageTurn(false);
+      notePageTurn(false, succeeded);
+    }
+  } else {
+    if (skip) {
+      // A skip is navigation, not reading: it never counts toward session dwell.
+      const bool succeeded = skipPages(10);
+      notePageTurn(false, succeeded);
+    } else {
+      const bool succeeded = pageTurn(true);
+      notePageTurn(true, succeeded);
+    }
+  }
+  requestUpdate();
+}
+
+void ReaderActivity::render(RenderLock&&) {
+  if (isAtEndOfBook()) {
+    if (!endOfBookOptions) {
+      endOfBookOptions = makeUniqueNoThrow<EndOfBookOptions>(renderer);
+      if (!endOfBookOptions) LOG_ERR("READER", "OOM: EndOfBookOptions");
+    }
+    renderer.clearScreen();
+    if (endOfBookOptions) {
+      endOfBookOptions->loadOnce(bookPath);
+      // Release-publish AFTER loadOnce() so the main task's acquire load can't
+      // observe an object whose names/selector are still being populated.
+      endOfBookOptionsReady.store(true, std::memory_order_release);
+      endOfBookOptions->render(renderer, mappedInput);
+    }
+    renderer.displayBuffer();
+    onEndOfBookRendered();
+    markPageRendered();
+    readerSession.onRenderComplete(millis(), trustedtime::trustedNow(), getProgressBasisPoints());
+    return;
+  }
+
+  renderBook();
+  readerSession.onRenderComplete(millis(), trustedtime::trustedNow(), getProgressBasisPoints());
+}
+
+bool ReaderActivity::handleForcedRefresh() {
+  {
+    RenderLock lock(*this);
+    pagesUntilFullRefresh = 1;
+    forcedRefreshPending = true;
+  }
+  requestUpdate();
+  return true;
+}

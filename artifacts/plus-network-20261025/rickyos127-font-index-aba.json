@@ -1,0 +1,75 @@
+{
+  "schema": "plus-font-index-comparison/1",
+  "date_local": "2026-10-25",
+  "firmware": "RickyOS Plus 1.2.7",
+  "app_elf_sha256": "b745d3554bd0924dad3ec7a7e2674c83afd908c8e17e4b2d767eca1170524268",
+  "after_full_pretest_flash_restoration": true,
+  "same_device_same_firmware_both_samples": true,
+  "samples": [
+    {
+      "order": 1,
+      "result": "success",
+      "primary_dns_ms": 24,
+      "primary_tcp_cumulative_ms": 97,
+      "primary_tls_cumulative_ms": 1011,
+      "primary_http_ms": 1309,
+      "primary_http_status": 200,
+      "received_bytes": 9024,
+      "manifest_stage_ms": 1364,
+      "catalog_parsed": true,
+      "clock_owner_overlaps_download": true,
+      "internal_free_before": 43251,
+      "internal_largest_before": 25600,
+      "dma_free_before": 16811,
+      "dma_largest_before": 7936,
+      "associated_rssi_dbm": -57,
+      "native_ntp_reply_later": true
+    },
+    {
+      "order": 2,
+      "result": "failure",
+      "primary_dns_ms": 24,
+      "primary_tcp_cumulative_ms": 103,
+      "primary_tls_completed": false,
+      "primary_abort_cumulative_ms": 30000,
+      "primary_abort_reason": "caller-total-request-budget",
+      "primary_http_status": -1,
+      "received_bytes": 0,
+      "manifest_stage_ms": 50562,
+      "catalog_parsed": false,
+      "fallback_dns_failure_ms": [
+        6370,
+        6947,
+        7013
+      ],
+      "clock_owner_overlaps_download": true,
+      "internal_free_before": 43187,
+      "internal_largest_before": 22528,
+      "dma_free_before": 18779,
+      "dma_largest_before": 6912,
+      "associated_rssi_dbm": -59,
+      "post_failure_udp_send_errno": [
+        12,
+        12,
+        12
+      ],
+      "post_failure_udp_send_targets": [
+        "dhcp-dns",
+        "public-dns",
+        "ntp"
+      ],
+      "post_failure_tcp_immediate_errno": 119,
+      "native_ntp_reply_later": false
+    }
+  ],
+  "interpretation": {
+    "intermittent_failure_observed": true,
+    "clock_overlap_alone_not_sufficient_cause": true,
+    "free_heap_not_a_proof_of_success": true,
+    "local_network_send_path_reports_allocation_error_after_failure": true,
+    "specific_failing_allocator_or_pool_identified": false,
+    "not_a_throughput_or_failure_rate_estimate": true,
+    "not_proof_of_vendor_relative_speed": true,
+    "product_fix_implemented": false
+  }
+}

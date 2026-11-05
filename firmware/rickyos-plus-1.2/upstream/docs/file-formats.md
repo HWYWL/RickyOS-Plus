@@ -1,0 +1,898 @@
+# File Formats
+
+Unless a section states otherwise, these formats describe the SD-card cache
+files under `/.crosspoint/epub_<hash>/`. All POD fields are written in the
+ESP32 little-endian representation used by `Serialization.h`; strings are
+length-prefixed UTF-8.
+
+Runtime readers additionally cap resource paths at 4096 bytes and human-readable
+text at 16384 bytes. A length that exceeds its field's cap or the remaining file
+bytes invalidates the cache; the output value is left unchanged.
+
+## `book.bin`
+
+### Version 11
+
+`book.bin` stores EPUB metadata plus lookup tables for spine and TOC entries.
+The current firmware writes this version from `BookMetadataCache`.
+
+> Version 9 forced a one-time rebuild after upstream began NFC-composing titles.
+> Upstream version 10 ignores ambiguous EPUB guide text references. CrossMux uses
+> 11 to include both changes while remaining above every shipped value from
+> either lineage. `BookMetadataCache.cpp` is the source of truth.
+
+ImHex pattern:
+
+```c++
+import std.mem;
+import std.string;
+import std.core;
+
+#define EXPECTED_VERSION 11
+#define MAX_STRING_LENGTH 65535
+
+struct String {
+    u32 length [[hidden, comment("String byte length")]];
+    if (length > MAX_STRING_LENGTH) {
+        std::warning(std::format("Unusually large string length: {} bytes", length));
+    }
+    char data[length] [[comment("UTF-8 string data")]];
+} [[sealed, format("format_string"), comment("Length-prefixed UTF-8 string")]];
+
+fn format_string(String s) {
+    return s.data;
+};
+
+struct Metadata {
+    String title [[comment("Book title")]];
+    String author [[comment("Book author")]];
+    String language [[comment("Book language code")]];
+    String coverItemHref [[comment("Path to cover image")]];
+    String textReferenceHref [[comment("Path to guided first text reference")]];
+};
+
+struct SpineEntry {
+    String href [[comment("Resource path")]];
+    u32 cumulativeSize [[comment("Cumulative uncompressed spine size through this entry")]];
+    s16 tocIndex [[comment("Index into TOC, or inherited/previous TOC index when no direct entry exists")]];
+};
+
+struct TocEntry {
+    String title [[comment("Chapter/section title")]];
+    String href [[comment("Resource path")]];
+    String anchor [[comment("Fragment identifier")]];
+    u8 level [[comment("Nesting level")]];
+    s16 spineIndex [[comment("Index into spine (-1 if none)")]];
+};
+
+struct BookBin {
+    u8 version;
+    if (version != EXPECTED_VERSION) {
+        std::error(std::format("Unsupported version: {} (expected {})", version, EXPECTED_VERSION));
+    }
+
+    u32 lutOffset [[comment("Offset to lookup tables")]];
+    u16 spineCount;
+    u16 tocCount;
+
+    Metadata metadata;
+
+    u32 currentOffset = $;
+    if (currentOffset != lutOffset) {
+        std::warning(std::format("LUT offset mismatch: expected 0x{:X}, got 0x{:X}", lutOffset, currentOffset));
+    }
+
+    u32 spineLut[spineCount] [[comment("Spine entry offsets")]];
+    u32 tocLut[tocCount] [[comment("TOC entry offsets")]];
+
+    SpineEntry spines[spineCount];
+    TocEntry toc[tocCount];
+};
+
+BookBin book @ 0x00;
+
+u32 fileSize = std::mem::size();
+u32 parsedSize = $;
+if (parsedSize != fileSize) {
+    std::warning(std::format("Unparsed data detected: {} bytes remaining at offset 0x{:X}", fileSize - parsedSize, parsedSize));
+}
+```
+
+## `section.bin`
+
+### Versions 78 / 79
+
+Adds a `verticalText` byte (bool) after `wordSpacingPercent`, before `pageCount`.
+A vertical cache lays lines out as columns: the reader swaps the viewport, so the
+stored `viewportWidth` is the column height and `viewportHeight` the width the
+columns fill, and turns paragraph spacing and images (alt text) off. Page bodies
+are unchanged; only drawing differs (`Page::renderVertical`). Horizontal and
+vertical caches of a chapter are told apart by the flag and rebuild on a switch.
+The partial sentinels are 204/203.
+
+### Versions 76 / 77
+
+Adds `paragraphIndentSpaces` (0–5, default 3) immediately after the retained
+`firstLineIndent` byte. Complete and partial caches rebuild on width changes.
+The partial sentinels are 206/205, derived from the complete versions with
+`0xFE - (completeVersion - 28)` so old partial layouts also rebuild.
+Only forced Western indentation uses this width; Auto follows CSS and Chinese
+retains two characters. Paragraph spacing remains independent.
+
+These versions integrate upstream character spacing, word spacing, list layout
+and Hangul wrapping. The section header adds signed `characterSpacing` and
+unsigned `wordSpacingPercent` after `collectTouchLinks`. TextBlock's BlockStyle
+adds `characterSpacing` after `directionDefined`. Existing caches rebuild;
+CrossMux paragraph spacing levels, first-line indentation and touch-link flags
+remain in the header.
+
+### Versions 72 / 73
+
+> Unified firmware uses the CJK-capable cache version **73**. Version 72 is the
+> Latin-build counter; its layout is identical, but font metrics differ,
+> so old pagination caches are deliberately invalidated.
+>
+> Versions 34/35 introduced the flat TextBlock arena layout. Versions 36/37
+> invalidated cached word positions after Arabic contextual shaping began measuring
+> shaped visual text. Versions 38/39 add the upstream line-through style and
+> resumable partial-build cache changes. Versions 40/41 keep the same byte layout
+> but invalidate pagination because compressed line heights are rounded instead
+> of truncated. Versions 42/43 persist each image's book-internal source href for
+> lazy extraction and serialize ruby annotations/group-continuation styles.
+> Versions 44/45 invalidate pagination after closed HTML tags began splitting
+> adjacent text blocks. Versions 46/47 keep the byte layout unchanged but
+> invalidate pagination because oversized tokens now wrap at UTF-8 boundaries
+> without inserting synthetic hyphens. Versions 48/49 invalidate pagination
+> because source whitespace now controls CJK gaps, ruby boundaries retain inline
+> continuation, and `<br>` no longer re-applies container margins. Versions 50/51
+> add a per-page visible-text offset LUT so progress and bookmarks survive
+> re-pagination. Versions 52/53 reserve layout space for ruby/CJK justification
+> and expand serialized footnote hrefs from 96 to 256 bytes.
+> Versions 54/55 keep the byte layout unchanged but invalidate word positions so
+> soft-flushed continuations of long paragraphs do not receive another first-line
+> indent and default CJK paragraph indents use two ideograph advances instead of
+> three space advances. Versions 56/57 invalidate pagination for focus-word
+> break opportunities, image viewport clamping, and the extra-wide line-spacing
+> option. Versions 58/59 additionally invalidate pagination because simple HTML
+> table rows are laid out as positioned columns rather than flattened paragraphs
+> with synthetic labels. Versions 60/61 append internal-link rectangles to each
+> page and invalidate pagination for inline direction inheritance, stripped
+> closing-block spacing, and preserved superscript/subscript on internal links.
+> The counters remain distinct and above every
+> previously shipped value so a firmware-flavor swap cannot read the other flavor's
+> stale cache.
+> `lib/Epub/Epub/Section.cpp` is the source of truth.
+
+Versions 72/73 keep the binary layout unchanged but invalidate complete and partial
+pagination caches because missing glyphs now reserve a visible outline placeholder.
+The outline is sized from the active font ascender and replaces implicit U+FFFD
+fallback. Existing source-offset progress, metadata and chapter indexes are retained.
+
+Each file in `sections/*.bin` stores one laid-out spine section. The header is
+also the cache-busting key: if any layout-affecting setting differs from the
+current reader settings, the section is discarded and rebuilt.
+
+Versions 62/63 add `collectTouchLinks` to the header cache key. Devices without
+touch input neither construct nor hydrate link geometry; button footnotes and
+anchors remain available. Partial-cache sentinels change in lockstep to 210/209 for versions 72/73.
+Versions 64/65 also invalidate pagination produced before bounded no-PSRAM
+soft flushing; disabling embedded styles no longer enlarges the token window.
+On devices without PSRAM, a low-memory styled build is discarded and retried
+once without embedded CSS for the reading session. The cache records the actual
+`embeddedStyle=false`; user settings and the selected font are unchanged.
+
+Versions 66/67 keep the serialized layout unchanged but invalidate pagination
+because content-based image recognition can change image indexes within a section.
+Extracted images and their pixel caches now use the `img2_` prefix to prevent
+reuse of older `img_` files with different source images. Old `img_` files remain
+unused until the existing whole-book **Delete cache** action removes them.
+Versions 68/69 add a `uint8 firstLineIndent` header field after
+`extraParagraphSpacing`: Auto (0) keeps the book's CSS text-indent, Indent (1)
+forces two CJK characters or three spaces, and NoIndent (2) removes the indent.
+Auto is the default. Changing modes invalidates both complete and partial caches;
+older caches are rebuilt because their headers lack this field.
+Without a CSS indent, Auto leaves paragraphs unindented. Select Indent to retain
+the implicit indentation used by older firmware when extra paragraph spacing was off.
+
+Versions 70/71 encode `extraParagraphSpacing` as a byte: 0 disables extra spacing;
+1..5 add 0.5, 0.75, 1, 1.25 or 1.5 line heights after a paragraph. The exact level
+and `firstLineIndent` are independent cache keys. Both complete and partial
+caches from earlier versions are rebuilt; older firmware rejects the new version
+rather than reading spacing levels 2..5 as a boolean. TXT keeps its existing
+one-byte 0/1 paragraph-layout field in `index.bin`; nonzero EPUB levels map to 1.
+
+Versions 60/61 append the internal-link rectangles produced during text layout
+to each serialized page. The reader uses these rectangles for touch navigation;
+older caches are rebuilt because they contain no link geometry.
+
+Versions 52/53 increase the fixed-size footnote href field from 96 to 256 bytes.
+This changes each serialized footnote record from 128 to 288 bytes, so older
+section caches must be discarded and rebuilt.
+
+Versions 52/53 also invalidate cached word positions after ruby and CJK justification
+layout changes. Versions 58/59 keep the serialized layout unchanged and invalidate
+pagination for the table-column layout.
+
+Versions 50/51 add a header offset and a `uint32_t` entry per page for the
+visible-text offset LUT. The other section LUTs remain unchanged.
+
+Version 30 is binary-identical to version 29. The version was bumped because
+Arabic contextual shaping changed text measurement (`getTextAdvanceX` now
+measures the shaped visual text), so word positions cached by v29 no longer
+match what `drawText` renders.
+Version 28 introduced serialized word style bits for underline, strikethrough,
+superscript, and subscript. The format also includes:
+
+- cache-busting fields for paragraph alignment, hyphenation, embedded CSS,
+  image rendering mode, and Focus Reading
+- page offset LUT
+- per-page visible-text offset LUT (zero-based Unicode codepoints in `<body>`)
+- anchor-to-page map for fragment and footnote navigation
+- paragraph and list-item LUTs retained for navigation and legacy sync fallback
+- optional per-word Focus Reading split metadata
+- per-page footnote entries
+- serialized word style bits for underline, strikethrough, superscript, and
+  subscript, plus the internal ruby-group continuation marker
+- optional ruby annotation strings for `<ruby>` / `<rt>` content
+- image source hrefs used for lazy extraction
+- flat TextBlock word storage (v29): per-word arrays plus one shared
+  NUL-terminated text blob, replacing v28's length-prefixed word strings. The
+  on-disk order mirrors the in-RAM arena so the firmware reads a whole block
+  payload with a single allocation and a single SD read
+
+ImHex pattern:
+
+```c++
+import std.mem;
+import std.string;
+import std.core;
+
+#define LATIN_VERSION 76
+#define CHINESE_VERSION 77
+#define MAX_STRING_LENGTH 65535
+#define FOOTNOTE_NUMBER_LEN 32
+#define FOOTNOTE_HREF_LEN 256
+
+struct String {
+    u32 length [[hidden, comment("String byte length")]];
+    if (length > MAX_STRING_LENGTH) {
+        std::warning(std::format("Unusually large string length: {} bytes", length));
+    }
+    char data[length] [[comment("UTF-8 string data")]];
+} [[sealed, format("format_string"), comment("Length-prefixed UTF-8 string")]];
+
+fn format_string(String s) {
+    return s.data;
+};
+
+enum PageElementTag : u8 {
+    TAG_PageLine = 1,
+    TAG_PageImage = 2,
+    TAG_PageHorizontalRule = 3
+};
+
+enum WordStyle : u8 {
+    REGULAR = 0,
+    BOLD = 1,
+    ITALIC = 2,
+    BOLD_ITALIC = 3,
+    UNDERLINE = 4,
+    STRIKETHROUGH = 8,
+    SUP = 16,
+    SUB = 32
+};
+
+enum TextAlign : u8 {
+    JUSTIFIED = 0,
+    LEFT_ALIGN = 1,
+    CENTER_ALIGN = 2,
+    RIGHT_ALIGN = 3,
+    NONE = 4
+};
+
+struct BlockStyle {
+    TextAlign alignment;
+    bool textAlignDefined;
+    s16 marginTop;
+    s16 marginBottom;
+    s16 marginLeft;
+    s16 marginRight;
+    s16 paddingTop;
+    s16 paddingBottom;
+    s16 paddingLeft;
+    s16 paddingRight;
+    s16 textIndent;
+    bool textIndentDefined;
+    bool isRtl;
+    bool directionDefined;
+    s8 characterSpacing;
+};
+
+struct TextBlock {
+    u16 wordCount;
+    u8 hasFocus;
+    u16 textBytes [[comment("Total size of text[], including one NUL per word")]];
+
+    if (wordCount > 0) {
+        u16 textOff[wordCount] [[comment("Byte offset of word i's text within text[]")]];
+        s16 wordXPos[wordCount];
+        if (hasFocus != 0) {
+            u16 wordFocusSuffixX[wordCount] [[comment("Suffix x offset from word start")]];
+        }
+        WordStyle wordStyle[wordCount];
+        if (hasFocus != 0) {
+            u8 wordFocusBoundary[wordCount] [[comment("UTF-8 byte boundary between bold prefix and suffix")]];
+        }
+        char text[textBytes] [[comment("All words back to back, each NUL-terminated")]];
+    }
+
+    BlockStyle blockStyle;
+};
+
+struct ImageBlock {
+    String imagePath;
+    String srcPath [[comment("Book-internal source path used for lazy extraction")]];
+    s16 width;
+    s16 height;
+};
+
+struct PageLine {
+    s16 xPos;
+    s16 yPos;
+    TextBlock block;
+};
+
+struct PageImage {
+    s16 xPos;
+    s16 yPos;
+    ImageBlock image;
+};
+
+struct PageHorizontalRule {
+    s16 xPos;
+    s16 yPos;
+    u16 width;
+    u8 thickness;
+};
+
+struct PageElement {
+    PageElementTag pageElementType;
+    if (pageElementType == TAG_PageLine) {
+        PageLine pageLine [[inline]];
+    } else if (pageElementType == TAG_PageImage) {
+        PageImage pageImage [[inline]];
+    } else if (pageElementType == TAG_PageHorizontalRule) {
+        PageHorizontalRule horizontalRule [[inline]];
+    } else {
+        std::error(std::format("Unknown page element type: {}", pageElementType));
+    }
+};
+
+struct FootnoteEntry {
+    char number[FOOTNOTE_NUMBER_LEN];
+    char href[FOOTNOTE_HREF_LEN];
+};
+
+struct PageLink {
+    char href[FOOTNOTE_HREF_LEN];
+    s16 x;
+    s16 y;
+    s16 width;
+    s16 height;
+};
+
+struct Page {
+    u16 elementCount;
+    PageElement elements[elementCount] [[inline]];
+
+    u16 footnoteCount;
+    FootnoteEntry footnotes[footnoteCount];
+    u16 linkCount; // at most 32; zero when collectTouchLinks=false
+    PageLink links[linkCount];
+};
+
+struct AnchorEntry {
+    String anchor;
+    u16 page;
+};
+
+struct AnchorMap {
+    u16 count;
+    AnchorEntry entries[count];
+};
+
+struct ParagraphLut {
+    u16 count;
+    u16 paragraphIndex[count];
+};
+
+struct SectionBin {
+    u8 version;
+    if (version != LATIN_VERSION && version != CHINESE_VERSION) {
+        std::error(std::format("Unsupported section version: {}", version));
+    }
+
+    s32 fontId;
+    float lineCompression;
+    u8 extraParagraphSpacing;
+    u8 firstLineIndent;
+    u8 paragraphIndentSpaces; // forced Western indent, 0..5
+    u8 paragraphAlignment;
+    u16 viewportWidth;
+    u16 viewportHeight;
+    bool hyphenationEnabled;
+    bool embeddedStyle;
+    u8 imageRendering;
+    bool focusReadingEnabled;
+    bool collectTouchLinks;
+    s8 characterSpacing;
+    u8 wordSpacingPercent;
+
+    u16 pageCount;
+    u32 pageLutOffset;
+    u32 anchorMapOffset;
+    u32 paragraphLutOffset;
+    u32 listItemLutOffset;
+    u32 visibleTextLutOffset;
+
+    Page pages[pageCount];
+
+    u32 currentOffset = $;
+    if (currentOffset != pageLutOffset) {
+        std::warning(std::format("Page LUT offset mismatch: expected 0x{:X}, got 0x{:X}", pageLutOffset, currentOffset));
+    }
+
+    u32 pageLut[pageCount] [[comment("Page data offsets")]];
+
+    if (anchorMapOffset != 0) {
+        AnchorMap anchorMap @ anchorMapOffset;
+    }
+
+    if (paragraphLutOffset != 0) {
+        ParagraphLut paragraphLut @ paragraphLutOffset;
+    }
+
+    if (listItemLutOffset != 0 && paragraphLutOffset != 0) {
+        u16 listItemIndex[paragraphLut.count] @ listItemLutOffset;
+    }
+
+    if (visibleTextLutOffset != 0) {
+	u32 visibleTextOffset[pageCount] @ visibleTextLutOffset;
+    }
+};
+
+SectionBin section @ 0x00;
+
+u32 fileSize = std::mem::size();
+u32 parsedSize = $;
+if (parsedSize != fileSize) {
+    std::warning(std::format("Unparsed data detected: {} bytes remaining at offset 0x{:X}", fileSize - parsedSize, parsedSize));
+}
+```
+
+## Legacy TXT reader cache
+
+TXT reader state is stored below `.crosspoint/txt_<path-hash>/`.
+
+`index.bin` version 8 is a little-endian page-offset checkpoint. Its fixed
+header contains, in order: `uint32 magic` (`TXTI`, `0x54585449`), `uint8
+version` (`8`), `uint32 fileSize`, `int32 viewportWidth`, `int32 linesPerPage`,
+`int32 fontId`, `int32 screenMargin`, `uint8 paragraphAlignment`, `uint8
+extraParagraphSpacing`, `uint8 complete`, `uint8 encoding` (`0` unknown/ASCII,
+`1` UTF-8, `2` GBK), and `uint32 knownPageCount`. It is followed by `knownPageCount`
+strictly increasing `uint32` byte offsets; the first offset is zero and every
+offset is smaller than `fileSize`. An empty file has no offsets and must be
+marked complete.
+
+An incomplete index contains only pages discovered while reading. It is
+checkpointed every 32 known page starts and when the reader exits; the final
+page marks it complete and makes `knownPageCount` exact. Version 8 retains the
+version-7 byte layout but rejects all earlier page indexes: missing-glyph outline
+advances change page boundaries. Both complete and partial indexes are rebuilt.
+A wrong magic, unsupported
+version, truncated payload, changed file size, changed layout setting,
+non-monotonic offset, or out-of-range offset invalidates the index. Writers
+flush `index.bin.tmp` before replacing the prior checkpoint.
+
+The Chinese firmware detects strict UTF-8 first and strict GBK second when it
+first encounters non-ASCII bytes. GBK is decoded to UTF-8 in the existing TXT
+page buffer while page offsets remain byte positions in the source file.
+Four-byte GB18030 sequences are not supported.
+
+`progress.bin` is an atomic eight-byte little-endian record containing `uint32
+magic` (`TXTO`, `0x4F545854`) followed by the `uint32` source-file byte offset
+of the current page. Legacy four-byte zero-based page numbers remain readable;
+records produced by still older firmware used only the low 16 bits. Legacy
+progress newer than the last partial-index checkpoint recalculates at most the
+next 31 pages before rendering resumes.
+
+`chapters.bin` version 1 is a little-endian, fixed-record chapter index. Its
+16-byte header stores, in order: `uint32 magic` (`TXTC`, `0x43545854`), `uint32
+fileSize`, `uint32 chapterCount`, `uint16 recordSize` (`196`), `uint8 version`
+(`1`), and `uint8 encoding` (`0` unknown/ASCII, `1` UTF-8, `2` GBK). Each record
+contains a `uint32` source-file byte offset followed by a NUL-terminated
+`char title[192]` in UTF-8. The file is built on first chapter-menu use through
+`chapters.bin.tmp`, flushed, and swapped into place with a recoverable `.bak`.
+A wrong header, unsupported encoding, changed file size, record-size mismatch,
+truncated payload, invalid offset, or unterminated title rejects the cache.
+Chapter offsets are independent of pagination. Selecting an offset outside the
+known page-index prefix opens it directly and keeps a fixed 32-page local
+navigation history, so jumping does not synchronously paginate the intervening
+text or grow RAM with book length.
+
+RickyOS Markdown uses semantic chapter-index version 2, without changing the
+16-byte header / 196-byte record layout. Its title contains the original ATX
+line (including the `#` prefix), under 192 UTF-8 bytes. Metadata derives levels
+1–6 and plain labels from this prefix. Fenced code is excluded. Old MD version-1
+indexes are rebuilt on demand; TXT and non-product Markdown remain version 1.
+
+## Reflowed TXT/Markdown source map
+
+Reflowed TXT metadata and HTML use conversion marker 2; RickyOS 1.1.5 Markdown
+uses marker 5 for parsed reading-oriented Markdown including pipe tables and ATX
+TOC (initial non-table candidate: 3; table candidate: 4). Non-product builds retain
+Markdown marker 2. Marker mismatch rebuilds only that book's HTML/sections.
+The metadata uses the EPUB
+book/section formats above. Generated chapter IDs are `txt-<source-byte-offset>`.
+Titles stay disk-backed; each chapter boundary is consumed during parsing without
+retaining the full chapter list. Old source progress is never deleted or rewritten
+by migration. Old page-number progress resolves through version 4–8 legacy indexes.
+Failed conversion, invalid maps or unresolved target pages preserve old progress.
+
+`txt-map.bin` version 1 is little-endian. Its 16-byte header is:
+
+| Offset | Field |
+|---:|---|
+| 0 | `uint32 magic = 0x4D545854` (`TXTM`) |
+| 4 | `uint32 sourceSize` |
+| 8 | `uint32 recordCount` |
+| 12 | `uint16 recordSize = 12` |
+| 14 | `uint8 version = 1` |
+| 15 | `uint8 encoding` (0 unknown/ASCII, 1 UTF-8, 2 GBK) |
+
+Each 12-byte run stores `uint32 sourceOffset`, `uint32 visibleOffset`, `uint8
+sourceCharacterWidth`, `uint8 visibleStep` and `uint16 reserved = 0`.
+A new record begins when source width or visible step changes. The final record
+has source offset equal to `sourceSize` and zero width/step; preceding offsets
+increase. Dropped trailing spaces, CR/LF and the BOM have step 0; HTML entities
+count as their decoded visible Unicode codepoint. Source offsets inside a multibyte
+character resolve to that character. Lookup binary-searches records on disk. The inverse lookup searches visible
+offsets, then resolves the source position through `chapters.bin` for the current
+TOC title and chapter navigation, without retaining chapter tables.
+Maps publish from `.tmp` only after successful conversion and flush. Books at or
+above 4GiB and chapter counts exceeding the existing 16-bit TOC budget fail safely.
+
+### RickyOS Markdown upgrade checkpoint
+
+`md-resume-v1.bin` is a 12-byte little-endian checkpoint in the reflowed EPUB
+cache: `uint32 magic=0x3152444D` (`MDR1`), `uint32 sourceSize`, and `uint32 sourceOffset`.
+Before replacing a version-2, version-3 or version-4 Markdown map, a 10-byte reader progress record is
+resolved through that old map and checkpointed atomically using `.tmp`/replace.
+The original progress file is not changed. The reader resolves the checkpoint
+through the new map, locates its containing page, then removes the checkpoint
+only after successfully saving the new progress. Restart/retry does not recapture
+the old visible offset through an already replaced map. Invalid checkpoints/maps
+fail the open without overwriting progress. Older 4/6-byte page-only records retain
+the existing proportional re-pagination behavior; they have no exact text coordinate.
+No existing binary layout/version changes. Dropped Markdown delimiters and link
+destinations have visible step 0; table pipes, delimiter rows and cell padding
+also have step 0, while displayed text/entities retain step 1. Deferred table
+headers are mapped in source order before the following delimiter line.
+
+## Electronic Woodfish counter
+
+`/.crosspoint/woodfish.bin` is a fixed 12-byte record:
+
+| Offset | Field |
+|---:|---|
+| 0 | `uint8 magic[4]` = `WDF1` |
+| 4 | little-endian `uint32 total` |
+| 8 | little-endian `uint32 complement` = `~total` |
+
+Readers require the exact length, magic, and complement. A valid canonical file
+wins; if it is missing or invalid, a valid `woodfish.bin.bak` is restored.
+Without either record the counter starts at zero. Writers flush
+`woodfish.bin.tmp`, move the previous canonical file to `.bak`, install the new
+record, and remove the backup only after success. The activity changes only RAM
+while it is being used, then checkpoints after 60 seconds without a knock or
+once on activity exit. A future layout change must use a new magic and update
+this section.
+
+## WeRead cache
+
+The Simplified Chinese build keeps WeRead's private data below `/.crosspoint/weread/`.
+Completed EPUB files are stored in `/WeRead/`; the pre-release `/Books/WeRead/`
+location is not migrated or read.
+
+- `session.bin` is the existing device-bound obfuscation envelope. Its decoded
+  payload starts with `WRA1\n`, followed by bounded `wr_vid`, `wr_skey`, and
+  `wr_rt` lines. No response body, signature, or complete Cookie header is
+  stored.
+- `disclaimer.accepted` records that the user accepted the WeRead disclaimer.
+  Its complete contents must be the five bytes `WRD1\n`; a missing, truncated,
+  or unknown marker shows the disclaimer again. Logging out preserves this
+  file.
+- `shelf.bin`, `<bookId>/toc.bin`, per-chapter
+  `<bookId>/chapters/NNNNNN.images`, and transient `<bookId>/images.work`
+  indexes start with a 12-byte little-endian header:
+  `uint32 magic`, `uint16 version`, `uint16 recordSize`, `uint32 recordCount`.
+  Their magic values are `WRS6` (`0x36535257`) and `WRT2` (`0x32545257`);
+  image indexes use `WRI2` (`0x32495257`) and image work indexes use `WIP1`
+  (`0x31504957`). Version is currently `1`.
+- Shelf records contain fixed `bookId[64]`, `title[192]`, `author[96]`, and
+  validated HTTPS `coverUrl[512]` fields followed by `uint32 readUpdateTime`.
+  Cover URLs use a JPEG/PNG suffix or an extensionless path whose downloaded
+  bytes must identify as JPEG/PNG. TOC records contain fixed
+  `chapterUid[64]`, `title[192]`, `uint32 wordCount`,
+  `uint32 chapterIdx`, and a paid flag.
+- `WRI2` records contain a generated EPUB-relative `href[64]` and the original
+  HTTPS image URL in `url[512]`; both are NUL-terminated. TXT chapters have a
+  valid zero-record index. Images that pass download and JPEG/PNG validation
+  are stored below `<bookId>/images/` and embedded into the generated EPUB.
+- `WIP1` records contain one `WRI2` record followed by `uint8 state`,
+  `uint8 attempts`, `uint8 redirects`, and one reserved byte. They schedule
+  pending images by HTTPS host so one TLS connection can serve a host batch.
+  During an `Embed` download, completed records are also the authoritative
+  image list for the OPF manifest and ZIP packaging pass.
+  `images.work` is always rebuilt from `WRI2`, may be deleted after interruption,
+  and is removed when the job finishes; it is not a durable cache format.
+- Per-book `options.bin` is an atomic fixed 8-byte `WRO1` record:
+  `uint32 magic` (`0x314F5257`), `uint16 version` (`1`), `uint8 imagePolicy`,
+  and one zero reserved byte. Policy `0` embeds validated images and policy `1`
+  excludes image requests and EPUB image entries while retaining `WRI2` and
+  existing image files. Missing, truncated, unknown-policy, or otherwise
+  damaged records fall back to policy `0`. The record is replaced only after a
+  generated EPUB succeeds; a directly returned complete EPUB remains unchanged.
+- Per-book `initial-progress.bin` is an atomic fixed 8-byte `WRP1` record:
+  `uint32 magic` (`0x31505257`) followed by a whole-book progress value as
+  `uint32 millionths` (`0`–`1000000`). It is written only after the cached EPUB
+  is atomically replaced. The value is fetched after a valid `WRT2` catalog and
+  before chapter or image downloads; a failed prefetch does not block caching,
+  and a successful recache without a usable remote value removes any stale
+  record. On first open, a valid reader `progress.bin` takes precedence and
+  removes this record; otherwise a positive value is applied once and removed
+  after the resulting reader progress is saved atomically. Invalid and
+  zero-valued records are removed and use the normal EPUB text start.
+- Per-book `detail.bin` starts with a fixed 1024-byte `WBD1` header followed
+  immediately by the decoded UTF-8 introduction. The version-1 header contains
+  `uint32 magic` (`0x31444257`), `uint16 version`, `uint16 headerSize`,
+  `uint32 introLength`, `uint16 newRating`, `uint16 flags`,
+  `uint32 newRatingCount`, `uint32 totalWords`, then fixed NUL-terminated
+  `title[192]`, `author[96]`, `publisher[96]`, `category[96]`, and
+  `coverUrl[512]` fields plus eight zero reserved bytes. Flag bit 0 records that
+  the introduction was truncated at its 64 KiB UTF-8-safe limit. The file size
+  must equal `1024 + introLength`; unknown flags, non-zero reserved bytes, and
+  unterminated fixed strings invalidate the cache. The file is committed from
+  `detail.bin.part` only after the complete response parses successfully.
+- Highlight and review caches are stored below
+  `/.crosspoint/weread/browse-cache/<bookId>/`. The fixed 100-byte
+  `cache.bin` manifest is `WRC1`: `uint32 magic` (`0x31435257`),
+  `uint16 version` (`1`), `uint16 size` (`100`), NUL-terminated
+  `ownerVid[64]`, three `uint32 pageCounts`, three `uint32 recordCounts`,
+  `uint16 flags`, `uint8 activeSlot`, and one zero reserved byte. Counts are
+  ordered as popular highlights, personal highlights, and popular reviews.
+  Manifest flag bit 0 means the popular-review result was limited to the first
+  50 records. Only `slot0` or `slot1` selected by `activeSlot` is readable.
+- Each cached server page has a `*.idx` index and a `*.txt` UTF-8 body file in
+  the selected slot. The 32-byte aligned `WRB1` index header stores, in order,
+  `uint64 nextSyncKey`, `uint32 magic` (`0x31425257`),
+  `uint32 recordCount`, `uint32 textBytes`, `uint32 nextMaxIdx`,
+  `uint16 version` (`1`), `uint16 recordSize` (`312`), `uint16 flags`,
+  `uint8 kind`, and one zero reserved byte. Header flag bit 0 marks a response
+  truncated by the 4 MiB/4096-record limits; bit 1 records that the server
+  advertised another review page. A valid empty API object (`{}`) is committed
+  as a zero-record page so an empty category does not invalidate the complete
+  three-category snapshot.
+- A `WRB1` record contains `uint32 textOffset`, `uint32 textLength`,
+  `uint32 heat`, `uint32 createTime`, `uint32 idx`, `uint16 rating`,
+  `uint16 flags`, then fixed NUL-terminated `chapterUid[64]`, `chapter[128]`,
+  and `author[96]`. Record flag bit 0 marks a body truncated at 64 KiB.
+  Offsets address the matching `*.txt` file. Both files are written through
+  `.part` replacements and validated together before reading. A refresh writes
+  only the inactive slot; after every page validates, `cache.bin.part`
+  atomically replaces the manifest and the old slot is removed. Interrupted,
+  cancelled, or failed refreshes leave the prior manifest and slot readable.
+  The manifest is accepted only for the current session's `wr_vid`; logout or
+  an account change attempts to remove the entire browse-cache root. Once the
+  session is deleted, a logout cache-cleanup failure is reported separately and
+  cannot return to the old shelf. Account-change cleanup must succeed before
+  the new session is saved. The old disposable
+  `/.crosspoint/weread/browse/` directory is deleted as legacy data and is not
+  migrated. These files do not change any book or EPUB cache version.
+- A successfully converted, aspect-preserving 2-bit cover of at most 112×164 is stored as
+  `<bookId>/cover.v2.bmp`. Its validated JPEG/PNG source is retained as
+  `<bookId>/cover.source.jpg` or `<bookId>/cover.source.png` and embedded as the
+  generated EPUB's `cover-image`; only source `.part` files and `cover.v2.bmp.part`
+  are transient. The pre-v2 `<bookId>/cover.bmp` is not read or migrated. A failed
+  fetch or conversion does not replace an existing v2 BMP.
+- A directly returned complete EPUB remains unchanged. When its validated WeRead
+  cover source is available, the source is atomically copied to the EPUB's
+  path-keyed cache directory as `cover.override`. The EPUB loader identifies
+  JPEG or PNG from the file signature, prefers the EPUB's internal cover, and
+  uses the override only as a fallback. A valid override makes an earlier empty
+  thumbnail marker retryable.
+- The WeRead menu's cache-clear action preserves `session.bin`,
+  `disclaimer.accepted`, `/WeRead/*.epub`, and the reader caches
+  for those EPUB files. It recursively removes every other entry below
+  `/.crosspoint/weread/`, including `shelf.bin`, per-book data, browse caches,
+  and partial files.
+- Shelf sync does not prefetch covers. Missing covers are fetched and converted
+  lazily for the visible shelf page. Existing v2 BMPs are skipped; cancellation
+  and per-book failures preserve every atomically completed cache file.
+Readers reject a wrong magic, version, record size, or total file length.
+Writers use `.part` plus atomic replacement, so a damaged or interrupted index
+is never exposed as current data.
+
+`WRA1` replaces the pre-release `WRD3` session marker after the application
+rename. `WRS6` rejects `WRS5` shelves because shelf records now include a
+validated cover URL; a successful sync rebuilds the shelf index while retaining
+existing per-book detail, cover, EPUB, and reading-progress files. `WRS5`
+rejected `WRS4` shelves because shelf records added `readUpdateTime`; records
+are rewritten in descending timestamp order while preserving server order for
+ties. `WRS4` rejected `WRS3` shelves whose book
+titles could be overwritten by nested category titles. A cached chapter
+without a valid `WRI2` index is downloaded again so pre-image-support chapter
+caches cannot silently lose figures. `WRI2` also rejects chapters generated
+before unsupported footnote references and bodies were filtered. Existing
+`/WeRead/*.epub` files remain readable and are not upgraded automatically;
+cache a book again to rebuild affected chapters and embed its available cover
+and selected chapter images.
+
+`WRT2` rejects `WRT1` TOC indexes because TOC records now include
+`wordCount`, used for fallback whole-book progress mapping. It is not the unit
+of WeRead's native `chapterOffset`.
+
+Newly generated chapter XHTML embeds `<!--wr-co:N-->` comments at source-text,
+entity, image, and final boundaries. `N` is the zero-based UTF-16 code-unit
+offset in the decoded raw chapter source after removing a UTF-8 BOM. The reader
+ignores these comments; manual sync streams the loose generated chapter to map
+between its visible-text offsets and WeRead's native offsets. Old chapters have
+no marker and remain compatible through the approximate fallback.
+Manual progress sync refreshes only an old or invalid TOC; an existing
+`/WeRead/*.epub` is retained.
+
+## SD-card font cache
+
+For the runtime read path, OTA/rollback lifecycle, rebuild triggers, progress
+UI, and performance verification, see
+[SD-Card Font Cache](engineering/sd-card-font-cache.md). Its
+[partition reuse model](engineering/sd-card-font-cache.md#partition-reuse-model)
+shows how the inactive application slot changes roles without modifying
+`otadata` or using SPIFFS.
+
+The non-running OTA application slot may temporarily hold the selected SD
+reader font. It is a disposable acceleration cache, not a firmware image and
+does not modify `otadata`. A normal online or SD-card OTA erases and overwrites
+it. The current 0x640000-byte OTA slots reserve the first 4096 bytes for the
+cache header, leaving at most 6,549,504 bytes for one `.cpfont` payload.
+
+Header version 1 is a fixed 156-byte little-endian record at slot offset 0:
+
+| Offset | Field |
+|---:|---|
+| 0 | `uint8 magic[8]` = `CPSDFC1\0` |
+| 8 | `uint16 version` = 1 |
+| 10 | `uint16 headerSize` = 156 |
+| 12 | `uint32 payloadSize` |
+| 16 | `uint32 contentHash` (FNV-1a of the `.cpfont` header and style TOC) |
+| 20 | `uint32 payloadCrc` |
+| 24 | `uint32 headerCrc` (CRC-32 with this field zeroed) |
+| 28 | NUL-terminated `char sourcePath[128]` |
+
+The `.cpfont` bytes start at offset 4096. A writer first erases the header,
+writes and CRC-verifies the complete payload, then commits the header last.
+Startup validates the header, source path and size, content hash, and normal
+`.cpfont` structure; it deliberately does not rescan the complete payload CRC.
+Any Flash read failure immediately falls back to the SD source.
+
+The legacy `CPOTAF1\0` Magic is rejected even when its header CRC is valid, so
+older caches safely fall back to SD and are rebuilt through the normal
+preprocessing flow.
+
+After an OTA, application confirmation is deferred until the new firmware has
+initialized the display and physically rendered its startup verification page.
+Only after confirmation cancels rollback may the old firmware slot be erased
+and rebuilt as a font cache. If that copy is interrupted or fails, the
+uncommitted header remains invalid and the selected font loads from SD.
+## CLX1 — library index (`.crosspoint/library.idx`)
+
+Written by `lib/LibraryIndex/LibraryBuilder.cpp`, read by `LibraryIndexFile`. One
+file describing every book on the card, so the shelf can sort and search
+thousands of titles without opening any of them.
+
+Format version 2. An index written by another version fails validation on open
+and is rebuilt; that is the entire migration mechanism.
+
+### Layout
+
+| Section | Offset | Contents |
+|---|---|---|
+| Header | 0 | 64 bytes, `ClixHeader` |
+| Folders | `folderStart` | length-prefixed paths, one per folder |
+| Records | `recordStart` | `bookCount` × 128-byte `ClixRecord` |
+| Permutations | `permStart` | `bookCount` u16 author order, then `bookCount` u16 arrival order |
+| Name blob | `nameStart` | per record: path hash, name, canonical author, title, source author (see below) |
+
+The arrival permutation runs oldest first, keyed by the record's FAT
+modification time (when the file landed on the card); `firstSeen` — the
+build-assigned discovery counter — breaks ties and carries books whose
+filesystem reports no time. Fold version 3 introduced the timestamp key; a
+fold bump rebuilds ranks while preserving `firstSeen`.
+Fold version 4 preserves leading articles in title sort and search keys.
+Fold version 6 changes which files are books: protected folders (`XTCache`,
+`System Volume Information`, dot-entries), small reader TXT records
+(`progress.txt`, `readTime.txt`, ... under 4 KiB) and `/crash_report.txt` are
+skipped. Version 5 was a development step and never merged.
+
+Sections are 512-byte aligned so each starts on an SD block boundary.
+
+### Records are exactly 128 bytes
+
+A fixed stride is what lets the reader seek straight to record *n* without an
+offset table, and read a screenful in one 4 KB block. `static_assert` enforces it.
+
+Each record carries `fold[96]`, the title normalised for search and sorting —
+accents stripped, case dropped, leading articles preserved — and `authorKey[12]`,
+the author's words folded and sorted so that "Victor Hugo" and "Hugo Victor" group as
+one person. `authorKey` is a GROUPING key, not an ordering one: the shelf orders by
+surname, derived separately from the display name.
+
+The byte before the folded title records metadata extraction status: not
+attempted, extracted, or failed. The final four bytes contain the packed FAT
+modification date and time returned by SdFat. A zero timestamp is not trusted.
+These fields occupy the alignment and reserved bytes from version 1, so the
+record remains exactly 128 bytes.
+
+The header records whether EPUB metadata extraction was enabled for the build.
+This prevents a metadata-disabled rebuild from making filename fallbacks look
+fresh to a later metadata-enabled build.
+
+### The name blob
+
+Per record, at `nameStart + nameOff`:
+
+```text
+[u64 pathHash]    FNV-1a fingerprint of the complete path
+[nameLen bytes]  filename, without the directory
+[u8][author]     display author, one spelling chosen per authorKey across the library
+[u8][title]      the book's own title, or length 0 if it never gave one
+[u8][source]     cleaned author spelling before the library-wide spelling vote
+```
+
+The filename must stay the first textual field and stay the filename: `readPath`
+rebuilds a book's path from it, so writing the display title there makes the book
+impossible to open. That was a real defect, and it is why title has its own field.
+
+The source author is separate from the displayed canonical author so a later
+rebuild can repeat the spelling vote after books are added or removed. Existing
+display reads still stop at the author or title fields and retain their offsets.
+
+### Freshness and unchanged rebuilds
+
+Reconciliation treats the persisted 64-bit complete-path fingerprint as the
+book identity. Metadata is reused only when the fingerprint, size, nonzero FAT
+timestamp, fold version, metadata mode, and expected extraction status agree.
+EPUBs with a zero timestamp or a previous extraction failure are parsed again.
+
+If every current record reuses metadata, the old and new counts agree, and no
+unreadable entry was seen, the staging files are discarded and the live index is
+left byte-for-byte unchanged. A normal rebuild action is therefore a freshness
+check, not a forced metadata reread.
+
+### Header flags
+
+`RANKS_DEGRADED` says one or more orders fell back to walk order because a
+checked sort allocation failed. Title and author each use a phase-local
+`SortKey[bookCount]` allocation (14 bytes per book, 57,344 bytes at the 4,096-book
+format ceiling); the first array is released before the second is requested.
+Sorting is therefore best effort through the full format limit rather than
+being disabled at an arbitrary library size.
+
+`DEDUP_DEGRADED` says a directory exceeded the fixed 1024-entry duplicate-key
+buffer, or that its fallible 8 KiB allocation failed. The walk still indexes
+every enumerated book; it only stops remembering additional identities for
+duplicate-dirent detection, so a damaged FAT may expose duplicates but cannot
+make a real book disappear.
+
+`selfSize` is the expected file size. Comparing it against the real one is a free
+truncation guard: a build cut short by a power failure cannot pass.

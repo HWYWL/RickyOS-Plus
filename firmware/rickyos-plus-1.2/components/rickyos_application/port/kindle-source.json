@@ -1,0 +1,8 @@
+{
+  "reference": "https://github.com/johnfactotum/foliate-js",
+  "commit": "78914aef4466eb960965702401634c2cb348e9b1",
+  "file": "mobi.js",
+  "license": "MIT",
+  "notice": "LICENSE.foliate-mobi",
+  "adaptation": "Bounded native C++ Palm/MOBI headers, PalmDOC/HUFF-CDIC and KF8 indices. No DOM, JavaScript runtime, DRM decryption or whole-book text allocation."
+}

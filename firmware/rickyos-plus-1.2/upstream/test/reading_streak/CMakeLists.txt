@@ -1,0 +1,4 @@
+add_executable(reading_streak_test ReadingStreakTest.cpp)
+target_include_directories(reading_streak_test PRIVATE ${REPO_ROOT}/src)
+target_link_libraries(reading_streak_test PRIVATE crosspoint_test_common GTest::gtest_main)
+gtest_discover_tests(reading_streak_test)

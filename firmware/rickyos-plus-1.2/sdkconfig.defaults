@@ -1,0 +1,103 @@
+CONFIG_IDF_TARGET="esp32s31"
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+CONFIG_ESPTOOLPY_FLASHMODE_DIO=y
+CONFIG_ESPTOOLPY_FLASHFREQ_80M=y
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_SPEED_200M=y
+CONFIG_SPIRAM_USE_MALLOC=y
+CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL=65536
+# Ordinary UI allocations above 2 KiB prefer PSRAM. The SDK's 16 KiB default
+# leaves too little internal/DMA memory beside retained Settings/font screens.
+# Explicit INTERNAL/DMA allocations keep their capability requirements.
+# See docs/plus-network-allocation-20261025.md for controlled device samples.
+CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=2048
+# S31 supports Wi-Fi/lwIP control and packet allocations in PSRAM. Keep DMA
+# buffers internal and bounded; concurrent browser sockets must not exhaust
+# the same internal heap used by TCP sends. See plus-web-response-20261020.md.
+CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP=y
+CONFIG_ESP_WIFI_STATIC_TX_BUFFER=y
+CONFIG_ESP_WIFI_STATIC_TX_BUFFER_NUM=16
+CONFIG_ESP_WIFI_CACHE_TX_BUFFER_NUM=32
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
+CONFIG_ESP_CONSOLE_SECONDARY_USB_SERIAL_JTAG=y
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+CONFIG_ESP_TASK_WDT_TIMEOUT_S=20
+CONFIG_FATFS_LFN_HEAP=y
+CONFIG_FATFS_API_ENCODING_UTF_8=y
+CONFIG_FATFS_CODEPAGE_936=y
+CONFIG_I2C_SUPPRESS_DEPRECATE_WARN=y
+
+CONFIG_FREERTOS_HZ=1000
+CONFIG_AUTOSTART_ARDUINO=n
+CONFIG_ARDUINO_SELECTIVE_COMPILATION=y
+CONFIG_ARDUINO_SELECTIVE_SPI=y
+CONFIG_ARDUINO_SELECTIVE_Wire=y
+CONFIG_ARDUINO_SELECTIVE_FS=y
+CONFIG_ARDUINO_SELECTIVE_SD_MMC=y
+CONFIG_ARDUINO_SELECTIVE_Network=y
+CONFIG_ARDUINO_SELECTIVE_WiFi=y
+CONFIG_ARDUINO_SELECTIVE_NetworkClientSecure=y
+CONFIG_ARDUINO_SELECTIVE_HTTPClient=y
+CONFIG_ARDUINO_SELECTIVE_Preferences=y
+CONFIG_ARDUINO_SELECTIVE_Update=y
+CONFIG_ARDUINO_SELECTIVE_Hash=y
+
+CONFIG_MBEDTLS_PSK_MODES=y
+CONFIG_MBEDTLS_KEY_EXCHANGE_PSK=y
+
+CONFIG_ARDUINO_SELECTIVE_ESPmDNS=y
+
+CONFIG_LWIP_SNTP_MAX_SERVERS=3
+
+CONFIG_COMPILER_OPTIMIZATION_SIZE=y
+# Assertions still abort; their file/expression strings are dropped to keep headroom in the app slot.
+CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_SILENT=y
+
+CONFIG_LWIP_DEBUG=y
+CONFIG_LWIP_SNTP_DEBUG=y
+
+CONFIG_TINYUSB_MSC_ENABLED=y
+CONFIG_TINYUSB_MSC_BUFSIZE=4096
+CONFIG_TINYUSB_DEBUG_LEVEL=0
+CONFIG_TINYUSB_MODE_DMA=y
+
+# CONFIG_LWIP_ETHARP_DEBUG is not set
+
+# CONFIG_LWIP_DNS_DEBUG is not set
+
+# CONFIG_LWIP_IP_DEBUG is not set
+
+# CONFIG_LWIP_UDP_DEBUG is not set
+
+# CONFIG_LWIP_ICMP_DEBUG is not set
+
+CONFIG_ESP_WIFI_NVS_ENABLED=y
+
+
+# SYN with SACK-permitted, like the Pico and every desktop OS: without it the COS
+# bucket (Tencent edge) never answers the Plus SYN. Experiment 2026-10-15.
+CONFIG_LWIP_TCP_SACK_OUT=y
+# The Pico's TCP receive window (32 KB) instead of 5760, experiment 2026-10-15.
+CONFIG_LWIP_TCP_WND_DEFAULT=32768
+CONFIG_LWIP_TCP_RECVMBOX_SIZE=32
+# WPA3-Personal station support. PlusWifiSecurity supplies explicit SAE PWE
+# negotiation for Arduino's zero-initialized STA configuration. Keep WPA2/PMF
+# optional networks usable; do not change the file-transfer hotspot's security.
+CONFIG_ESP_WIFI_ENABLE_WPA3_SAE=y
+CONFIG_ESP_WIFI_ENABLE_SAE_H2E=y
+CONFIG_ESP_WIFI_WPA3_COMPATIBLE_SUPPORT=y
+# CONFIG_ESP_WIFI_ENABLE_SAE_PK is not set
+# CONFIG_ESP_WIFI_SOFTAP_SAE_SUPPORT is not set
+# Bursts from nearby servers (the TLS reply from WeRead/Tencent) were lost with 10 RX buffers
+# and a 6-frame BA window: the handshake timed out with TCP up. With these it completes.
+CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM=24
+CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM=64
+CONFIG_ESP_WIFI_RX_BA_WIN=16
+
+# The panel bounce-buffer EOF interrupt must run while flash/PSRAM cache is off
+# (an NVS read from another task): a deferred refill re-sends rows 16 back, a
+# faint copy of the text beside it at the portrait left edge.
+CONFIG_LCD_RGB_ISR_IRAM_SAFE=y

@@ -1,0 +1,26 @@
+# Local toolchains, fetched dependencies, build trees, device logs.
+.local/
+logs/
+tools/
+
+# Generated resources (i18n tables, embedded HTML, compressed fonts).
+firmware/rickyos-plus-1.2/generated/
+firmware/**/sdkconfig
+firmware/**/sdkconfig.old
+firmware/**/managed_components/
+firmware/**/dependencies.lock
+
+# Restore staging directory; the verified snapshot lives in upstream/.
+firmware/rickyos-plus-1.2/upstream-restore/
+
+# Build outputs that must never be committed.
+firmware/**/dist/*.bin
+*.bin
+*.elf
+*.map
+build/
+build-*/
+
+__pycache__/
+.DS_Store
+Thumbs.db

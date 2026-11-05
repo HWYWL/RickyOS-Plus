@@ -1,0 +1,166 @@
+{
+  "rows": [
+    {
+      "phase": "power-default",
+      "attempt": 1,
+      "tcp_ok": false,
+      "errno": 116,
+      "tcp_ms": 15003,
+      "txdone": {
+        "total": 15,
+        "ok": 4,
+        "failed": 11,
+        "recorded": 15
+      }
+    },
+    {
+      "phase": "power-default",
+      "attempt": 2,
+      "tcp_ok": true,
+      "errno": 0,
+      "tcp_ms": 1363,
+      "txdone": {
+        "total": 4,
+        "ok": 2,
+        "failed": 2,
+        "recorded": 4
+      }
+    },
+    {
+      "phase": "power-same-explicit",
+      "attempt": 1,
+      "tcp_ok": false,
+      "errno": 116,
+      "tcp_ms": 15003,
+      "txdone": {
+        "total": 18,
+        "ok": 4,
+        "failed": 14,
+        "recorded": 18
+      }
+    },
+    {
+      "phase": "power-same-explicit",
+      "attempt": 2,
+      "tcp_ok": true,
+      "errno": 0,
+      "tcp_ms": 1353,
+      "txdone": {
+        "total": 6,
+        "ok": 3,
+        "failed": 3,
+        "recorded": 6
+      }
+    },
+    {
+      "phase": "power-cap13",
+      "attempt": 1,
+      "tcp_ok": false,
+      "errno": 116,
+      "tcp_ms": 15003,
+      "txdone": {
+        "total": 15,
+        "ok": 4,
+        "failed": 11,
+        "recorded": 15
+      }
+    },
+    {
+      "phase": "power-cap13",
+      "attempt": 2,
+      "tcp_ok": true,
+      "errno": 0,
+      "tcp_ms": 1181,
+      "txdone": {
+        "total": 5,
+        "ok": 4,
+        "failed": 1,
+        "recorded": 5
+      }
+    },
+    {
+      "phase": "power-cap5",
+      "attempt": 1,
+      "tcp_ok": true,
+      "errno": 0,
+      "tcp_ms": 116,
+      "txdone": {
+        "total": 6,
+        "ok": 6,
+        "failed": 0,
+        "recorded": 6
+      }
+    },
+    {
+      "phase": "power-cap5",
+      "attempt": 2,
+      "tcp_ok": true,
+      "errno": 0,
+      "tcp_ms": 100,
+      "txdone": {
+        "total": 5,
+        "ok": 5,
+        "failed": 0,
+        "recorded": 5
+      }
+    },
+    {
+      "phase": "power-original-repeat",
+      "attempt": 1,
+      "tcp_ok": true,
+      "errno": 0,
+      "tcp_ms": 14810,
+      "txdone": {
+        "total": 21,
+        "ok": 9,
+        "failed": 12,
+        "recorded": 21
+      }
+    },
+    {
+      "phase": "power-original-repeat",
+      "attempt": 2,
+      "tcp_ok": true,
+      "errno": 0,
+      "tcp_ms": 94,
+      "txdone": {
+        "total": 4,
+        "ok": 4,
+        "failed": 0,
+        "recorded": 4
+      }
+    }
+  ],
+  "ap_identity_checks": [
+    {
+      "phase": "power-default",
+      "same_ap_as_initial": true
+    },
+    {
+      "phase": "power-same-explicit",
+      "same_ap_as_initial": true
+    },
+    {
+      "phase": "power-cap13",
+      "same_ap_as_initial": true
+    },
+    {
+      "phase": "power-cap5",
+      "same_ap_as_initial": true
+    },
+    {
+      "phase": "power-original-repeat",
+      "same_ap_as_initial": true
+    },
+    {
+      "phase": "restore",
+      "same_ap_as_initial": true
+    }
+  ],
+  "original_power_quarter_dbm": 80,
+  "low_power_quarter_dbm": 20,
+  "exact_same_binary_sha256": "ef531b75f8ac9df666dede48ecea09c70552cb93434f7402533dbdb0e41c9181",
+  "normal_firmware_restored": true,
+  "boot_verified": true,
+  "interpretation": "At 5 dBm first TCP succeeds in 116 ms with zero TX failures; default/explicit20 and13 dBm first TCP time out at15 s. Returning20 dBm first TCP takes14.810 s with12 TX failures, ultimately succeeds. Same AP and same binary independent boot. Supports power-dependent link fault/mitigation; unique hardware/PHY/supply cause and far-range acceptance not established."
+}

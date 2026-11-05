@@ -1,0 +1,85 @@
+{
+  "candidate_sha256": "449b42a905c2ddf0d9c02106ca4a2e159bd739f851a09c65535e1b5b6543db98",
+  "downloads": [
+    {
+      "name": "wallpapers",
+      "result": 0,
+      "download_ms": 827,
+      "bytes": 3965,
+      "crc32": 252721562,
+      "content_match": true,
+      "cleanup": true,
+      "only_cos": null
+    },
+    {
+      "name": "fonts",
+      "result": 0,
+      "download_ms": 676,
+      "bytes": 9024,
+      "crc32": 2970146193,
+      "content_match": true,
+      "cleanup": true,
+      "only_cos": null
+    },
+    {
+      "name": "font12",
+      "result": 0,
+      "download_ms": 6702,
+      "bytes": 1763452,
+      "crc32": 2837099957,
+      "content_match": true,
+      "cleanup": true,
+      "only_cos": true
+    },
+    {
+      "name": "wallpapers",
+      "result": 0,
+      "download_ms": 565,
+      "bytes": 3965,
+      "crc32": 252721562,
+      "content_match": true,
+      "cleanup": true,
+      "only_cos": null
+    }
+  ],
+  "clock": {
+    "began": 1,
+    "success": 1,
+    "valid_time": 1,
+    "epoch": 1792118350,
+    "ms": 1096,
+    "radio_owners": 0
+  },
+  "summary": {
+    "downloads_passed": 4,
+    "expected": 4,
+    "auto_reconnect_restored": 1
+  },
+  "dns_bypassed": false,
+  "download_api": "HttpDownloader actual production path",
+  "font_was_temporary_file_not_installed_family": true,
+  "normal_ui_boot_before_auto_test": true,
+  "original_saved_ap_auto_selected": true,
+  "diagnostic_removed": true,
+  "ordinary_baseline_restored": true,
+  "ordinary_baseline_boot_verified": true,
+  "txdone_totals": [
+    {
+      "total": 15,
+      "failed": 0
+    },
+    {
+      "total": 15,
+      "failed": 0
+    },
+    {
+      "total": 761,
+      "failed": 0
+    },
+    {
+      "total": 14,
+      "failed": 0
+    }
+  ],
+  "clock_source": "native SNTP reply; no HTTPS fallback"
+}

@@ -1,0 +1,29 @@
+name: Read Pico host checks
+
+on:
+  pull_request:
+    paths:
+      - 'libs/display/**'
+      - 'libs/hardware/**'
+      - '.github/workflows/readpico-host.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'libs/display/**'
+      - 'libs/hardware/**'
+      - '.github/workflows/readpico-host.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  readpico-host:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Check display, initialization failures and PMU concurrency
+        run: python3 libs/display/EpdiyLcd/test/host/test_transactions.py

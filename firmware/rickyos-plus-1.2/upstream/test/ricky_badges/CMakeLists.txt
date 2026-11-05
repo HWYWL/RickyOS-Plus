@@ -1,0 +1,4 @@
+add_executable(ricky_badges_test RickyBadgesTest.cpp)
+target_include_directories(ricky_badges_test PRIVATE ${REPO_ROOT}/src)
+target_link_libraries(ricky_badges_test PRIVATE crosspoint_test_common GTest::gtest_main)
+gtest_discover_tests(ricky_badges_test)

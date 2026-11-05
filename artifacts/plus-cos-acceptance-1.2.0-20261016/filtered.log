@@ -1,0 +1,46 @@
+I (1581) app_init: App version:      1.2.0
+[33571] [INF] [ACCEPT] begin cold_downloads=4 native_clock=1
+[40476] [INF] [ACCEPT] name=wallpapers joined=1 route=1 join_ms=6901 rssi=-55
+[40491] [INF] [WIFI] TX power lease: previous=80 applied=20 owners=1
+[41569] [INF] [HTTP] 3965 B in 1076 ms (3 KB/s), status 200: https://rickyos-1309217881.cos.ap-guangzhou.myqcloud.com
+[41575] [INF] [WIFI] Last TX power owner released: restored=80 result=0
+[41584] [INF] [WIFI] Last radio owner released: restored=1 result=0
+[41590] [INF] [HTTP] Transfer timing: bytes=3965 totalMs=1102 writeMs=9 inputMs=0 writes=3 result=0
+[41815] [INF] [ACCEPT] name=wallpapers result=0 download_ms=1134 bytes=3965 crc32=252721562 content_match=1 cleanup=1 only_cos=-1
+[41816] [INF] [ACCEPT] name=wallpapers after_power_read=0 after_power=80 radio_owners=0
+[51652] [INF] [ACCEPT] name=fonts joined=1 route=1 join_ms=9828 rssi=-55
+[51666] [INF] [WIFI] TX power lease: previous=80 applied=20 owners=1
+[52470] [INF] [HTTP] 9024 B in 801 ms (11 KB/s), status 200: https://rickyos-1309217881.cos.ap-guangzhou.myqcloud.com
+[52476] [INF] [WIFI] Last TX power owner released: restored=80 result=0
+[52486] [INF] [WIFI] Last radio owner released: restored=1 result=0
+[52492] [INF] [HTTP] Transfer timing: bytes=9024 totalMs=828 writeMs=14 inputMs=0 writes=6 result=0
+[52718] [INF] [ACCEPT] name=fonts result=0 download_ms=858 bytes=9024 crc32=2970146193 content_match=1 cleanup=1 only_cos=-1
+[52718] [INF] [ACCEPT] name=fonts after_power_read=0 after_power=80 radio_owners=0
+[60003] [INF] [ACCEPT] name=font12 joined=1 route=1 join_ms=7278 rssi=-55
+[60022] [INF] [WIFI] TX power lease: previous=80 applied=20 owners=1
+[61882] [INF] [ACCEPT] font_progress bytes=263458 total=1763452 ms=1869
+[62742] [INF] [ACCEPT] font_progress bytes=527394 total=1763452 ms=2729
+[63665] [INF] [ACCEPT] font_progress bytes=791378 total=1763452 ms=3652
+[64525] [INF] [ACCEPT] font_progress bytes=1055362 total=1763452 ms=4512
+[65415] [INF] [ACCEPT] font_progress bytes=1319298 total=1763452 ms=5402
+[66220] [INF] [ACCEPT] font_progress bytes=1583234 total=1763452 ms=6207
+[66812] [INF] [HTTP] 1763452 B in 6783 ms (259 KB/s), status 200: https://rickyos-1309217881.cos.ap-guangzhou.myqcloud.com
+[66819] [INF] [WIFI] Last TX power owner released: restored=80 result=0
+[66828] [INF] [WIFI] Last radio owner released: restored=1 result=0
+[66834] [INF] [HTTP] Transfer timing: bytes=1763452 totalMs=6815 writeMs=1931 inputMs=16 writes=868 result=0
+[68249] [INF] [ACCEPT] name=font12 result=0 download_ms=6846 bytes=1763452 crc32=2837099957 content_match=1 cleanup=1 only_cos=1
+[68250] [INF] [ACCEPT] name=font12 after_power_read=0 after_power=80 radio_owners=0
+[74438] [INF] [ACCEPT] name=clock joined=1 route=1 join_ms=6181 rssi=-55
+[74442] [INF] [WIFI] TX power lease: previous=80 applied=20 owners=1
+[74914] [INF] [WIFI] Last TX power owner released: restored=80 result=0
+[74915] [INF] [WIFI] Last radio owner released: restored=1 result=0
+[74980] [INF] [ACCEPT] clock began=1 success=1 valid_time=1 epoch=1792124549 ms=541 radio_owners=0
+[81164] [INF] [ACCEPT] name=wallpapers-repeat joined=1 route=1 join_ms=6184 rssi=-56
+[81179] [INF] [WIFI] TX power lease: previous=80 applied=20 owners=1
+[81683] [INF] [HTTP] 3965 B in 498 ms (7 KB/s), status 200: https://rickyos-1309217881.cos.ap-guangzhou.myqcloud.com
+[81688] [INF] [WIFI] Last TX power owner released: restored=80 result=0
+[81698] [INF] [WIFI] Last radio owner released: restored=1 result=0
+[81704] [INF] [HTTP] Transfer timing: bytes=3965 totalMs=528 writeMs=7 inputMs=0 writes=3 result=0
+[81885] [INF] [ACCEPT] name=wallpapers result=0 download_ms=562 bytes=3965 crc32=252721562 content_match=1 cleanup=1 only_cos=-1
+[81886] [INF] [ACCEPT] name=wallpapers after_power_read=0 after_power=80 radio_owners=0
+[81894] [INF] [ACCEPT] done downloads_passed=4 expected=4 auto_reconnect_restored=1

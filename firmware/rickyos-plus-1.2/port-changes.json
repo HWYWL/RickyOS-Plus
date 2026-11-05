@@ -1,0 +1,1455 @@
+{
+  "baseline": "a42d939944c4495a8731b194171e365c85e5a000",
+  "sdk_baseline": "96de1be6ce08eb732909e6e8149af8f892b9a2c5",
+  "changes": [
+    {
+      "path": "freeink-sdk/libs/book/ContentProtection/src/WolfsslCrypto.cpp",
+      "baseline_sha256": "acf1109473c9290cedca944e8bc7779264c3d985b8e6a314270e2014f602174f",
+      "ported_sha256": "f3b27c1edabcd03c59963e9a90cdd46b10c554132569d9462742a6b3ba0cd0c0"
+    },
+    {
+      "path": "freeink-sdk/libs/hardware/BatteryMonitor/include/BatteryMonitor.h",
+      "baseline_sha256": "e9cb6848a141ab3adf8e43587ac2fd63bae74cd25faa3da2310df8495e79b0d4",
+      "ported_sha256": "f18b240909e17bb18f70260ad9f3cab0d20876deb87e01880735c78ff71642aa"
+    },
+    {
+      "path": "freeink-sdk/libs/hardware/BatteryMonitor/src/BatteryMonitor.cpp",
+      "baseline_sha256": "f6a217520fd415968d75ac1b1e226283d397b28469ab3e44570c085d36d30eec",
+      "ported_sha256": "b46d578f412cc2226b68242e035280eab1e0546d39a5d4637e222237314a4157"
+    },
+    {
+      "path": "freeink-sdk/libs/hardware/BoardConfig/include/BoardConfig.h",
+      "baseline_sha256": "65bb181509420675162eb6c06a1e17c4b66b1e0eca38ed0a767e2bdc196693a2",
+      "ported_sha256": "f1a2edf4dbd8c03daa88104258c4fea035435f62fa5780ee1b34cd845e80a7af"
+    },
+    {
+      "path": "freeink-sdk/libs/hardware/FrontlightManager/include/FrontlightManager.h",
+      "baseline_sha256": "981d6bf33786e861d16f573d014777560ed4f12893cbe5b24ecdd8c9eec9e13b",
+      "ported_sha256": "4a4beb791a029a0fbc9ff168bb0af9c248b76a02a80415a9eec4fd2728b6e6d7"
+    },
+    {
+      "path": "freeink-sdk/libs/hardware/FrontlightManager/src/FrontlightManager.cpp",
+      "baseline_sha256": "e687a061e08c2b0387c7af27082ebc66a804d6f1e7d80f4f0e2b7c5305ffb298",
+      "ported_sha256": "5de1bbd49a3492f1bd34a1886ca9c0416be84eac986fd9f6edd03e5ea4dcf9f7"
+    },
+    {
+      "path": "freeink-sdk/libs/hardware/Imu/include/Imu.h",
+      "baseline_sha256": "ece19fd3b6d2746bd852ef3e84864f087335cc83a440ebcee28aefc95b7664de",
+      "ported_sha256": "775756304499cab37a3ef70b0b5e8342b22992220a1c6b6dd1975c3a204fee15"
+    },
+    {
+      "path": "freeink-sdk/libs/hardware/Imu/src/Imu.cpp",
+      "baseline_sha256": "38706e89c2277c4cb924cbd37705213ac31f63fb54ffe80b9abffc3eff9ebbd8",
+      "ported_sha256": "3d95948541cb01b6294e4b63983f07aa6c0f64910ea31524c7c07b56c245dfaf"
+    },
+    {
+      "path": "freeink-sdk/libs/hardware/InputManager/include/InputManager.h",
+      "baseline_sha256": "f093f88a3096281e2cd5d0a766e20abaa263bb4efbe49379fc4c4c64dd419baa",
+      "ported_sha256": "4c7b2152ea3b3542aab2913d1a8fb393667b382aa51eaed3305f5b2354121cf8"
+    },
+    {
+      "path": "freeink-sdk/libs/hardware/InputManager/src/InputManager.cpp",
+      "baseline_sha256": "3a42a0bb11354775900ed8fa06a25bd5ec12a083ba97c8ddc872840b52ba3ada",
+      "ported_sha256": "1ac7290facab2d600ee51c6cbda8daba97fa94a8552f3f656762458711b2b810"
+    },
+    {
+      "path": "freeink-sdk/libs/hardware/PowerManager/src/PowerManager.cpp",
+      "baseline_sha256": "2c76b408db836c96fbd0d6f288c3ba5dbd7494a3eb2709bc02c38809b6a14a5b",
+      "ported_sha256": "effa795fad7f9bb0176cb3df64cd1587c1b7ba88f8a135d387c688bab3942de9"
+    },
+    {
+      "path": "freeink-sdk/libs/hardware/Rtc/src/Rtc.cpp",
+      "baseline_sha256": "863de99db69d15cb431f2ee5f547f7858a1f73aba8b5850beac7f4abb41eb3df",
+      "ported_sha256": "1507ad1dd08a4fe46f481612fef1a685c1a84f15b87f0ee51fdc925000084a2b"
+    },
+    {
+      "path": "freeink-sdk/libs/hardware/SDCardManager/src/SDCardManager.cpp",
+      "baseline_sha256": "905e335adb3b0a88cd391632089a0093b86e5e42dfe4d2293137db2ba9c3e042",
+      "ported_sha256": "b3b1f14e1857892f9af22776cae358b482acf4bc092ad0d7a7b25f7d698a63cc"
+    },
+    {
+      "path": "freeink-sdk/libs/network/SecureNet/include/SecureClient.h",
+      "baseline_sha256": "b6251189f9a0b89753e132322d09440a5c66468e6c81e7d255c898ea1f941a43",
+      "ported_sha256": "a45483981fe189de17675dfef3017300231ba2325a306f17e1899c747540c98c"
+    },
+    {
+      "path": "freeink-sdk/libs/network/SecureNet/include/SecureHttpClient.h",
+      "baseline_sha256": "690c9772a16013702e124afd21c5c050f281f1fa20a0d2f38d7906b975ebca72",
+      "ported_sha256": "1295d136991d74955a204c3e06f339603bcaeba131851003a9fdc8b920f2b182"
+    },
+    {
+      "path": "freeink-sdk/libs/network/SecureNet/src/SecureClient.cpp",
+      "baseline_sha256": "544d404e40b81e254a418118623c01a207897b72f7297fd2275b1fe44160dfd5",
+      "ported_sha256": "17113a738861b3de994ef57f0b0925d5e97d913ea555a0adecfb66643b128f95"
+    },
+    {
+      "path": "lib/EpdFont/FontDecompressor.cpp",
+      "baseline_sha256": "a0f43a7c458ecbbb34a150e405de3b90f0e6f16e18e8ef54fa56978303674697",
+      "ported_sha256": "20d6a39b0f6b0757d234578e91d1a34da17c66e9ef56c3b9f198532569fa3f81"
+    },
+    {
+      "path": "lib/EpdFont/FontDecompressor.h",
+      "baseline_sha256": "b7032c8393f5d0cebe67c75c2b9b268e3c0c248b1449a4e1fc6069baee083c89",
+      "ported_sha256": "fcd27f2631a3b5a7c9c39db1b809a2af3ec9209e0ef2b498771a5ba9fe797baf"
+    },
+    {
+      "path": "lib/EpdFont/TtfEpdFont.cpp",
+      "baseline_sha256": "eff434819e1097126a59adb0e9a0211f784e72c283b175634112a46057b7e98b",
+      "ported_sha256": "6eb7f02fc23d039d7897eee333b71c4f66cac2dcc24fedddc01317221a5909bc"
+    },
+    {
+      "path": "lib/EpdFont/TtfEpdFont.h",
+      "baseline_sha256": "6f2da94b59d2f8b0914ed67a6af2f81565f956d20b61c42c0405a7c2721ba9e9",
+      "ported_sha256": "d4111cd762a8e5976ab8e1c23c54a27ea6b9f43c4f8b768e2522b58ea35af4cd"
+    },
+    {
+      "path": "lib/EpdFont/builtinFonts/notosans_cjk_10.h",
+      "baseline_sha256": "7971ead5003be78d2a5df8d67ff272240084d0ab669708a593096ce6f7649bac",
+      "ported_sha256": "cba6e330133e8f540b907d938f47bcc1a0711acd7f8edec6fc0bd7a28c52ad72"
+    },
+    {
+      "path": "lib/EpdFont/builtinFonts/notosans_cjk_12.h",
+      "baseline_sha256": "f2772d09397c0a7ac8e3c582d3c6023b7ee10d9ec44febf66803eb8ce316a1b9",
+      "ported_sha256": "972665c74b7acb951349bdb39e8018325af76b0149e160fc2f408ba37ac74761"
+    },
+    {
+      "path": "lib/EpdFont/builtinFonts/notosans_cjk_14.h",
+      "baseline_sha256": "56d1b1092c13ed0a8a918280de3f9c03045bdf0bd97aa554ff208493ea1dcf5d",
+      "ported_sha256": "1a298c300e3edd6d6a03629f069f28e8a81fdff3ba35bced9b2db62086cb5763"
+    },
+    {
+      "path": "lib/EpdFont/builtinFonts/notosans_cjk_16.h",
+      "baseline_sha256": "49d4e1846c27fa058dd343d20548a80314ed853bd8d98c528016a53da48c7e85",
+      "ported_sha256": "85eb6ebd8118cf580f52bbd7173679bf994336b75a1232836bc1fee81762d975"
+    },
+    {
+      "path": "lib/EpdFont/builtinFonts/notosans_cjk_18.h",
+      "baseline_sha256": "4842a61e8f0e680c81af99a2c79eff1c779249119a4848ae4c1ed1c74768792c",
+      "ported_sha256": "ab26952d2ac8d10ffc56bafaaa4bf7fab4096c9ba49b1ddfc36c294d84ebd66e"
+    },
+    {
+      "path": "lib/EpdFont/builtinFonts/notosans_cjk_8.h",
+      "baseline_sha256": "d82568dc62adb87e4de09b79908fe2bd07667866a008e1da4979e81b52a968d5",
+      "ported_sha256": "db8d04dc1e2c105b38118a459ad1e291133f7a741ec6f7b8efe08f31733af848"
+    },
+    {
+      "path": "lib/EpdFont/builtinFonts/notosans_cjk_common_intervals.h",
+      "baseline_sha256": "ba5bf100757b0d883357e0447f312cd3ca0946ff3353bd845b5175aa1387605a",
+      "ported_sha256": "73738c0787764f06730ef2700d1d7b0369311ff49ef2b04a1f55aabbb3f4d0ef"
+    },
+    {
+      "path": "lib/EpdFont/builtinFonts/ricky_book_12_medium.h",
+      "baseline_sha256": null,
+      "ported_sha256": "037d89412eb026cba7d8deb06e56c411c9dbc969f4b373c213e8fcefc38d052d"
+    },
+    {
+      "path": "lib/EpdFont/builtinFonts/ricky_caption_10_regular.h",
+      "baseline_sha256": "d9e32b31e4a385b9b846ab3d80d66b6dc79b513c1c9ce2f58ce9ac5c08355cb5",
+      "ported_sha256": "0a0cf32ef3f374aafd8187e167c0cdf08ab5acafdb9a260fa4a525697c8256b9"
+    },
+    {
+      "path": "lib/EpdFont/builtinFonts/ricky_headline_14_medium.h",
+      "baseline_sha256": "6440daae5bef749d4ac14557bcbb77130d165bc12790bc03fb06e016dbac73ab",
+      "ported_sha256": "593cc83f336728bfd280ee029521ee98c8a832dd29352ce078b9efc41b1c8fd5"
+    },
+    {
+      "path": "lib/EpdFont/builtinFonts/ricky_title_16_bold.h",
+      "baseline_sha256": "ef9b2a5868a9c9d0232f96edccc3346b34be7f5969b0fb7a19e76d3169421ac0",
+      "ported_sha256": "281cec5a7e4d82be5bbec38fc84daa5acda68524cd0a136754f77f40582756b3"
+    },
+    {
+      "path": "lib/EpdFont/scripts/cn_common_chars.txt",
+      "baseline_sha256": "5e76b157c329b56c6c0a21dc12a73004e9c2c2920a48cae94f2551f0172ef411",
+      "ported_sha256": "65885c872d18a96d9e0a22345b3fce68b02d306e8f1848d182467273231c9265"
+    },
+    {
+      "path": "lib/EpdFont/scripts/cn_i18n_chars.txt",
+      "baseline_sha256": "d13e7b41e90b999d53d937c519ca059cfa815cfadb844a7fb9d175bfa44dc87e",
+      "ported_sha256": "831853120c8e550baaae7852735bc1200f9b73ba7bd67636e939cb0376997297"
+    },
+    {
+      "path": "lib/Epub/Epub.cpp",
+      "baseline_sha256": "a104a180f95744bcdd6ef4fede82fe33cc20e539cd8fb9e075f0f52002b6e95e",
+      "ported_sha256": "c99b06d1d4201f73b64528c85602496a7e0923951889dde56bfd01cc5d2878a4"
+    },
+    {
+      "path": "lib/Epub/Epub.h",
+      "baseline_sha256": "0f47da662224f5dac3f3a37aae7bc0d3574abb1aad1424f2293bf30247a89671",
+      "ported_sha256": "4f557762bd9ce5563ba0029e55bd964634f48d47697cdb226ad21d2c3a7d20b3"
+    },
+    {
+      "path": "lib/Epub/Epub/BookFonts.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "18afee9c70e32865c0fcb594a7be7a28f4eb2b90955158f5bff2807b45417a50"
+    },
+    {
+      "path": "lib/Epub/Epub/BookFonts.h",
+      "baseline_sha256": null,
+      "ported_sha256": "a8c2c81a82c7d7b962f56e0e23349435659fa47bec8a87e95a9612652791d217"
+    },
+    {
+      "path": "lib/Epub/Epub/BookMetadataCache.cpp",
+      "baseline_sha256": "0c565fb939b22ccb6817425b4e1a567e1836cfb6bb50c6d0eb659773e387163b",
+      "ported_sha256": "2a3e30c0a40b7d66c2d7915c117262726f1b8a98a20f216631cf93e999166588"
+    },
+    {
+      "path": "lib/Epub/Epub/BookMetadataCache.h",
+      "baseline_sha256": "e3f7276514d718db3cea23e5f51ab4912e722a1e30dad49cdf495569dab82f29",
+      "ported_sha256": "651541e93ac16843bfda3f18d4c3ad32a693012c6df41b439b7186ce212ac4ca"
+    },
+    {
+      "path": "lib/Epub/Epub/Page.cpp",
+      "baseline_sha256": "3041bb6d9f0a1d20b49400a39816568f58db4590dde8e9c1e849f005ecd4d25c",
+      "ported_sha256": "3dd79e2e8dbb9e547582a47bc9feb28d66356f345950fa12de6645e51d55b879"
+    },
+    {
+      "path": "lib/Epub/Epub/Page.h",
+      "baseline_sha256": "d3211e40dbb118275aa0fcc8ea175a0ec89a5a282641dbf35cd1aab1a35946af",
+      "ported_sha256": "31a5f83c248eb498bb26623a9b5b33fa9ab4e3c1ea6e9bd1a3e21d3ed62d684f"
+    },
+    {
+      "path": "lib/Epub/Epub/ParsedText.cpp",
+      "baseline_sha256": "5eb2780dddefe910c206fc7c78163cc7462ed5b2b61fea380caf858ff9448439",
+      "ported_sha256": "e4aede6ce6e3796e5001824c3acdc3f453a351235e1d99d87f07a1536d3f1ccc"
+    },
+    {
+      "path": "lib/Epub/Epub/ParsedText.h",
+      "baseline_sha256": "de6100a79277145d89f0fde08d63dd83b3fb199082779434cf2f876e4486d1ce",
+      "ported_sha256": "bb5cfe481b6068d02e684d7975ab621e69f981adacc610812f788fc92e83dfea"
+    },
+    {
+      "path": "lib/Epub/Epub/ReaderRenderSpec.h",
+      "baseline_sha256": "42f8e30e437a10b38a9659698a34f3b00bde48c1418958e9f1970ace61b42321",
+      "ported_sha256": "80719566dffc43e5f9627b08451aaf1db8693b425dcca5d8e4327475e7c8ccff"
+    },
+    {
+      "path": "lib/Epub/Epub/Section.cpp",
+      "baseline_sha256": "01de5535d5106a94583eeeae5b1b59ad6878acbf75d2771f07d91e79a0bbde15",
+      "ported_sha256": "77ed95048015f39b9696b61b93adaefaf8ea053df9691e933c8b82d0a530c3ff"
+    },
+    {
+      "path": "lib/Epub/Epub/WordLook.h",
+      "baseline_sha256": null,
+      "ported_sha256": "60cd0f104e6870f22b7e9ee367c3f5e001888915589db5bff4236ea242254946"
+    },
+    {
+      "path": "lib/Epub/Epub/blocks/BlockStyle.h",
+      "baseline_sha256": "31a06e49eb4952267d6be5db575d2916373c164867170f681805a62ddee26fee",
+      "ported_sha256": "5ce3274d74273830e4f90043146b8af453b28ea476a5169540b027b56c51ca77"
+    },
+    {
+      "path": "lib/Epub/Epub/blocks/ImageBlock.cpp",
+      "baseline_sha256": "cc01768f0aa7a90cae80b176f6856cc0219ae9e2251c09a1c41e2df9f13e902a",
+      "ported_sha256": "44069b564e18cfbb3138e7aba5633cfe90522450d93985a9def7e828c60be67b"
+    },
+    {
+      "path": "lib/Epub/Epub/blocks/ImageBlock.h",
+      "baseline_sha256": "eb2dd76470f1119fbc94e5cac2e2326ca087e5d4a58e5cf0a1a1a307c64dbddc",
+      "ported_sha256": "0a141971b94de7eead24fb20fed4b9facae814bd53c5a45edf1f7d86d66fe0fc"
+    },
+    {
+      "path": "lib/Epub/Epub/blocks/TextBlock.cpp",
+      "baseline_sha256": "a0f2d88d44074e83df0ad1dcbae19af306211f4ed6dc02fd67077287215712d2",
+      "ported_sha256": "3f8c0591b5d4134e6e2c2702ae315db30d7c156c0724bacacbde872ee906c061"
+    },
+    {
+      "path": "lib/Epub/Epub/blocks/TextBlock.h",
+      "baseline_sha256": "8b9b11685c29c2ee9f412c3ed09017e86ba33f043b05c7e9355133a5c7ba39d8",
+      "ported_sha256": "d34758e4f44f580391f0afc3cbf9ce1188ab77c8f484f116785170ef846ca850"
+    },
+    {
+      "path": "lib/Epub/Epub/converters/ImageDecoderFactory.cpp",
+      "baseline_sha256": "5e57b0225d135eefc225fa3ea1074627726e8d26278fcf1acd8182a297f840a4",
+      "ported_sha256": "21b6f134ff4dc099c3e4bdd9fb313630910d21fb963ed93fa5ee8628ad79861d"
+    },
+    {
+      "path": "lib/Epub/Epub/converters/JpegToFramebufferConverter.cpp",
+      "baseline_sha256": "cee4267399fa69f4eb8350a756c170dfb868ecb716b87ca28f3f94c6a4da485c",
+      "ported_sha256": "b457f55f0cb6b6820a051ad0d1b1a9c475bd033a9597ec514ed80b3f7d7f00fd"
+    },
+    {
+      "path": "lib/Epub/Epub/converters/PngToFramebufferConverter.cpp",
+      "baseline_sha256": "9c47bdd5169c5a5df56da843e5f7f33d2659f66a86e1dc717473577d59ea0ea9",
+      "ported_sha256": "41b26e4b552368f047baa151628d4004f3010b18db6bf1baf80115be6d54b03f"
+    },
+    {
+      "path": "lib/Epub/Epub/css/CssParser.cpp",
+      "baseline_sha256": "4c35fc4083101ebfe9595ddae76a3eaaafda335f1f37eacea395a45a1ebbed4f",
+      "ported_sha256": "b61c6251c53abc94d9430e55103656b87e81c7b9c2a520b9c0f8a69768441f7f"
+    },
+    {
+      "path": "lib/Epub/Epub/css/CssParser.h",
+      "baseline_sha256": "66d734e180d09f666647ec707752952fc978cde83e8da152e7fe49c40c6acfac",
+      "ported_sha256": "344a6fe1ff854891711c191c226bc9707cb021b9681bb347690b1ffa967bcb8e"
+    },
+    {
+      "path": "lib/Epub/Epub/css/CssStyle.h",
+      "baseline_sha256": "c0f7ab38205ec6ae3fac5dfab9613d4efc31c800858246751e772c60760bd338",
+      "ported_sha256": "2cf48a7cf7762f2969c97109b3000bc2a293c9c7cf3fc37f0fb4cbdc13be5280"
+    },
+    {
+      "path": "lib/Epub/Epub/parsers/ChapterHtmlSlimParser.cpp",
+      "baseline_sha256": "4327cec5abfe03692da0280846862a29b3491449ba1ca9008f4503f6beb26fef",
+      "ported_sha256": "b2ee308cbf7025c5fc299668754f1b51c960a7bf482a3eac3616a7e501f67771"
+    },
+    {
+      "path": "lib/Epub/Epub/parsers/ChapterHtmlSlimParser.h",
+      "baseline_sha256": "21097841f36c684a9e8790c5fa33d8ad02a7097542d5c7bdc3dbe53e981eb4a7",
+      "ported_sha256": "59d740d6cfa43e9ee20c3710d6cb7f0ebdf26f69aa843f1e52b424d6cbbbe052"
+    },
+    {
+      "path": "lib/FsHelpers/FsHelpers.cpp",
+      "baseline_sha256": "312700b63cdcd3fee0ea93c5043a57da15132e15fce8d5f768725b48fafd732d",
+      "ported_sha256": "95fc42af967df3802e3bbde131298aae3ebbbc7bdd34f25b4653c3549d7af24d"
+    },
+    {
+      "path": "lib/GfxRenderer/FontCacheManager.cpp",
+      "baseline_sha256": "59f5464b92716d30769fe77d39fa3a3e8fda95249cc63f81240bd9ea08ebbdf4",
+      "ported_sha256": "8e77fcd670464e4f21e8c4c5834e92ba91a5163e1e20078a7f1a6878284da94a"
+    },
+    {
+      "path": "lib/GfxRenderer/GfxRenderer.cpp",
+      "baseline_sha256": "d9bb2737f8a0da787c6e8b956410d1aeee92e58d6cb87f80eb776f4bba3c4075",
+      "ported_sha256": "5d95e3365e9810d5d547a38b471dc0fd71afd3be1aeb5342c278d449ba01fee8"
+    },
+    {
+      "path": "lib/GfxRenderer/GfxRenderer.h",
+      "baseline_sha256": "d0b47eb0d21f8256d9d509e910dbd8c94795c27621d7b85e8638aa0370097f13",
+      "ported_sha256": "fcfd310ed21619f3b5aa4d75b51658aafa81bb94219f9cda9eb2f3da2cbd7cd2"
+    },
+    {
+      "path": "lib/I18n/translations/chinese.yaml",
+      "baseline_sha256": "021ec5b9e5880155fea752af9c60ce83a259dd69131f9bd12ffe0ca59e3366bd",
+      "ported_sha256": "5d0cbffc76c9f50ff18dcb570bad54ee0c2e3d6e8ea30c0f68a7843bc09b73b0"
+    },
+    {
+      "path": "lib/I18n/translations/english.yaml",
+      "baseline_sha256": "85a4d226f1400f6a185759420c63ecff5f81eeb3722afd66c312d4aec6bcb315",
+      "ported_sha256": "1b91d76b845f0d11b3acb9a1cd23ea68b1f39245d93b230253898cd6d58a8e7f"
+    },
+    {
+      "path": "lib/JpegToBmpConverter/JpegToBmpConverter.cpp",
+      "baseline_sha256": "a7bcdaa84264b1f20301c5436baf3fc0d030cf16094ea6e29a14068bba7b506b",
+      "ported_sha256": "4d39b96f2aec094e900147c9a7ac29ae67a2586154adcf038dad1ad82b772901"
+    },
+    {
+      "path": "lib/JpegToBmpConverter/JpegToBmpConverter.h",
+      "baseline_sha256": "7dbbd16335049668975fb756f1ae92f432bf274f296b61b8c9a3f09372df3e92",
+      "ported_sha256": "7b9d2c0c836925f80af89e9c69c79eb7bead4dc841ac68c29b07948d7f454ef7"
+    },
+    {
+      "path": "lib/LibraryIndex/LibraryBuilder.cpp",
+      "baseline_sha256": "70d8edb5b759d6febf83bfc45e2331c81c34ed3a46b42ba38010367da19d04f1",
+      "ported_sha256": "c4ee9b4244a380f5b1b15930af064f74ad5ea5189533b36237f8b986ee5bacc4"
+    },
+    {
+      "path": "lib/LibraryIndex/LibraryBuilder.h",
+      "baseline_sha256": "834fd19c6194d86cc97b20751ab131dc1a3dc9dff58bd071847bac07ba9e5950",
+      "ported_sha256": "cdb197c25ccf36930f873a7a7f75aa6cc90d64944254529eea8a8676392a8e94"
+    },
+    {
+      "path": "lib/LibraryIndex/LibraryCategories.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "719d96078dd049790d43ad55aae934d7c3f27fd9690e9334a7b657c887202b78"
+    },
+    {
+      "path": "lib/LibraryIndex/LibraryCategories.h",
+      "baseline_sha256": null,
+      "ported_sha256": "57a13690bacfe174e2040881d177667598d8c98aa9eac7953e7e0deb507a95f7"
+    },
+    {
+      "path": "lib/LibraryIndex/LibraryFormat.h",
+      "baseline_sha256": "2eeff50df15d0e2b72413a103f01b08efa867ad6d3375fdb83ba9b7cf6238ae8",
+      "ported_sha256": "56a25bb34df98d12bd1a22700a0acee8bda73abddf9637194767f0c33967da38"
+    },
+    {
+      "path": "lib/LibraryIndex/LibraryIncoming.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "08f8fbe2904558349ab00998f20f5c63e095487f9bbc291e27bae5d8ce179f1f"
+    },
+    {
+      "path": "lib/LibraryIndex/LibraryIncoming.h",
+      "baseline_sha256": null,
+      "ported_sha256": "c1a15699111fa4f6b1bb6932dfe3d03e4f9a840ed8c907854616a6289d1d4929"
+    },
+    {
+      "path": "lib/LibraryIndex/LibraryIndexFile.cpp",
+      "baseline_sha256": "b84239ae4658fa53dc3071f71fec646f4c520d4579824bab769593efbe20256a",
+      "ported_sha256": "7f80ba388546abf7c6216bd6c8833ed270cd865bcc8b528081f94818206b8a74"
+    },
+    {
+      "path": "lib/LibraryIndex/LibraryIndexFile.h",
+      "baseline_sha256": "6f3b81030e47de9e388274baa112f71b7af747c0f21d5eb037e7a503e2958bd9",
+      "ported_sha256": "eb4cd908bd6df00359424d21c1ec7769bff241576a97e003a02a075f1df10b84"
+    },
+    {
+      "path": "lib/LibraryIndex/LibrarySources.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "a8e61f44e9bc39af8467d187fc6560469b6c1f98a54456b3141da86d534aba20"
+    },
+    {
+      "path": "lib/LibraryIndex/LibrarySources.h",
+      "baseline_sha256": null,
+      "ported_sha256": "3e9c57f8b6212f572c6a904b380435495ad7fc18a16954c3f3e070b055ec4f35"
+    },
+    {
+      "path": "lib/Logging/Logging.cpp",
+      "baseline_sha256": "a484e746aa2c62f875e0fe0134f71ec181a9ad9f758832910f6fcccd1f5695f7",
+      "ported_sha256": "98681524032c73117edb905a96938796e67ba9a8a5cf8e9544775925303c8738"
+    },
+    {
+      "path": "lib/Logging/RickyPerf.h",
+      "baseline_sha256": null,
+      "ported_sha256": "c4f4489191b6cd57276e3d81f843103a8ab7a3b21e0a56053cd1117e760b37b1"
+    },
+    {
+      "path": "lib/PngToBmpConverter/PngToBmpConverter.cpp",
+      "baseline_sha256": "e5b76fc6c5b3cf804430a359edc4a656c72b0f33fd98aef0d12d9004eb2d2f9f",
+      "ported_sha256": "90b7dd4b74ba3f348527401859f32b38fadf6ba56ce1b9a546725cb4cb31d278"
+    },
+    {
+      "path": "lib/PngToBmpConverter/PngToBmpConverter.h",
+      "baseline_sha256": "57cf25e67da982aadf3375358701a407667a1cd04f16b95bd5904981407b9ec3",
+      "ported_sha256": "67cd2b9a024c8aedc611427f5e2ad476b0ad497b01155343fc59a187cd3897b2"
+    },
+    {
+      "path": "lib/TrustedTime/TrustedTime.cpp",
+      "baseline_sha256": "9373de24b10de51934ab8bd232ed3fc2fd096a480fd576b5c502e5df723a9004",
+      "ported_sha256": "d4b345eed4d32ec44803c6c61096ad045b5c26c87a540736722737200d472b00"
+    },
+    {
+      "path": "lib/Txt/MarkdownFormatter.cpp",
+      "baseline_sha256": "8a80e8622e85e85926931c0702166c0b9f5ee76132dae9dede849bfad1800557",
+      "ported_sha256": "aff6d4b234970144014e2041e06bd4269da025a2f5de037c2117f1697ec85707"
+    },
+    {
+      "path": "lib/Txt/MarkdownFormatter.h",
+      "baseline_sha256": "5e920223e230cab56b0489eca5ecd7cb2c23e69a81fd017c631f5f394be76772",
+      "ported_sha256": "69039aa5066d3098c472f1264da59beb52e41bfe5128f7c03b48402976d9d280"
+    },
+    {
+      "path": "lib/Txt/Txt.cpp",
+      "baseline_sha256": "a8318bd9c2448077462d38cfbd0e78f3a2fc47688811f8d538e564e12f393c84",
+      "ported_sha256": "0ac87a42cf91ce6cd2c33850c84618fd256d3e3d0f908b5df9782fef23bc5876"
+    },
+    {
+      "path": "lib/Txt/Txt.h",
+      "baseline_sha256": "768fddee05bb7b2574ef3ab9e9e2fab94333630a19902acdeadcc1e2d561fad0",
+      "ported_sha256": "6ff2d8850886daaa5a963b7915a2c01ff5900102826f969ecded272b98003924"
+    },
+    {
+      "path": "lib/Txt/TxtCache.cpp",
+      "baseline_sha256": "00c77a8ce05d4da6e94b23ae55530a5085809a669e30a52f6c2437c5d6813ade",
+      "ported_sha256": "b11ced890550aa5cbc998b3e4f3ebaa6714ea5eb86c5905e97dc94ce65b63dc8"
+    },
+    {
+      "path": "lib/Txt/TxtEncoding.cpp",
+      "baseline_sha256": "5bb7df1d6423abb56a35abc6693e5666895bb1a967a9be5c5e06e16a0a53a0c8",
+      "ported_sha256": "4ab5cd725848248fcd1f5ffc5dbcfc11868c032ca6fa9281ea1326fe9026429f"
+    },
+    {
+      "path": "lib/Txt/TxtEncoding.h",
+      "baseline_sha256": "4fe627be857dfb9aed1980b1c61f5d004700c5aae25a0356f3cbc7ba894a9e04",
+      "ported_sha256": "c8e14bacf5eca39719dcba86616f4a8288ae61415bfce5d7d929bb72b2af72ec"
+    },
+    {
+      "path": "lib/Txt/TxtProgress.cpp",
+      "baseline_sha256": "f966844ca219351f7d43a4b5b178ae6027af770ad8209b46494d402bfa19d2d4",
+      "ported_sha256": "9e46424b509441d1503e6268bde29d327d7befd34b0ffe4af8ff3854bf6c88e0"
+    },
+    {
+      "path": "lib/Txt/TxtProgress.h",
+      "baseline_sha256": "ff8d64ba7edbb7d3820041be2ffe6d8c91a209854c166059acc59283218ca396",
+      "ported_sha256": "d03bc8d67691cdc2ed90b22400653044b66a3d8af9fa3e3cb90a0de6cf59e4d1"
+    },
+    {
+      "path": "lib/Txt/TxtToHtml.cpp",
+      "baseline_sha256": "792c52965cef5e188045346f34425958e59cad260ecea6dd90fdb743f2b35a38",
+      "ported_sha256": "bbfb500c46eb3acbb5018cccdf24f44b8ff7420b1fbb250a11ff3b912cf7a551"
+    },
+    {
+      "path": "lib/Txt/TxtToHtml.h",
+      "baseline_sha256": "6ef5bb23899b3a8d87b59f2315474732856c08871772d99597c84a5437f656be",
+      "ported_sha256": "8f1ae2d7b2a8148717797bb5e3068bdff731fd59d71d82f830b508f974aa8c64"
+    },
+    {
+      "path": "lib/WeReadWebApi/src/WeReadClient.cpp",
+      "baseline_sha256": "e257fb9dbf31aef9ed6e86d1d294cd983fc8bf9d3627df6d0c1697bba7ad8cc6",
+      "ported_sha256": "4be190bbde96255f0ad5a743145d7f4697f9398eecf7936a8596b57537157da3"
+    },
+    {
+      "path": "lib/WeReadWebApi/src/WeReadClient.h",
+      "baseline_sha256": "ed6bfafd583a4f59698bc6aafad2a57276a23b2fa4463e4dabd62e894b080fda",
+      "ported_sha256": "7f470b2a2955accfb021d6cddf30fd28575335785b32fb3d93a882c2639031ff"
+    },
+    {
+      "path": "lib/WeReadWebApi/src/WeReadHttpClient.cpp",
+      "baseline_sha256": "6b1da2abbd71e59a21d1641c6b86350154d4f091adcfb4a154cbc29d91e79c61",
+      "ported_sha256": "82b05af215f5657a287f02936339f5fabb95ea8f8161ef92587a7c605ebc11df"
+    },
+    {
+      "path": "lib/ZipFile/ZipFile.cpp",
+      "baseline_sha256": "d4e877f51dbd6b56b2bfb7b1053963aea657ea7f5fc182d36c0bfb6233d7b247",
+      "ported_sha256": "dd14b78ef7e19a4549a5229a9f49a29a819349da7a1f90ff3aa62429da9dff1d"
+    },
+    {
+      "path": "lib/ZipFile/ZipFile.h",
+      "baseline_sha256": "3ac5e948eea7ccc766e7474d3c10bb8afac5858689c736482dc963b0876b7a6c",
+      "ported_sha256": "9c258ccffffa0162da5c95bf66b9b9cc805cdf8ea8b2ece3d3c26a08bfa1ca65"
+    },
+    {
+      "path": "lib/hal/BatteryDisplayFilter.h",
+      "baseline_sha256": null,
+      "ported_sha256": "eca9206e82424e41020ffd2f1a233a3e2b281fb5c14489509db1ff81112d6205"
+    },
+    {
+      "path": "lib/hal/HalAudioOutput.cpp",
+      "baseline_sha256": "402506af5026e44ed927ce857fa97917e029b3144793ede908c0a0d38fece482",
+      "ported_sha256": "43624f45f22684436dd7a853212d098c3fd080d8dcf836ccf5a0b8d5ac7b62c0"
+    },
+    {
+      "path": "lib/hal/HalAudioOutput.h",
+      "baseline_sha256": "f0bf1cf1618f778f2302a24198c45052791e6fd643b49b034e2e714ab1bd3ee1",
+      "ported_sha256": "953eccd4cbc5fcf0f066c8586fd4ea71524e4f817c38d8fd1cc369b1d32f2c64"
+    },
+    {
+      "path": "lib/hal/HalClock.cpp",
+      "baseline_sha256": "0567d8be98feb5942e6217066792e250fe6b014ce9474c86c2eb5c3a2b72c465",
+      "ported_sha256": "6fc7398577dc5bfad6241c5072659a0dedda5b0b475028110af9662462207b0f"
+    },
+    {
+      "path": "lib/hal/HalClock.h",
+      "baseline_sha256": "5eb10e1591668cb59e2a56c7c28d3ff2b08d05121b3afa4d18c94d27b3b4ad84",
+      "ported_sha256": "e21adb611b087cf887e16189664e7695ee30eb2bde8e4588182585fc803c2093"
+    },
+    {
+      "path": "lib/hal/HalDisplay.cpp",
+      "baseline_sha256": "0b168b7f240f557d75a138ee6f9fc7073e2ecd2431b794bd0e8502977a831fcb",
+      "ported_sha256": "b82a9007a4695c350ffaf7a17aea6d24ceb1b5bf4e83c869a1bb2f5ed832ab25"
+    },
+    {
+      "path": "lib/hal/HalDisplay.h",
+      "baseline_sha256": "a2eed517fa85335c0857981ae01bf05799d3bdeae36fcb2d767b6901d51fe58c",
+      "ported_sha256": "f7c46e646c7711efa9dadc27acd75d4e7a402296d3c28ab4e2c4c9fcbce18516"
+    },
+    {
+      "path": "lib/hal/HalGPIO.cpp",
+      "baseline_sha256": "12c4c18ac3586866d8b2551e016c4cc6d85f727dfd5c15ddb7625efc1022fe77",
+      "ported_sha256": "4682aee6bd75ead128d66eb75c236e93fd9f7ea5d0ef929e6db2e2dd6acc1fe0"
+    },
+    {
+      "path": "lib/hal/HalGPIO.h",
+      "baseline_sha256": "69f039fca010004dd61aa05b4c584e9d12c36aeda36f7168a1edfd958d0f759c",
+      "ported_sha256": "988232cf588c26351d785842513c43733a8b83e22557ef2bd4bd0f25493f3d0f"
+    },
+    {
+      "path": "lib/hal/HalPowerManager.cpp",
+      "baseline_sha256": "c8021acd737310ddd402aad3bd9f953db5bcbef2064ff4736540302e3c2fb5ad",
+      "ported_sha256": "7620be77048a09490df419f72f67f1df7a5003bb2652a64567e955839ab7fba2"
+    },
+    {
+      "path": "lib/hal/HalPowerManager.h",
+      "baseline_sha256": "28f6f38e9a7b15f434f7b6576412df60b5e64969e5ccdc25b5d386ea4fe03fb2",
+      "ported_sha256": "c559ee92d3845e0450429eb79941048318bc2fc6936c181269677f9994deb80b"
+    },
+    {
+      "path": "lib/hal/HalRecorder.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "f89018fc39515d52dd3f23c9034871da6e8e0126ffb9fbf23c49d1d63afc83db"
+    },
+    {
+      "path": "lib/hal/HalRecorder.h",
+      "baseline_sha256": null,
+      "ported_sha256": "ee462af3202a45c632e11975748d849a32729e4a0f8fba9d33deb7d7cc6860af"
+    },
+    {
+      "path": "lib/hal/HalStorage.cpp",
+      "baseline_sha256": "8b12b963ffa643f66bbeb74bcb754d54fbe570417af171b569170d653dcfd870",
+      "ported_sha256": "f908d3d5298dfb44998fca838465379583a85413b1dee939359a938509dd628c"
+    },
+    {
+      "path": "lib/hal/HalStorage.h",
+      "baseline_sha256": "77fef824405ef1faf3f96612d9590073fd37c7eafaa425172b8dd009e45d2c9e",
+      "ported_sha256": "347de3d49bcfe7e38a68d2c2922d48c99d31e0be3066a6fec4aa24229e0703ea"
+    },
+    {
+      "path": "lib/hal/HalSystem.cpp",
+      "baseline_sha256": "2ab858519a3fe553b960aa1ce6ecdd86854d2130bc96d04343918d2750b3ab53",
+      "ported_sha256": "55f209caa1f621839adf351877816932bc9b9e3e2e436f4a5a25ed1ed0fc5a72"
+    },
+    {
+      "path": "lib/hal/HalSystem.h",
+      "baseline_sha256": "3a297ba98d2c7c77e0cc20b86167ec2ed6f10db735bda9d370c3c046bd02fc6a",
+      "ported_sha256": "0195b2b6a3fc2eaaaadb1586f0ddd1d1af5a04a6d36267d719384c8f51378464"
+    },
+    {
+      "path": "lib/hal/HalTiltSensor.cpp",
+      "baseline_sha256": "5d44583454d27b9c022a83dc792d275bc706599432a47e9132b1154fbd21f20b",
+      "ported_sha256": "814b3f41590d24acad73fa07b74c647a5e0be014b2439ce7502f2fe16008c019"
+    },
+    {
+      "path": "lib/hal/HalTiltSensor.h",
+      "baseline_sha256": "1dca09c1c83fc0e34423317ef8e7d239efc246ce696b9e44b6e3142664414fce",
+      "ported_sha256": "927dbe4ea7267b6c083b0d79e494abdbce2278c89bd52ac83a9504647bfdb190"
+    },
+    {
+      "path": "lib/hal/NativeGrayRefreshPolicy.h",
+      "baseline_sha256": "5d8e4550754003da8ef4d33c57cd343fd7020de3b94c3d7bacb9280c5d4c3f0a",
+      "ported_sha256": "014c72a10c8af8f9838ba0826c6f66c66c69a76e2d8e1ba7e8a47db418a6b527"
+    },
+    {
+      "path": "lib/hal/RecorderWav.h",
+      "baseline_sha256": null,
+      "ported_sha256": "9381a4422b2f5b0a39d001c8cf3ccd7b39e8503a423778a9a557a0f4d523dcd1"
+    },
+    {
+      "path": "scripts/build_rickyos_app_icons.cjs",
+      "baseline_sha256": "f5c925378ef61f596f7810d80df3fe088beba4a4759fb64d6b97dfdfb50dff97",
+      "ported_sha256": "bc16a09ed7913f208a7aa755dd909793c12205118dbf6df8bb3d7e4277c0e3d4"
+    },
+    {
+      "path": "scripts/build_rickyos_page_icons.cjs",
+      "baseline_sha256": "ded0860bbebf3c65e2ed28a23515204e91f3bab5a6f2cd77a8353c7029aab1a0",
+      "ported_sha256": "da79367d718e9a092b02b99637efba0a37f350b91724fb189585500c17fe7e7b"
+    },
+    {
+      "path": "scripts/tests/run_txt_utf16_tests.py",
+      "baseline_sha256": null,
+      "ported_sha256": "e3115f06fa4eefa1b60ba8a35d19becce2ccb135777db3bf83ce42713dbffefc"
+    },
+    {
+      "path": "scripts/tests/test_battery_icon_alignment.py",
+      "baseline_sha256": null,
+      "ported_sha256": "0b9950ee079027138703e4f154381d889ed692d4825d6d2a9b8f58f0c67df9c1"
+    },
+    {
+      "path": "scripts/tests/test_home_button_persistence.py",
+      "baseline_sha256": null,
+      "ported_sha256": "875c3c29faeac5556030a4fd8edcdf5267356ca8801b6e29ff8601886804b6c1"
+    },
+    {
+      "path": "scripts/tests/test_imu_double_tap.py",
+      "baseline_sha256": null,
+      "ported_sha256": "d9127a47ef25a3c5b17ce3260dbf8585b8f13eb7ba934e7e8f1590a0616f1c90"
+    },
+    {
+      "path": "scripts/tests/test_reader_page_cache.py",
+      "baseline_sha256": "7153d307adee5a6960f252e680077353bb32ef22105d7cd5911554b492602b1e",
+      "ported_sha256": "2233c03ebb150856fb02ad97de5ed86c74d703cc315825305098d93057f6d656"
+    },
+    {
+      "path": "scripts/tests/test_reading_ui_regressions.py",
+      "baseline_sha256": "00be354017d99dd560fb3eb5ee7eef22ba17a27d2a5232003bb93ebe83c8436c",
+      "ported_sha256": "06814c53fec7990119ed232b373ed55e62f6c3934f48ff33f51af168e7f4510d"
+    },
+    {
+      "path": "scripts/tests/test_rickyos_app_profile.py",
+      "baseline_sha256": "dcea506c3ba494d742ca22a63a8af5823e296d723d415f42ca2dbd68b54c712d",
+      "ported_sha256": "7c59000e6852cb1ba53d405d58d000393e5ad735afaf8e4fb41e11de63c3fdac"
+    },
+    {
+      "path": "scripts/tests/test_rickyos_interior_ui.py",
+      "baseline_sha256": "b74d60e8f83e96750320175d3fff6bef3fd407a87207c362f9995763b9b38c6c",
+      "ported_sha256": "14663a5f957de0ea9beb97b1f2ac0432807e72529946e66ee36129c1c40e7c62"
+    },
+    {
+      "path": "scripts/tests/test_rickyos_reader_chrome.py",
+      "baseline_sha256": "2fb005add96d52fde454774ab3c278ecfe792738a610c101b5e62bed67961da7",
+      "ported_sha256": "203766ff9e28f1825f82ab16f1c678952f1b8fa2d54d3acb8c5b8de2bfa31b9b"
+    },
+    {
+      "path": "scripts/tests/test_ui_chrome_icons.py",
+      "baseline_sha256": "962f9133e8c10016418d7d22df917a55dce38cac748a3955803e5c1da1a0ffcd",
+      "ported_sha256": "31b165ee21aff7b68e9746014cf17d107b7063c15221408464fe9ba6b2b7e133"
+    },
+    {
+      "path": "src/AppVisibility.h",
+      "baseline_sha256": "8f0c96c1d8143203efcd5097edda1c466765889742f0d8305299cbef9ac4182a",
+      "ported_sha256": "b9fdad6922a19590726f5f83e82f188074a2dc1a2eab740836d50ea220f89f43"
+    },
+    {
+      "path": "src/CrossPointSettings.cpp",
+      "baseline_sha256": "549f275cd35b12b0479eadda063c5460e167d1156274e759bee34e2232b4dc37",
+      "ported_sha256": "0656b30461770ca2868cd8cce2f9b732622c228de44928f668e68f0951007e94"
+    },
+    {
+      "path": "src/CrossPointSettings.h",
+      "baseline_sha256": "c5a733423898aad83b2f932929b80d3de201da9aa0e181d82d0071a2ac576330",
+      "ported_sha256": "fc39ed7e4467369575e1dc70e15aee981b36c8129725333927fa11f93bc8b7d2"
+    },
+    {
+      "path": "src/HomeButtonSettings.h",
+      "baseline_sha256": "d42fe26bbf4bd1b6deb57c6848561acce4d998a44ec27418d405e3a0d4fb20a7",
+      "ported_sha256": "d54470a47f3ada5177232a1100935dd6520c9d922f9757b165133bc2e996e674"
+    },
+    {
+      "path": "src/InxItemLayout.h",
+      "baseline_sha256": "cebb8ad5ef97faada4b2858546a62f8c825f9e934cfa4b072f9b160a6cf5bc71",
+      "ported_sha256": "f32c745f3e51fd3b576be4e9d7b0a338154dda865b73932bf12aeeba8a3c7faa"
+    },
+    {
+      "path": "src/MappedInputManager.cpp",
+      "baseline_sha256": "6cb329fd1abfcff7b2537405b9cad92aa4c78e94fddefe3086d2fb6650ca60c7",
+      "ported_sha256": "4b8c9cc9ce8660cc9df5e3c0c345a9c1df5ecd96c9b7e23779bb401b0f30e8bf"
+    },
+    {
+      "path": "src/MappedInputManager.h",
+      "baseline_sha256": "f463ca3c5112b4f0c510513c96d384aecd87ebce778545982cdc13d8024be352",
+      "ported_sha256": "47c866751cc597147c81e0302a80b4a6923cad0fcd01515b29f36df8308ea6b5"
+    },
+    {
+      "path": "src/SdCardFontSystem.cpp",
+      "baseline_sha256": "993fc2f5078336baac6d059867954ff11dbaf17fdc6452872b0a9a1f4063150e",
+      "ported_sha256": "61c1565e5beec87593daef6e3f390648da0c212bd8c19c854cf9c42f4fb9c810"
+    },
+    {
+      "path": "src/SdCardFontSystem.h",
+      "baseline_sha256": "af8139402245ebebd239697cd753b680fcbb46461019f2085d3590acf9b14f6a",
+      "ported_sha256": "391d5880f9856bd09c8738b7fd4981d121a1625f87fed38f947fd45d86a8cb6a"
+    },
+    {
+      "path": "src/SettingsList.h",
+      "baseline_sha256": "47ca912ff8e169d64ef58e3da86d57ccd581fe11f9f3cf283d75ed471398e583",
+      "ported_sha256": "4a2d0d025e67ec65a8b5a6d5bf5fe026e84fa7b51384c0e9f2afc2c14fb0ad34"
+    },
+    {
+      "path": "src/activities/Activity.cpp",
+      "baseline_sha256": "e7981a965a7468c6848d27c272501d1608fd23702a3eb00dfbab74c701062a73",
+      "ported_sha256": "ff0ab70e16d99bddbe6d6fccb4759a174288f2480bac30a9966afc3a2c59e4f6"
+    },
+    {
+      "path": "src/activities/Activity.h",
+      "baseline_sha256": "c74bf393fe04cb637ad900c9856c12efadf3251fbc318b5dedb229ce3a71a012",
+      "ported_sha256": "ac1c6ea01dd8d495fe67e8d766fed78455b3a6e41b4013e250046ad3ab6623a4"
+    },
+    {
+      "path": "src/activities/ActivityManager.cpp",
+      "baseline_sha256": "e97372dc858385e6ac21bac9d545abadd7bcd9ca036feb7c3dc8ed8bf8cb9ada",
+      "ported_sha256": "384268efa36b8a0f61343f53557596b00f8332f03c6d07c65ee65e437efc5431"
+    },
+    {
+      "path": "src/activities/ActivityManager.h",
+      "baseline_sha256": "01c40530f8ee1ae4a1cd07ba1c02d2a8c494992c72ed0bafd12c4924bf65ff80",
+      "ported_sha256": "2b181fae1a6c5503999115208c062143215ab8744c76bbf2e6597227001580a5"
+    },
+    {
+      "path": "src/activities/MainTabMotion.h",
+      "baseline_sha256": null,
+      "ported_sha256": "50ae4c4fe4e90f8f066525d7b7173ca9f43191a5cd6b8d18866a7670d1cbef95"
+    },
+    {
+      "path": "src/activities/UiListActivity.h",
+      "baseline_sha256": "2ab54e81a490129243e6f5d4b8b44ea8b2b97697eb737e69bfe154fc90dc2214",
+      "ported_sha256": "90a1ff1d6ea303d18adeff21257104123fab0750c4ffb7d8e3689f01a0292f4b"
+    },
+    {
+      "path": "src/activities/apps/AppsMenuActivity.cpp",
+      "baseline_sha256": "aee473e42f7d5e8545965aa5d6be38ce36966fa25e1122e28984f65c40c093e6",
+      "ported_sha256": "60f358015eeda6850868e8b4c2ad27ee86407038f728970d499040c81410a741"
+    },
+    {
+      "path": "src/activities/apps/gomoku/GomokuArt.h",
+      "baseline_sha256": null,
+      "ported_sha256": "6c431a76f67084e48f8df2f15d76f723e605b645b2c4b6e926372a99fa41bd75"
+    },
+    {
+      "path": "src/activities/apps/gomoku/GomokuGameActivity.cpp",
+      "baseline_sha256": "e473a2c121bd1f625814ff968ff71317e71f8dddf2e365e58038de5bd86c1efa",
+      "ported_sha256": "3b84d482e874699087d035690fd400267014c52c1517a9a86ca56975960f9309"
+    },
+    {
+      "path": "src/activities/apps/gomoku/GomokuGameActivity.h",
+      "baseline_sha256": "5f9a966f17bc8c7c6e04a513b20907988d407558455e850b1cb13e239f0192e6",
+      "ported_sha256": "010455834f8008077ef8fe6409c9040bd500c44508072bdc0be26adfc3c177e6"
+    },
+    {
+      "path": "src/activities/apps/gomoku/GomokuLayout.h",
+      "baseline_sha256": null,
+      "ported_sha256": "5cc5dbb6978a96fb64fa4ce62bc40e3979fc1c14f8fef9174f371a3cf47ed9ae"
+    },
+    {
+      "path": "src/activities/apps/gomoku/GomokuModeActivity.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "f499d6fc43e8d24361ed604ac19349666aab95e69a8633638099d69028b7291d"
+    },
+    {
+      "path": "src/activities/apps/gomoku/GomokuModeActivity.h",
+      "baseline_sha256": null,
+      "ported_sha256": "7d3b8cf6b92693c43d297d326d1f50a0506424c1fd2a196cad229d0fdca095d9"
+    },
+    {
+      "path": "src/activities/apps/gomoku/SkillGomoku.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "d8026ce84defe2159e872ced7b1540eae47e763717db8ca5198dc9846051f450"
+    },
+    {
+      "path": "src/activities/apps/gomoku/SkillGomoku.h",
+      "baseline_sha256": null,
+      "ported_sha256": "338c2b02ca3360c5564f2756fc790822b0bf53b3d3fdb80ee78eb3a5cc8c1ba3"
+    },
+    {
+      "path": "src/activities/apps/gomoku/SkillGomokuActivity.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "7353acb0d3b370eb46c83fcfdf72bdff1eb8bb0be7bcecdf1fbf976b46796ec1"
+    },
+    {
+      "path": "src/activities/apps/gomoku/SkillGomokuActivity.h",
+      "baseline_sha256": null,
+      "ported_sha256": "7261f4167c9df79058d740546c1b85a58315524c6aedd852375b286daf911dd6"
+    },
+    {
+      "path": "src/activities/apps/gomoku/SkillGomokuStore.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "01946d3e6f0892859c108f7f9014d1e059f90d23b47034b288a2f0ce895d556d"
+    },
+    {
+      "path": "src/activities/apps/gomoku/SkillGomokuStore.h",
+      "baseline_sha256": null,
+      "ported_sha256": "70f511e172b963cde727a91db6ae67472fae0ea7d2724845b00419dcf4ea4340"
+    },
+    {
+      "path": "src/activities/apps/recorder/RecorderActivity.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "175a8e6df9c35a802d1e47ab259e60aa697e0a64174217cefd7af92489c6fbd5"
+    },
+    {
+      "path": "src/activities/apps/recorder/RecorderActivity.h",
+      "baseline_sha256": null,
+      "ported_sha256": "bbc61f87a51590c7b62a4589ca8358e5e99846731d11ab344393e43e4eba9d42"
+    },
+    {
+      "path": "src/activities/apps/standby/RickyStandbySettingsActivity.cpp",
+      "baseline_sha256": "670da33bf0a95ebf85ba5f4df0950d84ba425f1b1f02fd6ddd4b6f8bf313bae4",
+      "ported_sha256": "8aeaa7b71fe3502b5ac0e8a95832cbcf787bdb712ce5463c07baf59dd4eb6dab"
+    },
+    {
+      "path": "src/activities/apps/standby/RickyStandbySettingsActivity.h",
+      "baseline_sha256": "90b97c88aa8b99bb478095c869285c40a8150e463904503281d5eae76ccf1623",
+      "ported_sha256": "8b7dc07f9f5d24418c58644200e5a63bf95f68461f067a459c4bc7e9b401027b"
+    },
+    {
+      "path": "src/activities/apps/standby/RickyWallpaperDownloadActivity.cpp",
+      "baseline_sha256": "93b97e40e79147da72f4fec6914b7c70d73546c72a792728e5ee47ce1c7807db",
+      "ported_sha256": "3e6080f4f182e326eb85428d5d9b759e78fe65b1efbc420f48fb255859d7bdb2"
+    },
+    {
+      "path": "src/activities/apps/standby/RickyWallpaperDownloadActivity.h",
+      "baseline_sha256": "97b7e67742dd2e780141c4ea5cdf49d8b6b843104e3417e9872a1f1a59dc9056",
+      "ported_sha256": "8ef67db994ef9adda4db5c8d3f465647d469c7c0fe8be6ee7ffc476bb54e5327"
+    },
+    {
+      "path": "src/activities/apps/standby/StandbyActivity.cpp",
+      "baseline_sha256": "29dde67945a5e69415ed2f40ca0d287d364f1ff7bf74cc241dd3ead386105696",
+      "ported_sha256": "29f7acae1fcb63d55707dab2a5fcb2f3f845929e14e5cdaa8069c9a9beef7fea"
+    },
+    {
+      "path": "src/activities/apps/standby/StandbyActivity.h",
+      "baseline_sha256": "819202486c48dfdb3816e4eef79a286b93ed2d7d305e0f6f027fed4cfc2e7e30",
+      "ported_sha256": "c00e8257856bb5acb63f83e7f8c9638fa2a9d37f4366be39cec24cc38dd23729"
+    },
+    {
+      "path": "src/activities/apps/standby/StandbyGalleryActivity.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "4c76134a44ea28fb7b2ae587df319425e08ed2d733e570b372977f7bd49727e4"
+    },
+    {
+      "path": "src/activities/apps/standby/StandbyGalleryActivity.h",
+      "baseline_sha256": null,
+      "ported_sha256": "44d3a85a91b48b214f70233c125c5bb2efdd1e1d0fa30f13a5f6fa530c8a8e1e"
+    },
+    {
+      "path": "src/activities/apps/standby/StandbyPictures.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "324652cc0c788cef049d23f921fad3e9373675f81698294d1aaaa7b4cf68b4f3"
+    },
+    {
+      "path": "src/activities/apps/standby/StandbyPictures.h",
+      "baseline_sha256": null,
+      "ported_sha256": "c5d37d21d11c7dc2395e63a9d2206f82e9032463c758a1d296d74a92b5bc7d1e"
+    },
+    {
+      "path": "src/activities/apps/standby/WallpaperFace.cpp",
+      "baseline_sha256": "d0339a0c29cca2eaaf57cb422aaa40edac7f4a9b4163c18fc0faee020be1b665",
+      "ported_sha256": "06ab48970d09293769a045ec6d929d6022cb33df2fc9fa9f1cbab0434ee36f97"
+    },
+    {
+      "path": "src/activities/apps/standby/WallpaperFace.h",
+      "baseline_sha256": "c50ff0d86623d105384a6a1009c372eb2e8da86347006d4113f33dade08adbae",
+      "ported_sha256": "efd87300f537983ca5c49b194277b3f3f86aa11df5c6496d10039ae36b8d71f0"
+    },
+    {
+      "path": "src/activities/boot_sleep/SleepActivity.cpp",
+      "baseline_sha256": "fbfa98e076f3690a5561ed122f0bf2e16f4cc34a7673f1aff6442db6760a7090",
+      "ported_sha256": "03a8d88a68e90b894aad94917543a5c32bf6f82af2afd524a9d3d5a8c48904dd"
+    },
+    {
+      "path": "src/activities/home/FileBrowserActivity.cpp",
+      "baseline_sha256": "9ab832cdfe1b98fdcf8b525a913bef80f97bee889b225e23e22789448cfb790c",
+      "ported_sha256": "1acbd7fdadfe900bb279bf776278ae7347e9f5235e40ae14db3c50930f21fc9d"
+    },
+    {
+      "path": "src/activities/home/FileBrowserActivity.h",
+      "baseline_sha256": "d233a93d24c2a50631286982868b5dcdf2fdf5b0e7859520ce35267325b973ef",
+      "ported_sha256": "18c5e6647e9d29552a26ca2a2ce8d5614d64825c254c78d14abf4adc25124b7f"
+    },
+    {
+      "path": "src/activities/home/InxRecentActivity.cpp",
+      "baseline_sha256": "24297a6dc2464bf423c17dbb23de2bf758875fdaf027fdb8bc63689619b52d42",
+      "ported_sha256": "62a19e00583b436b4f74ecfe19b27ddfb779fbecb73bb09a5183b8c8eaaf4a9d"
+    },
+    {
+      "path": "src/activities/home/InxRecentActivity.h",
+      "baseline_sha256": "ec56f474c57f95ba1bc7d3fc64b3e87a67d9d3598a89b7c89d6550b6607336f1",
+      "ported_sha256": "d7578f4916c036540d1429eb5b52ad99ad2b3b19c02f030b5078dc6c7d3d4e09"
+    },
+    {
+      "path": "src/activities/home/RickyStorageActivity.cpp",
+      "baseline_sha256": "f0158ad4db46ac8302a207e4c0c8d3ce51b2981e10a25d9d13efda76d33afb76",
+      "ported_sha256": "798da7a98ab60b9f807927a0657bb669eb41922cd914f24d47b5a521940b1ee4"
+    },
+    {
+      "path": "src/activities/home/RickyStorageActivity.h",
+      "baseline_sha256": "efca55d6298f4165bf0b14d92f98d804964974f20483ee1e2f4371c301d4acab",
+      "ported_sha256": "fcb22a8f36a95c56a7c12749a0cb1e26cd60e40e9c8f4fa7cb72526e01851665"
+    },
+    {
+      "path": "src/activities/library/LibraryCategoriesActivity.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "38c7535e1a29812f27c11ed407686e221e4e69af65334afa9eaed8cc285afe16"
+    },
+    {
+      "path": "src/activities/library/LibraryCategoriesActivity.h",
+      "baseline_sha256": null,
+      "ported_sha256": "a3d5544d56b7a19ef86c577c2091944312cf4151e7a94495c496948347dbd746"
+    },
+    {
+      "path": "src/activities/library/LibraryFoldersActivity.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "767fe78a955c41c5e40217f2176cdfe5c657754dc96902d849e361b233b18332"
+    },
+    {
+      "path": "src/activities/library/LibraryFoldersActivity.h",
+      "baseline_sha256": null,
+      "ported_sha256": "ce831aa2f12f43b9010b987989c9a0b3ae8e4c05b28392881978ab971876d4e8"
+    },
+    {
+      "path": "src/activities/library/LibraryListActivity.cpp",
+      "baseline_sha256": "390421f0e356311b536e8d9d3ec0f7805fbe83ca0ee641fec6303ce7a995c465",
+      "ported_sha256": "e12ecc78bacb5f2ab87abd88d7b6e064002bef14880a940c7fdd2847282d460d"
+    },
+    {
+      "path": "src/activities/library/LibraryListActivity.h",
+      "baseline_sha256": "60b38496e2531ec3078e6b74c2b148434e12a7a67cf88ed5be3ecb727c546728",
+      "ported_sha256": "7427010aa26c44cea5b769c63aff117ef4bac5a48c0a276b3f5e1e09a953e664"
+    },
+    {
+      "path": "src/activities/library/LibrarySearchTable.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "f9e6b95d89430ac1567e172e8c8f80dd128ecca406b531ea58affdb66a7d8319"
+    },
+    {
+      "path": "src/activities/library/LibrarySearchTable.h",
+      "baseline_sha256": null,
+      "ported_sha256": "2b557fb77895db2b56540a929cafee625c2e95d54f308480ca724fd375c67c2b"
+    },
+    {
+      "path": "src/activities/library/LibrarySourcesActivity.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "e2a0ac33c8aa6409582d651d581af71448f288232bf05dabe9215cc34159ab75"
+    },
+    {
+      "path": "src/activities/library/LibrarySourcesActivity.h",
+      "baseline_sha256": null,
+      "ported_sha256": "1188ae8048224442b4fae94eee232969a7851733522659118ce6276fe767ccbc"
+    },
+    {
+      "path": "src/activities/network/CrossPointWebServerActivity.cpp",
+      "baseline_sha256": "0903483304e119335effb96ef03b90968584b596fee21a876344febba6303ea7",
+      "ported_sha256": "17e783f702368ec53924a71ba5a7a5f5a26f96fdf0df8c2291d1936672883a02"
+    },
+    {
+      "path": "src/activities/network/UsbDriveActivity.cpp",
+      "baseline_sha256": "036db58eed577168346619065b676fba4db77bfdcecc940467a03176b941c945",
+      "ported_sha256": "676649068299485289931f346d5245c179aef35d0e384bb52f94b05dc6c640af"
+    },
+    {
+      "path": "src/activities/network/WifiSelectionActivity.cpp",
+      "baseline_sha256": "40a713262fe8618035edd48551c1c86146b744030733b70e3535590b4f3e074f",
+      "ported_sha256": "28bf959061979bacbd87e03491c895d95a472ceb1b8d03cfb2705e338c3fc1be"
+    },
+    {
+      "path": "src/activities/network/WifiSelectionActivity.h",
+      "baseline_sha256": "cf88f463e3cee398cb48ce49923c686ac2aa0475b819d6373bbd30e2e2802484",
+      "ported_sha256": "6f33cf02cd335c93eae565e17114365eab7b6d3d6578ec638db7aebd3d3cd3f3"
+    },
+    {
+      "path": "src/activities/reader/BookFontSet.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "a3c46dce9a4f4444f201a3d5b7db03ac340b69e740908b777b55d76c9a33cb84"
+    },
+    {
+      "path": "src/activities/reader/BookFontSet.h",
+      "baseline_sha256": null,
+      "ported_sha256": "0b12d45b851286d5544e616f034ce05be91198f3470ea0aa44dedae9262dd573"
+    },
+    {
+      "path": "src/activities/reader/EpubReaderActivity.cpp",
+      "baseline_sha256": "330723cad52ac629fa1451c9ca90cffff0a04b06e0266861e092ff93e8ffa1c9",
+      "ported_sha256": "017da3aaefd2040d207e30bc64ae4bea3555a02ffda0feee07b2cdb6824b933e"
+    },
+    {
+      "path": "src/activities/reader/EpubReaderActivity.h",
+      "baseline_sha256": "6fb5eb74b19af5cbfe08ae3974b70d49d6019dc888535f7091ceeb389f3dd650",
+      "ported_sha256": "5aded696b4604f33782bb05630b27958eae27c7b213159c56b26cd0038cbf40c"
+    },
+    {
+      "path": "src/activities/reader/EpubReaderChapterSelectionActivity.cpp",
+      "baseline_sha256": "afeb5d800d47aa507ca1d8ecae1a5b109ee435c686c1fbb96ec09780da4670c7",
+      "ported_sha256": "191672916fab506a93dcee215092cd928b4bae9b1fe4c9808464a742962d8881"
+    },
+    {
+      "path": "src/activities/reader/EpubReaderChapterSelectionActivity.h",
+      "baseline_sha256": "101241f0b9b81e1f46f3223e336c978818ac036313a15c7e4b75ff9d740e1f74",
+      "ported_sha256": "6483792e9ae0e816aaf72c1ec297f73c94cf0a07bf4d795d9c71dfe24ae5aab5"
+    },
+    {
+      "path": "src/activities/reader/EpubReaderMenuActivity.cpp",
+      "baseline_sha256": "10f81dc59a4993bdc732321fa65bf70c86f26d6add5af9bd4c4d9c1b9ad30804",
+      "ported_sha256": "f212348617b2416abec8cbf617b23b674d6c6c1d365500cd816db05c3774e2fb"
+    },
+    {
+      "path": "src/activities/reader/EpubReaderMenuActivity.h",
+      "baseline_sha256": "4203d66954b8a513fac86c3d9fc4ca33fbe0b4776f64886635e235e920a0ed1c",
+      "ported_sha256": "4c8c7263662d8aee7b1071abd36ae66c7efc6b89201c356b9ecd0ec13c4bc5e6"
+    },
+    {
+      "path": "src/activities/reader/NativeTurnRequest.h",
+      "baseline_sha256": null,
+      "ported_sha256": "c71be08e82bda8adcb1b82a0c2ed826212d95975876a34a95f8db5515bc821ec"
+    },
+    {
+      "path": "src/activities/reader/ReaderActivity.cpp",
+      "baseline_sha256": "add5d8195d6aa38ad0abc769be80e4ce383cdf401df03130a5b1c452a2bacc87",
+      "ported_sha256": "9bb64fb9c2267f68f93857cf2e2849fe6c0ba181fde49a18c07fc155aa3c4332"
+    },
+    {
+      "path": "src/activities/reader/ReaderChrome.h",
+      "baseline_sha256": "79cbe3ebc3ae39099850b91dc96c9d930b17e534f394bec2dfe5a95ae08931a1",
+      "ported_sha256": "1d18abf91d4067ca7d05eb251396f09f42734e0b4fe0d433c2dc8dff09a86179"
+    },
+    {
+      "path": "src/activities/reader/ReaderRefresh.h",
+      "baseline_sha256": "4c9018d2057078d2620ee6412403da868a2e4a9a52c31ef0c20bf4c06a3f1697",
+      "ported_sha256": "c3f827b7bcb68cc0860ab5a8513d82f2534f29cbbe521f28b724c0326b533e51"
+    },
+    {
+      "path": "src/activities/reader/ReaderUtils.h",
+      "baseline_sha256": "efe1b606f9e3e1dd33a990130104a3831b94fa29cc4ae185840bd610f4595052",
+      "ported_sha256": "f4a7567af758873a3cb23b4f66a82b25b31b51b16b768b761130006eab7c9e7f"
+    },
+    {
+      "path": "src/activities/settings/ClockSyncActivity.cpp",
+      "baseline_sha256": "5feb59d42fbd7c2da1872cb399895594b3fa4c060785c41395732ee8f00c67a9",
+      "ported_sha256": "3fc36366627bb199f410c543d17913ca34553d129ef524904ba4f6149ef9989c"
+    },
+    {
+      "path": "src/activities/settings/ClockSyncActivity.h",
+      "baseline_sha256": "d2954320133f173a2aef4bb7ba3d362ac9e0cfe823bccfed10873a5ba1578884",
+      "ported_sha256": "5ca0b2e8171c4ff54b9d48a4d9d956acfbf57ac735e1591d24ad12cc1107d73e"
+    },
+    {
+      "path": "src/activities/settings/DictionaryDownloadActivity.cpp",
+      "baseline_sha256": "fd07d2b40acb684070616860b3998db12a06e8379ce24fc261dbd51c97117d42",
+      "ported_sha256": "623d9dddc14113ca9f25a0fd4f715a2929431f9df13dc148332e7ba7a1125c39"
+    },
+    {
+      "path": "src/activities/settings/FontDownloadActivity.cpp",
+      "baseline_sha256": "f4cb1fa336fa62a66e765b574a65dd68cd1587c5b05cbcd14513b1cea0678f9d",
+      "ported_sha256": "df81adcd6334f66297f20473ebc6976b55afb0120572430923609e8f1bf477d1"
+    },
+    {
+      "path": "src/activities/settings/FontDownloadActivity.h",
+      "baseline_sha256": "5b4eef1fea6533015d61ead60bb307743d2bd25e49193852966a786edb96ad99",
+      "ported_sha256": "dfcf99b56e9497cf614c2573afd52d6e85d397c7f8d3661f0d3cad4ecfafc3ad"
+    },
+    {
+      "path": "src/activities/settings/HomeButtonSettingsActivity.cpp",
+      "baseline_sha256": "64a5a0828635400a72a0fe24fc1a1702ffd619195c6b7319991957d1c740b3ea",
+      "ported_sha256": "cb54bfd0bb825f6eaa703dec834a8f6ba46802e9348455d74b7913873921f0e6"
+    },
+    {
+      "path": "src/activities/settings/HomeButtonSettingsActivity.h",
+      "baseline_sha256": "ce63cbfee271557b6141642df0c1c5a9e3d680c866743fbba426d4c30a65bc9b",
+      "ported_sha256": "202b81d480fd37d08889e57264ca0f4d8098d6d60c0090e78b37be6ae2284707"
+    },
+    {
+      "path": "src/activities/settings/RickyOptionListActivity.cpp",
+      "baseline_sha256": "cb58d870dbd08af18396b7bd389c57a6b17511c43ffcd7224450914902057927",
+      "ported_sha256": "2a70560423707ed0f0d3026ffa8ef18517487476cb0353b7614c8d7548d0fd42"
+    },
+    {
+      "path": "src/activities/settings/SettingsActivity.cpp",
+      "baseline_sha256": "772d10b0d827b2760a4abcfec811feb9cc741274dd505243a5233676bc680391",
+      "ported_sha256": "406e4c5fd984c9c291759703f3b595e1c9c2f6f25a6e30751775abb306ffc597"
+    },
+    {
+      "path": "src/activities/settings/SettingsActivity.h",
+      "baseline_sha256": "fce35a218bfa3aeb8bb6be29cba8de737685c0e3bddd1d4ccf0510ed60b71ab1",
+      "ported_sha256": "95b721e4393d70c6efcb2c07c1ee7dd249874c85fa86e5696f3a7891f41d0a1f"
+    },
+    {
+      "path": "src/activities/settings/StatusBarSettingsActivity.cpp",
+      "baseline_sha256": "caecb4a9e9b738d40a4c1c203c41b71ea0de49185bcb021a6e948fca76b44537",
+      "ported_sha256": "ac56665d6fb249727656c16e20817bd72d1788f140a617c11fae48062f6f980c"
+    },
+    {
+      "path": "src/activities/settings/TextSettingsActivity.cpp",
+      "baseline_sha256": "a550e9e011e6ca6e9e50aeabbe83235a62d90969a6f5423a7ef76ba4c0bf0c7e",
+      "ported_sha256": "c8a6c47be80ae5ac808e67bf7aa22d506f15fedeebb54c9e1387e4da24812370"
+    },
+    {
+      "path": "src/activities/settings/TextSettingsActivity.h",
+      "baseline_sha256": "3473441607e75f270a735835a1df8a3e3146ec171f646cb663fb2f44a76f548b",
+      "ported_sha256": "fafb9426c84a25923b3671fcdf53ef8462f497cbffa3a5999b5c70caafa7d160"
+    },
+    {
+      "path": "src/activities/settings/TextSettingsPreview.cpp",
+      "baseline_sha256": "6b2b42b31cec4516854d2a8549f88eb57d87c50452e1fe0e91ffba430aa59ecb",
+      "ported_sha256": "296dc021641c52f380880ab5a25d3865729868296604180b960254511711de21"
+    },
+    {
+      "path": "src/activities/settings/TextSettingsPreview.h",
+      "baseline_sha256": "d3bfa20d057d10c048d27d2f11d579b29ac3b13298e1a7e0565f6afe268dc600",
+      "ported_sha256": "69a797c45defeef2d8183526533ba302fe29b9fa8d034a66f2b5f980ddea07be"
+    },
+    {
+      "path": "src/activities/util/FrontlightPanelActivity.cpp",
+      "baseline_sha256": "3b032b72a9d4e568d587e0686816fa143775397cbb14f626a579eb4501c41115",
+      "ported_sha256": "1c804e933337cfae37ee094f7b66124b122bb8b2612910039f4cfd9e95c46e1e"
+    },
+    {
+      "path": "src/activities/util/FrontlightPanelActivity.h",
+      "baseline_sha256": "28f273626ec6d605dd24764a8b99c856289cb7d8b27664e6e839d7689486f779",
+      "ported_sha256": "b7c3bcac1eb41fb1b85ec71b39353a7ae032958ffb8ad3e36c18d684f6d0e5d2"
+    },
+    {
+      "path": "src/activities/util/ImageViewerActivity.cpp",
+      "baseline_sha256": "2ce0b62995eaea1b70f33432e01d9f22253163cbae59aca5b56944d8c8b66070",
+      "ported_sha256": "63d4ec54106b2a79395dc62a8794a8ce80477e1bb0abcb8507395a997bf0d783"
+    },
+    {
+      "path": "src/activities/util/ImageViewerActivity.h",
+      "baseline_sha256": "d68b0fd94aa4344dd1c07b98144a35e6b3c0b7dded3c1b723a7874e88f0b18ec",
+      "ported_sha256": "849a1764b36e83bfc03d035e94ce78e8bf4d8dc2cf04b3456fded804df9ecad6"
+    },
+    {
+      "path": "src/activities/util/KeyboardLayoutSet.cpp",
+      "baseline_sha256": "c9d29e2d58011a8a720130da84192eb3f373fc0e3a20f031ae27fb51057e078e",
+      "ported_sha256": "4e3753a77ed8798fc8fdd4abe6c925e9c74d03bcb0b4af42ff8ba48fb06ca9f4"
+    },
+    {
+      "path": "src/activities/util/KeyboardLayoutSet.h",
+      "baseline_sha256": "d0c3db500319eee1faac0861bb438f44ae7d7a9012e9fd02e014537b359113bc",
+      "ported_sha256": "6c55d14ea9d9d7bf6d7e85860768acc354d93adf420b398506bbd33842f525ae"
+    },
+    {
+      "path": "src/components/BatteryStatusLayout.h",
+      "baseline_sha256": null,
+      "ported_sha256": "4f003ba2f1f3a64c772e94fd8d62f06b3a2f47637ccee359aae0a61ad1c241aa"
+    },
+    {
+      "path": "src/components/OptionPopup.h",
+      "baseline_sha256": "6eac94c75a2a250fcc759c91100c9aa52b0c51c611b6f5919a3ad590acd3f8b5",
+      "ported_sha256": "4fb05269ef9e0d341cd2f0970abace7aa5d0189420ffb2cf92bee6bcc65f0d25"
+    },
+    {
+      "path": "src/components/RickyDesignTokens.h",
+      "baseline_sha256": "d59af1ca42d6ae6d74732304d67ba45bbf23bcc382760403d6ca7c67ceb5278b",
+      "ported_sha256": "2a6bfbbc4c0316fe48f44f2010a994dc1d9c5af2de3abf14de1e01a1ef18d926"
+    },
+    {
+      "path": "src/components/RickyDesignUi.h",
+      "baseline_sha256": "ae5acc8b93778f862a8de972123e1fda1490b603638396d33d220e49e99ce5ca",
+      "ported_sha256": "c0e639bb294d19e59fe8182f4f225454a84c623f08ebd024f142256edbec4f6e"
+    },
+    {
+      "path": "src/components/RickyHomeUi.cpp",
+      "baseline_sha256": "85d40f37352a3df9b434762459291e312b59e4ce3728f5fd8b779fd016abbb3c",
+      "ported_sha256": "34c207b6baa632f43791f1e984d4e45fe8f0d13176005f4a6dd5dc5b5279925e"
+    },
+    {
+      "path": "src/components/RickyPageUi.h",
+      "baseline_sha256": "8a92bb7d8ebd9a22f899a092a00e9392ec28e4c5b117e257116aad01b43a7d69",
+      "ported_sha256": "f01858c80a48c36339870eb3b0da27d27fb50e1cdfb65c1b1355d5bbce9d8d53"
+    },
+    {
+      "path": "src/components/RickyProfile.cpp",
+      "baseline_sha256": "d2943e6974a516051b90a6c401fa794b31a21d29662760b0862f9a868e2e0047",
+      "ported_sha256": "18a02d97fc1d62882ff3979c1b4373a6c4d53538fa81bc223107f83ed3406915"
+    },
+    {
+      "path": "src/components/RickyReaderMenuLayout.h",
+      "baseline_sha256": "a83890eca3f01b59dabaa69b50d0b7d3b5c62133c0fd0331c9d8999f12dbd4d6",
+      "ported_sha256": "e8523aa28bb53125b1bee72512e1057e959a2c1d18f1a9e7fec1e02e89cb3331"
+    },
+    {
+      "path": "src/components/RickyRowList.h",
+      "baseline_sha256": "ab0b31a20b44ed39615b921c73fb64aa84ce51b75f06ecfa849cfc7721e6db84",
+      "ported_sha256": "2a996cc5a5425f1b36de5ac24a661cab2eb8a127ca89ce92826d594f77635559"
+    },
+    {
+      "path": "src/components/UITheme.cpp",
+      "baseline_sha256": "8229fe954cb82d346c6297657a2b597128379b71bf5e5e5b9c38ffac84aab2aa",
+      "ported_sha256": "42e4e6263e20d803363bc9235a2528bbe4d570a132ed79aff2c23efe61c163c9"
+    },
+    {
+      "path": "src/components/UiAppHelpers.h",
+      "baseline_sha256": "4193e0cc5d417c20dee024a3ce4415d740f0c48e8db7a9666b4363d13eb5fce7",
+      "ported_sha256": "c28296020b5d04a78d3687e7bcf8e2ce9e1f80edbd817081ac2349faa216dada"
+    },
+    {
+      "path": "src/components/icons/rickyAaIcons.h",
+      "baseline_sha256": "aca9684a0ba70f68288545d8d76373cd90ec68e11d8f90fd3d9f2445354a7d25",
+      "ported_sha256": "71c5888058571eceabbb119fb41dbe78aa1c34195172b23a3aea64befe389bca"
+    },
+    {
+      "path": "src/components/icons/rickyAppIcons.h",
+      "baseline_sha256": "b64188539b8276460b41f143da2dbe5965116b87472ea288d1fa967784cdd602",
+      "ported_sha256": "5049252f250c8c9e673e638eb68c3a30e7a608acbad12ba360e24bc02c327b82"
+    },
+    {
+      "path": "src/components/icons/rickyPageIcons.h",
+      "baseline_sha256": "c27a38304b40c5616e51ed99286ca2dcd164bca3a0677389508ca5755f6cdbff",
+      "ported_sha256": "c299963db21f281a8641296410adce1e782139a253d0a1828a7d9102fbdaa172"
+    },
+    {
+      "path": "src/components/icons/sources/rickyos/apps/gallery.svg",
+      "baseline_sha256": null,
+      "ported_sha256": "5b1c88bf789527d977c96d89834542e7c6feb0b0651760145cb9770b7d65ad23"
+    },
+    {
+      "path": "src/components/icons/sources/rickyos/apps/recorder.svg",
+      "baseline_sha256": null,
+      "ported_sha256": "83857a5f1733566493921d49f64bed6831777329bd6d5bf200b979247f3bd4c7"
+    },
+    {
+      "path": "src/components/icons/sources/rickyos/apps/wallpaper.svg",
+      "baseline_sha256": null,
+      "ported_sha256": "a880953920c47ed4b49ffd6a2e6a29609c71aebd030fbabc8a6e3566f706c6dc"
+    },
+    {
+      "path": "src/components/themes/BaseTheme.cpp",
+      "baseline_sha256": "e54b5b4ab7ec37346bf3d19929021e05a03408ff6cd347efc9fe74a317ae8f79",
+      "ported_sha256": "79f12de39b0f7a925d346ef397822b79ea43df1f421005e5f99b490591837d19"
+    },
+    {
+      "path": "src/components/themes/BaseTheme.h",
+      "baseline_sha256": "378abe736a3301c0d1a2caac764177f0f6346679e2a35a408a3af9458778a48a",
+      "ported_sha256": "f8fadd3dfcbcfa4b94fd90100bfcf8834ba2cd32a62ee17de4d8c943444d34db"
+    },
+    {
+      "path": "src/components/themes/inx/InxTheme.cpp",
+      "baseline_sha256": "a662133664c064efc3dd6afda059e50f3a1c182788ac03c935c4a5e024545464",
+      "ported_sha256": "fb1c314a64fc3c647a6c9362d3d8d937d26f29024af92ed58effb8a7e8cd2d76"
+    },
+    {
+      "path": "src/components/themes/inx/InxTheme.h",
+      "baseline_sha256": "94165ea7bc80aba179daa0c4d699dda6954fa5d4c88654a65245a118477531f7",
+      "ported_sha256": "99f83975771fd6ba5f3ec3537e7c13273cd01144cf05eb1435f25f89bb49aea6"
+    },
+    {
+      "path": "src/main.cpp",
+      "baseline_sha256": "a9593200335b30dace971723992905ac8ce0beb05159ecb6d17d837bdb73fdc5",
+      "ported_sha256": "52689ed3803a9a4e660051e1e0cff589a88f57aa95d3b2abdd63fff4e8a63df3"
+    },
+    {
+      "path": "src/network/CrossPointWebServer.cpp",
+      "baseline_sha256": "cc26e2862bc34cfd502efd63ab616d9c7e577d51e120037525a8be6222c75ee5",
+      "ported_sha256": "53550f7227842d988fd66b57d178a2e934d6a0174683785552aa5d454c2e82ae"
+    },
+    {
+      "path": "src/network/CrossPointWebServer.h",
+      "baseline_sha256": "848da78a7e6db037f7b8285ae66417dcee3ec32fab802cfc63d001bf92fb15ab",
+      "ported_sha256": "b4440cb90bc490ef63783a7f34e6bdf5340b607f145354795d33012b44613252"
+    },
+    {
+      "path": "src/network/FontDownloadSource.h",
+      "baseline_sha256": null,
+      "ported_sha256": "94acde2dc44aa72d8dc5c1c40f12c1289cb59ca7ed1adc5c4e5036bb79bd78aa"
+    },
+    {
+      "path": "src/network/HttpDownloader.cpp",
+      "baseline_sha256": "8257013fbed5cdb59a66015719597b2d042e6eba32e6572e5aa1724fe4d2191b",
+      "ported_sha256": "91baf39bc829ec03f706fd44084afc1ce393b095719259664f5c664fc756e2b6"
+    },
+    {
+      "path": "src/network/HttpDownloader.h",
+      "baseline_sha256": "fd39f0f7f94b7e2a01307b8f32a60f922dac5106fc257ad6f853531530a89b5e",
+      "ported_sha256": "8dec8e5f30f24d301a14cba0cfeb10b5084b8cd4696b5017377693869036e880"
+    },
+    {
+      "path": "src/network/RickyOtaManifest.h",
+      "baseline_sha256": "38afa0bfd28cb95dd862b8e7fcf7611ac8925c4f5fa05da0d2d88052d6bac8f3",
+      "ported_sha256": "861dea711e7d6b1626a8204a272d1bd7e3ff9614a0cb5ebafdf8f3157c8ff924"
+    },
+    {
+      "path": "src/network/RickyOtaPolicy.h",
+      "baseline_sha256": "0a328f420911b3fcb79d3fcbe2935eeade552f8ee6c23370c8092a5af00d907d",
+      "ported_sha256": "c51820abd6e71af2e5a1f9e8d197390e7fc7b17b102df5b211c98ead60d3f37a"
+    },
+    {
+      "path": "src/network/RickyOtaTrust.h",
+      "baseline_sha256": "032e277a59fffc330935ffc806c8b75a91039399963712cfe54293bd4bc695e2",
+      "ported_sha256": "22b47241516b4ec57d653a55603fbea7745066abce4a8881d214f2272d875e97"
+    },
+    {
+      "path": "src/network/RickyReaderResources.h",
+      "baseline_sha256": null,
+      "ported_sha256": "46ce9459487310bad98a46aeb4046de47fa98b5b4e8753a4f0ca8d16eefc08eb"
+    },
+    {
+      "path": "src/network/WifiPowerSaveGuard.h",
+      "baseline_sha256": "00a0ea3d2a912d96af0c3c6f1e9815096b7d8dd39f352d9a7e5f15ad6ccd4580",
+      "ported_sha256": "e820fad5603086a392b042ed72bb3235794ac97bf2ddc4ab6515ada644921f9e"
+    },
+    {
+      "path": "src/util/BookCoverLoader.cpp",
+      "baseline_sha256": "ee6df51aac1ea11610f6f4cd4502c011ea180457bcd7ca547e8b538286d5359c",
+      "ported_sha256": "b860ed1b20771b7a461d0445cfbde9d8eb36b5c71b0018d8b9e6f93971f4442f"
+    },
+    {
+      "path": "src/util/BootPreparation.cpp",
+      "baseline_sha256": "683c1e896659b54b7724a454bd82f2b3a33f55a8d12175f9ce535f38deba093c",
+      "ported_sha256": "7201f26c66791289af74ccbd39eae4d65f57ab66c91eb005f452c076a6d629e6"
+    },
+    {
+      "path": "src/util/HomeButtonInput.h",
+      "baseline_sha256": "0b75e74eafdf5ba84b94c4cb179d41447e3f03430653ac7a2b6ee7ce0eec4fdc",
+      "ported_sha256": "4f189bf06125fb05d2bd248e39ad2234964e34fc61a4d0c5ba9dce8711840940"
+    },
+    {
+      "path": "src/util/PlusButtonInput.h",
+      "baseline_sha256": null,
+      "ported_sha256": "88c15f24d43979de701a5e0b669112ff87eb8bf63257c83ab6f7c67496725da8"
+    },
+    {
+      "path": "src/util/ReadingBackground.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "c2a1f0938a2a3c3f29b4a551662cd7cff8bc819ce9be54f134614f6c07ebdb2d"
+    },
+    {
+      "path": "src/util/ReadingBackground.h",
+      "baseline_sha256": null,
+      "ported_sha256": "92bc8e0d5e4c8bad77003ca77c824a52c70cf3b92debb7f384af9b38e93bfc8f"
+    },
+    {
+      "path": "src/util/UserGuide.cpp",
+      "baseline_sha256": "2e87de6c9f3fc96fad078720d98727f177be45ce4eb4f0fdf7e926062ebe5950",
+      "ported_sha256": "33031812ba0afa38c518d6926a6a7b79f0c076d52e6eb15220d4199dc4f42f3f"
+    },
+    {
+      "path": "src/util/UserGuide.h",
+      "baseline_sha256": "a5b2cbbfcab52fda78526019ae3f3a16e7523e3b81bf8bbaa016b82b620e7596",
+      "ported_sha256": "f077c58e6ff59f7ef36f6e92fdf732d0063f0a9c1b5102644795797eae462ef3"
+    },
+    {
+      "path": "test/CMakeLists.txt",
+      "baseline_sha256": "d248d84f479f67bb1cf097ae3312c81e1f535e795d6769b9fe8462cfb0432475",
+      "ported_sha256": "f6e556747434dba7501d37917afe24ff6c602793c4e77e65c583b12941a9e7ef"
+    },
+    {
+      "path": "test/chapter_html_slim_parser/CMakeLists.txt",
+      "baseline_sha256": "ad6cde6708c1660d08bcc0675812ea1d2fa9b3164a844fff29db320aee7603a5",
+      "ported_sha256": "7f3b3ae2e9d57477435a05838621789384f3f1fa5824668f08fc65f84066872f"
+    },
+    {
+      "path": "test/chapter_html_slim_parser/ChapterHtmlSlimParserTest.cpp",
+      "baseline_sha256": "0f77829b70d37e4665c0069cc8744758943655a149034ba75d6aaba0f72cc84c",
+      "ported_sha256": "9096d2c23baf318a4882a01f4c9647d4bf358a5058516956f5a32ed39fb170cf"
+    },
+    {
+      "path": "test/chapter_html_slim_parser/ParserLinkStubs.cpp",
+      "baseline_sha256": "70a51f3638dbb7e498d685acdeb2fc34b52694cec17966c91a9158330ebd6318",
+      "ported_sha256": "29cc8f367c9b8f67b91b38cba10b967113b3163f005ba4b4dad8efc8d15d2626"
+    },
+    {
+      "path": "test/chapter_html_slim_parser/upstream_stubs/GfxRenderer.h",
+      "baseline_sha256": "2edc3c9f78750c26f7f850a7de8d79122d20d18fb7d8f923050133af90cd282c",
+      "ported_sha256": "52982bf0b9954f75ac4e0028d6b6845fea2a2f4bd8cc2b8f71165fa69ab0ef11"
+    },
+    {
+      "path": "test/css_parser/CssParserTest.cpp",
+      "baseline_sha256": "308bef843e6b93b4e495ea3a87d3f3f96b74844e15147d0f812d50d94daa18de",
+      "ported_sha256": "6c98c67b97758ea7ad17a95ccdb07c11bba4abbb31875398bd594b37de19f054"
+    },
+    {
+      "path": "test/inx_navigation/test_checkbox_rows.py",
+      "baseline_sha256": "5d250d7f713c7783f46011f95920f5cb1806271d835654aa5dd8653aa3a1724b",
+      "ported_sha256": "0e62c1b102f1fbacacd333328a15929233f8954e11ba012ab39f0b75c1dab6fb"
+    },
+    {
+      "path": "test/inx_navigation/test_unified_keyboard.py",
+      "baseline_sha256": "cb6712f7e5e7e4fbf0c20f5db03830e832af995e92a743e342e2c2e8ccf5c2c3",
+      "ported_sha256": "6503b06d9e6cf7d3d3ad41ce0473bb9ef6081ecf7eab01c46a0226d0014a4ac2"
+    },
+    {
+      "path": "test/txt_chapter_index/TxtChapterCacheTest.cpp",
+      "baseline_sha256": "b2cdea7658030840c5b9578d39cd3e65f343071ff3d0230f7830d987300b8735",
+      "ported_sha256": "14766f3bce48078494947b5d2b80c60112e4a5b1cfa4039e0dfd6c1f1da7c0cc"
+    },
+    {
+      "path": "test/txt_chapter_index/TxtProgressTest.cpp",
+      "baseline_sha256": "8077a0d8cd91901bda238fb10352d5f441fb00dd8f516252e33636977c89044f",
+      "ported_sha256": "cb46c1f00733d59c69edd8a2efcf99308cb5fe62b600707e84a2bb109efa5103"
+    },
+    {
+      "path": "test/txt_encoding/TxtEncodingTest.cpp",
+      "baseline_sha256": "f3945affe41b8b3a5253b9ba54be72c430096486149bc88b1c175985a9bd2ec1",
+      "ported_sha256": "6d0547c6520eec8f54cb5aed998b810ea0e8375e45c265e767bcea615695aa6e"
+    },
+    {
+      "path": "test/txt_to_html/MarkdownToHtmlTest.cpp",
+      "baseline_sha256": "7b0f585c8c85c734982fc9b67bb1a83a71d02dd455028ede5d9b78f2eaa64b03",
+      "ported_sha256": "98c87b67998154ab576938224b0c21dc9d6c8f0eaba3de81acb2ede0f8c65497"
+    },
+    {
+      "path": "test/txt_to_html/TxtToHtmlTest.cpp",
+      "baseline_sha256": "0d8e47da578b3785a17848bd689593e1441ae0efab95d2afac631d035fa5f608",
+      "ported_sha256": "c43d84dced8da72fc956168d3e0f6a5d787b3e657e64c9bbafcfa6fd57fb908d"
+    },
+    {
+      "path": "test/txt_utf16_pipeline/CMakeLists.txt",
+      "baseline_sha256": null,
+      "ported_sha256": "c3e9910cc0f301a51215fc69f42d9d3a81b989b9ba4bc5ff1885611d09708d98"
+    },
+    {
+      "path": "test/txt_utf16_pipeline/TxtUtf16PipelineTest.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "0c523d87d604df5a89fcba9ce76a2db043803c3f974e9b8e3d5051ec78b25a1c"
+    },
+    {
+      "path": "src/util/ReadingExcerpt.h",
+      "baseline_sha256": null,
+      "ported_sha256": "8e1b8393ea8e3685f9837cfde187075df841e1b852e1acbbaa258c19a5fa129c"
+    },
+    {
+      "path": "src/util/ReadingExcerpt.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "d389018fc5356a030ed26fecf5164e86bb2043bd272ed40839a47394171aa846"
+    },
+    {
+      "path": "src/activities/apps/standby/ReadingCard.h",
+      "baseline_sha256": null,
+      "ported_sha256": "89b9c43fa309a073b7a725b3ae2b5dd737a1f8ddaaae56e3f718aab944c4083e"
+    },
+    {
+      "path": "src/activities/apps/standby/ReadingCard.cpp",
+      "baseline_sha256": null,
+      "ported_sha256": "75f3c3f5ec32fbb36995dadabbff3a54bcec8dca87429c55dba03a61e72a9eec"
+    }
+  ],
+  "feature_sources": {
+    "pinyin": "6e1d0ea7111d70596295c730ea8a3a84814932cb",
+    "regional_gray_and_transparent_standby": "6e1d0ea7111d70596295c730ea8a3a84814932cb"
+  }
+}

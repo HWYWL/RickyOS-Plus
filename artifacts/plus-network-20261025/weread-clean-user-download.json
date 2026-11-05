@@ -1,0 +1,42 @@
+{
+  "firmware": "1.2.7-netfix",
+  "user_report": "logged in",
+  "image_phase": [
+    {
+      "elapsed_ms": 60932,
+      "total": 53,
+      "downloaded": 53,
+      "cached": 0,
+      "skipped": 0,
+      "bytes": 9985898,
+      "redirects": 53,
+      "files": 53,
+      "tls_new": 2,
+      "tls_reused": 104
+    }
+  ],
+  "packaging": [
+    {
+      "elapsed_ms": 11267,
+      "bytes": 10496896,
+      "image_policy": "embed"
+    }
+  ],
+  "pipeline": [
+    {
+      "result": "complete",
+      "pipeline_total_ms": 118332,
+      "chapter_transfer_ms": 22528,
+      "shard_bytes": 504657,
+      "combine_base64_ms": 3869,
+      "xhtml_ms": 3253
+    }
+  ],
+  "reader_entry": true,
+  "panic_observed": false,
+  "limitations": [
+    "single real user download; does not prove sustained stability",
+    "book identity, account, content and paths omitted",
+    "automatic repeat shelf/detail results still pending"
+  ]
+}

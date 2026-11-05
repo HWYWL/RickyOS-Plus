@@ -1,0 +1,4 @@
+add_executable(reading_mode_test ReadingModeTest.cpp)
+target_include_directories(reading_mode_test PRIVATE ${REPO_ROOT}/src)
+target_link_libraries(reading_mode_test PRIVATE crosspoint_test_common GTest::gtest_main)
+gtest_discover_tests(reading_mode_test)

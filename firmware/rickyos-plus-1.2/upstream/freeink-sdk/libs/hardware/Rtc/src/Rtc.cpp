@@ -1,0 +1,484 @@
+#include "Rtc.h"
+
+#include <time.h>
+
+#include <BoardConfig.h>
+#if FREEINK_DEVICE_METALIO_PLUS
+#include <plus_i2c_wire.h>
+#include <metalio_i2c1.h>
+#endif
+
+namespace {
+// Board-supplied PMU time source (BoardConfig::RtcType::Cw32L010Pmu). Kept
+// outside the FREEINK_CAP_RTC guard so a capability-off build still links the
+// setter the board support library calls from its own begin().
+Rtc::PmuTimeHooks g_pmuTimeHooks = {};
+}  // namespace
+
+void Rtc::setPmuTimeHooks(const PmuTimeHooks& hooks) { g_pmuTimeHooks = hooks; }
+
+#if FREEINK_CAP_RTC
+
+#include <Wire.h>
+#include <soc/soc_caps.h>
+#if FREEINK_DEVICE_MURPHY_M4
+#include <MurphyM4I2c.h>
+#endif
+
+namespace freeink {
+namespace {
+
+// PCF8563 register map (confirmed against the vendor peripheral demo).
+constexpr uint8_t PCF8563_REG_CONTROL_STATUS1 = 0x00;
+constexpr uint8_t PCF8563_REG_TIME = 0x02;  // seconds, minutes, hours, days, weekdays, months, years
+constexpr uint8_t PCF8563_REG_CLKOUT = 0x0D;
+constexpr uint8_t PCF8563_CLKOUT_DISABLED = 0x00;
+constexpr uint8_t PCF8563_VL_FLAG = 0x80;  // seconds reg bit7: oscillator stopped / voltage-low
+
+// PCF85063A register map. Same BCD time layout as the PCF8563 but shifted:
+// Control_1/2 at 0x00/0x01, time from 0x04, seconds bit7 is the OS (oscillator
+// stopped) flag, and Months carries no century bit.
+constexpr uint8_t PCF85063_REG_CONTROL1 = 0x00;
+constexpr uint8_t PCF85063_REG_TIME = 0x04;
+constexpr uint8_t PCF85063_OS_FLAG = 0x80;
+
+// DS3231 register map.
+constexpr uint8_t DS3231_REG_TIME = 0x00;  // seconds, minutes, hours, day, date, month, year
+constexpr uint8_t DS3231_REG_CONTROL = 0x0E;
+constexpr uint8_t DS3231_REG_STATUS = 0x0F;
+constexpr uint8_t DS3231_CONTROL_INTCN = 0x04;
+constexpr uint8_t DS3231_STATUS_OSF = 0x80;
+
+// RX8130CE register map (Paper Mono / PaperS3).
+constexpr uint8_t RX8130_REG_TIME = 0x10;
+constexpr uint8_t RX8130_REG_CONTROL0 = 0x1D;
+constexpr uint8_t RX8130_POR_FLAG = 0x80;
+constexpr uint8_t RX8130_STOP = 0x01;
+
+// Epson RX8010SJ register map.
+constexpr uint8_t RX8010_REG_TIME = 0x10;
+constexpr uint8_t RX8010_REG_FLAG = 0x1E;
+constexpr uint8_t RX8010_FLAG_VLF = 0x02;
+
+// Calendar -> unix seconds in UTC, for the PMU RTC (which speaks unix seconds
+// rather than BCD fields). mktime() is local-time and timegm() is not declared
+// by the newlib <time.h> this project builds against, so the civil-days formula
+// is the only timezone-independent route. HalClock.cpp carries the same copy for
+// its own epoch conversions.
+int64_t daysFromCivil(int year, unsigned month, unsigned day) {
+  year -= month <= 2;
+  const int era = (year >= 0 ? year : year - 399) / 400;
+  const unsigned yearOfEra = static_cast<unsigned>(year - era * 400);
+  const unsigned dayOfYear = (153 * (month + (month > 2 ? -3 : 9)) + 2) / 5 + day - 1;
+  const unsigned dayOfEra = yearOfEra * 365 + yearOfEra / 4 - yearOfEra / 100 + dayOfYear;
+  return static_cast<int64_t>(era) * 146097 + static_cast<int64_t>(dayOfEra) - 719468;
+}
+
+bool g_wireReady[2] = {false, false};
+
+TwoWire& sensorWire() {
+  const auto& s = BoardConfig::ACTIVE.sensors;
+#if SOC_I2C_NUM > 1
+  return s.i2cBus == 1 ? Wire1 : Wire;
+#else
+  return Wire;
+#endif
+}
+
+void ensureWire() {
+#if FREEINK_DEVICE_METALIO_PLUS
+  return; // The Plus board owns Wire1; all RTC transfers use its shared lock.
+#endif
+  const auto& s = BoardConfig::ACTIVE.sensors;
+  const uint8_t bus =
+#if SOC_I2C_NUM > 1
+      s.i2cBus == 1 ? 1 : 0;
+#else
+      0;
+#endif
+  if (g_wireReady[bus]) return;
+  auto& wire = sensorWire();
+  wire.begin(s.i2cSda, s.i2cScl, s.i2cHz);
+  g_wireReady[bus] = true;
+}
+
+uint8_t bcdToDec(uint8_t v) { return static_cast<uint8_t>((v >> 4) * 10U + (v & 0x0FU)); }
+uint8_t decToBcd(uint8_t v) { return static_cast<uint8_t>((v / 10U) << 4 | (v % 10U)); }
+
+bool writeReg(uint8_t addr, uint8_t reg, uint8_t value) {
+#if FREEINK_DEVICE_METALIO_PLUS
+  if (!metalio_i2c1_lock(20)) return false;
+  const auto result = plus_i2c_write(addr, reg, &value, 1);
+  metalio_i2c1_unlock();
+  return result == ESP_OK;
+#else
+  ensureWire();
+  auto& wire = sensorWire();
+  wire.beginTransmission(addr);
+  wire.write(reg);
+  wire.write(value);
+  return wire.endTransmission() == 0;
+#endif
+}
+
+bool readRegs(uint8_t addr, uint8_t reg, uint8_t* dst, uint8_t len) {
+#if FREEINK_DEVICE_METALIO_PLUS
+  if (!metalio_i2c1_lock(20)) return false;
+  const auto result = plus_i2c_read(addr, reg, dst, len);
+  metalio_i2c1_unlock();
+  return result == ESP_OK;
+#else
+  ensureWire();
+  auto& wire = sensorWire();
+  wire.beginTransmission(addr);
+  wire.write(reg);
+  if (wire.endTransmission(false) != 0) return false;
+  if (wire.requestFrom(addr, len, static_cast<uint8_t>(true)) < len) return false;
+  for (uint8_t i = 0; i < len; ++i) dst[i] = wire.read();
+  return true;
+#endif
+}
+
+#if FREEINK_DEVICE_MURPHY_M4
+bool m4ReadRegs(uint8_t addr, uint8_t reg, uint8_t* dst, uint8_t len) {
+  const auto& s = BoardConfig::ACTIVE.sensors;
+  const auto device = freeink::murphy_m4_i2c::rtcDevice(s.i2cSda, s.i2cScl, addr);
+  return freeink::murphy_m4_i2c::read(device, reg, dst, len);
+}
+
+bool m4WriteRegs(uint8_t addr, uint8_t reg, const uint8_t* data, uint8_t len) {
+  if (len > 7) return false;
+  uint8_t payload[8] = {reg};
+  for (uint8_t i = 0; i < len; ++i) payload[i + 1] = data[i];
+  const auto& s = BoardConfig::ACTIVE.sensors;
+  const auto device = freeink::murphy_m4_i2c::rtcDevice(s.i2cSda, s.i2cScl, addr);
+  return freeink::murphy_m4_i2c::write(device, payload, static_cast<size_t>(len) + 1);
+}
+#endif
+
+}  // namespace
+
+bool Rtc::begin() {
+  const uint8_t addr = BoardConfig::ACTIVE.sensors.rtcAddr;
+  if (addr == 0) return false;
+  const auto& s = BoardConfig::ACTIVE.sensors;
+  if (s.i2cSda < 0 || s.i2cScl < 0 || s.i2cHz == 0) return false;
+#if FREEINK_DEVICE_MURPHY_M4
+  if (s.rtcType == BoardConfig::RtcType::Rx8010) {
+    uint8_t status = 0;
+    if (!m4ReadRegs(addr, RX8010_REG_FLAG, &status, 1)) return false;
+    begun_ = true;
+    return true;
+  }
+#endif
+  // The PMU RTC is not on the Wire register interface at all: the board owns the
+  // CW32L010 frame protocol and its own bus bring-up, so re-begin()ing Wire here
+  // would only reconfigure a bus the board handshake already set up.
+  if (s.rtcType != BoardConfig::RtcType::Cw32L010Pmu) ensureWire();
+  uint8_t status = 0;
+  switch (s.rtcType) {
+    case BoardConfig::RtcType::Pcf8563:
+      if (!readRegs(addr, PCF8563_REG_CONTROL_STATUS1, &status, 1)) return false;
+      writeReg(addr, PCF8563_REG_CLKOUT, PCF8563_CLKOUT_DISABLED);  // we don't use the 32 kHz CLKOUT
+      break;
+    case BoardConfig::RtcType::Pcf85063:
+      // No CLKOUT write: the PCF85063's CLKOUT lives in Control_2 alongside bits
+      // this driver has no business touching, and it boots disabled.
+      if (!readRegs(addr, PCF85063_REG_CONTROL1, &status, 1)) return false;
+      break;
+    case BoardConfig::RtcType::Ds3231:
+      if (!readRegs(addr, DS3231_REG_STATUS, &status, 1)) return false;
+      writeReg(addr, DS3231_REG_CONTROL, DS3231_CONTROL_INTCN);  // disable square-wave output
+      break;
+    case BoardConfig::RtcType::Rx8130:
+      if (!readRegs(addr, RX8130_REG_CONTROL0, &status, 1)) return false;
+      break;
+    case BoardConfig::RtcType::Rx8010:
+      return false;
+    case BoardConfig::RtcType::Cw32L010Pmu:
+      // The hooks are installed by the board support library AFTER its own PMU
+      // handshake, so their presence is the "device answers" signal every other
+      // case proves with a register read here. Availability itself is not a
+      // promise that the PMU's clock is calibrated: an unsynced or absent PMU
+      // still fails every now()/set() below, which is exactly the documented
+      // failure semantics (HalClock then keeps the software clock and logs the
+      // failed write). Refusing here instead would make the write path
+      // unreachable, so the PMU RTC could never be set or restored at all.
+      if (g_pmuTimeHooks.getUnix == nullptr || g_pmuTimeHooks.setUnix == nullptr) return false;
+      break;
+    case BoardConfig::RtcType::None:
+      return false;
+  }
+  begun_ = true;
+  return true;
+}
+
+bool Rtc::now(DateTime& out) {
+  const uint8_t addr = BoardConfig::ACTIVE.sensors.rtcAddr;
+  if (!begun_ || addr == 0) return false;
+  const auto& s = BoardConfig::ACTIVE.sensors;
+  uint8_t raw[7] = {};
+  switch (s.rtcType) {
+    case BoardConfig::RtcType::Pcf8563: {
+      if (!readRegs(addr, PCF8563_REG_TIME, raw, sizeof(raw))) return false;
+      if (raw[0] & PCF8563_VL_FLAG) return false;  // oscillator stopped -> time not trustworthy
+      out.second = bcdToDec(raw[0] & 0x7FU);
+      out.minute = bcdToDec(raw[1] & 0x7FU);
+      out.hour = bcdToDec(raw[2] & 0x3FU);
+      out.day = bcdToDec(raw[3] & 0x3FU);
+      out.weekday = bcdToDec(raw[4] & 0x07U);
+      out.month = bcdToDec(raw[5] & 0x1FU);
+      const uint8_t yy = bcdToDec(raw[6]);
+      out.year = (raw[5] & 0x80U) ? static_cast<uint16_t>(1900 + yy) : static_cast<uint16_t>(2000 + yy);
+      return true;
+    }
+    case BoardConfig::RtcType::Pcf85063: {
+      if (!readRegs(addr, PCF85063_REG_TIME, raw, sizeof(raw))) return false;
+      if (raw[0] & PCF85063_OS_FLAG) return false;  // oscillator stopped -> time not trustworthy
+      out.second = bcdToDec(raw[0] & 0x7FU);
+      out.minute = bcdToDec(raw[1] & 0x7FU);
+      out.hour = bcdToDec(raw[2] & 0x3FU);
+      out.day = bcdToDec(raw[3] & 0x3FU);
+      out.weekday = bcdToDec(raw[4] & 0x07U);
+      out.month = bcdToDec(raw[5] & 0x1FU);
+      out.year = static_cast<uint16_t>(2000 + bcdToDec(raw[6]));
+      return true;
+    }
+    case BoardConfig::RtcType::Ds3231: {
+      uint8_t status = 0;
+      if (!readRegs(addr, DS3231_REG_STATUS, &status, 1) || (status & DS3231_STATUS_OSF)) return false;
+      if (!readRegs(addr, DS3231_REG_TIME, raw, sizeof(raw))) return false;
+      out.second = bcdToDec(raw[0] & 0x7FU);
+      out.minute = bcdToDec(raw[1] & 0x7FU);
+      if (raw[2] & 0x40U) {
+        uint8_t h12 = bcdToDec(raw[2] & 0x1FU);
+        if (h12 == 12) h12 = 0;
+        out.hour = static_cast<uint8_t>((raw[2] & 0x20U) ? h12 + 12 : h12);
+      } else {
+        out.hour = bcdToDec(raw[2] & 0x3FU);
+      }
+      out.weekday = bcdToDec(raw[3] & 0x07U) % 7U;
+      out.day = bcdToDec(raw[4] & 0x3FU);
+      out.month = bcdToDec(raw[5] & 0x1FU);
+      out.year = static_cast<uint16_t>(2000 + bcdToDec(raw[6]));
+      return true;
+    }
+    case BoardConfig::RtcType::Rx8130: {
+      if (!readRegs(addr, RX8130_REG_TIME, raw, sizeof(raw))) return false;
+      if (raw[0] & RX8130_POR_FLAG) return false;
+      out.second = bcdToDec(raw[0] & 0x7FU);
+      out.minute = bcdToDec(raw[1] & 0x7FU);
+      out.hour = bcdToDec(raw[2] & 0x3FU);
+      out.weekday = 0;
+      for (uint8_t i = 0; i < 7; ++i) {
+        if (raw[3] & (1u << i)) {
+          out.weekday = i;
+          break;
+        }
+      }
+      out.day = bcdToDec(raw[4] & 0x3FU);
+      out.month = bcdToDec(raw[5] & 0x1FU);
+      out.year = static_cast<uint16_t>(2000 + bcdToDec(raw[6]));
+      return true;
+    }
+    case BoardConfig::RtcType::Rx8010: {
+#if FREEINK_DEVICE_MURPHY_M4
+      if (BoardConfig::ACTIVE.board != BoardConfig::Board::MurphyM4) return false;
+      uint8_t flag = 0;
+      if (!m4ReadRegs(addr, RX8010_REG_FLAG, &flag, 1) || (flag & RX8010_FLAG_VLF)) return false;
+      if (!m4ReadRegs(addr, RX8010_REG_TIME, raw, sizeof(raw))) return false;
+      out.second = bcdToDec(raw[0] & 0x7FU);
+      out.minute = bcdToDec(raw[1] & 0x7FU);
+      out.hour = bcdToDec(raw[2] & 0x3FU);
+      out.weekday = 0;
+      for (uint8_t i = 0; i < 7; ++i) {
+        if (raw[3] & (1u << i)) {
+          out.weekday = i;
+          break;
+        }
+      }
+      out.day = bcdToDec(raw[4] & 0x3FU);
+      out.month = bcdToDec(raw[5] & 0x1FU);
+      out.year = static_cast<uint16_t>(2000 + bcdToDec(raw[6]));
+      return true;
+#else
+      return false;
+#endif
+    }
+    case BoardConfig::RtcType::Cw32L010Pmu: {
+      // PMU_CMD_TIME_GET: unix seconds (0 = never calibrated) plus the PMU's own
+      // `synced` flag (read_pico_pmu_protocol.h). Like the VL / POR / OSF checks
+      // in the register-map cases above, an unsynced or zero clock means the time
+      // is not trustworthy, so this reports "no time" and the consumer falls back
+      // to the software clock rather than restoring a bogus epoch.
+      if (g_pmuTimeHooks.getUnix == nullptr) return false;
+      uint32_t unixSec = 0;
+      bool synced = false;
+      if (!g_pmuTimeHooks.getUnix(unixSec, synced)) return false;
+      if (!synced || unixSec == 0) return false;
+      struct tm utc {};
+      const time_t epoch = static_cast<time_t>(unixSec);
+      if (gmtime_r(&epoch, &utc) == nullptr) return false;
+      out.year = static_cast<uint16_t>(utc.tm_year + 1900);
+      out.month = static_cast<uint8_t>(utc.tm_mon + 1);
+      out.day = static_cast<uint8_t>(utc.tm_mday);
+      out.hour = static_cast<uint8_t>(utc.tm_hour);
+      out.minute = static_cast<uint8_t>(utc.tm_min);
+      out.second = static_cast<uint8_t>(utc.tm_sec);
+      out.weekday = static_cast<uint8_t>(utc.tm_wday);
+      return true;
+    }
+    case BoardConfig::RtcType::None:
+      return false;
+  }
+  return false;
+}
+
+bool Rtc::set(const DateTime& dt) {
+  const uint8_t addr = BoardConfig::ACTIVE.sensors.rtcAddr;
+  if (!begun_ || addr == 0) return false;
+  const auto& s = BoardConfig::ACTIVE.sensors;
+#if FREEINK_DEVICE_METALIO_PLUS
+  if (s.rtcType != BoardConfig::RtcType::Pcf8563 || dt.year < 2000 || dt.year > 2099 ||
+      dt.month < 1 || dt.month > 12 || dt.day < 1 || dt.day > 31 || dt.hour > 23 || dt.minute > 59 || dt.second > 59)
+    return false;
+  const uint8_t raw[7] = {decToBcd(dt.second), decToBcd(dt.minute), decToBcd(dt.hour), decToBcd(dt.day),
+                          decToBcd(dt.weekday), decToBcd(dt.month), decToBcd(static_cast<uint8_t>(dt.year % 100))};
+  if (!metalio_i2c1_lock(20)) return false;
+  const auto result = plus_i2c_write(addr, PCF8563_REG_TIME, raw, sizeof(raw));
+  metalio_i2c1_unlock();
+  return result == ESP_OK;
+#endif
+  if (s.rtcType == BoardConfig::RtcType::Cw32L010Pmu) {
+    // PMU_CMD_TIME_SYNC takes unix seconds, so the calendar has to be converted
+    // here. Unix seconds cannot express a year before 1970, and the register-map
+    // branches above already reject an implausible year (PCF85063: <2000/>2099);
+    // the same bound plus field sanity keeps a nonsense DateTime out of the PMU
+    // instead of writing a wrapped epoch. A failed write is the caller's to log:
+    // HalClock keeps the system clock and only reports the persistence failure.
+    if (g_pmuTimeHooks.setUnix == nullptr) return false;
+    if (dt.year < 2000 || dt.year > 2099 || dt.month < 1 || dt.month > 12 || dt.day < 1 || dt.day > 31 ||
+        dt.hour > 23 || dt.minute > 59 || dt.second > 59) {
+      return false;
+    }
+    const int64_t seconds = daysFromCivil(dt.year, dt.month, dt.day) * 86400 + static_cast<int64_t>(dt.hour) * 3600 +
+                            static_cast<int64_t>(dt.minute) * 60 + dt.second;
+    if (seconds <= 0 || seconds > 0xFFFFFFFFLL) return false;
+    return g_pmuTimeHooks.setUnix(static_cast<uint32_t>(seconds));
+  }
+  if (s.rtcType == BoardConfig::RtcType::Pcf85063) {
+    if (dt.year < 2000 || dt.year > 2099) return false;
+    ensureWire();
+    auto& wire = sensorWire();
+    wire.beginTransmission(addr);
+    wire.write(PCF85063_REG_TIME);
+    wire.write(decToBcd(dt.second));  // also clears OS once a valid time is written
+    wire.write(decToBcd(dt.minute));
+    wire.write(decToBcd(dt.hour));
+    wire.write(decToBcd(dt.day));
+    wire.write(decToBcd(dt.weekday));
+    wire.write(decToBcd(dt.month));
+    wire.write(decToBcd(static_cast<uint8_t>(dt.year % 100)));
+    return wire.endTransmission() == 0;
+  }
+#if FREEINK_DEVICE_MURPHY_M4
+  if (s.rtcType == BoardConfig::RtcType::Rx8010) {
+    if (BoardConfig::ACTIVE.board != BoardConfig::Board::MurphyM4) return false;
+    const uint8_t time[] = {decToBcd(dt.second),
+                            decToBcd(dt.minute),
+                            decToBcd(dt.hour),
+                            static_cast<uint8_t>(1u << (dt.weekday % 7u)),
+                            decToBcd(dt.day),
+                            decToBcd(dt.month),
+                            decToBcd(static_cast<uint8_t>(dt.year % 100))};
+    if (!m4WriteRegs(addr, RX8010_REG_TIME, time, sizeof(time))) return false;
+    uint8_t flag = 0;
+    if (!m4ReadRegs(addr, RX8010_REG_FLAG, &flag, 1)) return true;
+    flag = static_cast<uint8_t>(flag & ~RX8010_FLAG_VLF);
+    return m4WriteRegs(addr, RX8010_REG_FLAG, &flag, 1);
+  }
+#endif
+  if (s.rtcType == BoardConfig::RtcType::Rx8010) return false;
+  const uint8_t centuryBit = dt.year < 2000 ? 0x80U : 0x00U;
+  ensureWire();
+  auto& wire = sensorWire();
+  if (s.rtcType == BoardConfig::RtcType::None) return false;
+  if (s.rtcType == BoardConfig::RtcType::Rx8130) {
+    uint8_t control = 0;
+    if (!readRegs(addr, RX8130_REG_CONTROL0, &control, 1) ||
+        !writeReg(addr, RX8130_REG_CONTROL0, static_cast<uint8_t>(control | RX8130_STOP))) {
+      return false;
+    }
+    wire.beginTransmission(addr);
+    wire.write(RX8130_REG_TIME);
+    wire.write(decToBcd(dt.second));
+    wire.write(decToBcd(dt.minute));
+    wire.write(decToBcd(dt.hour));
+    wire.write(static_cast<uint8_t>(1u << (dt.weekday % 7u)));
+    wire.write(decToBcd(dt.day));
+    wire.write(decToBcd(dt.month));
+    wire.write(decToBcd(static_cast<uint8_t>(dt.year % 100)));
+    const bool written = wire.endTransmission() == 0;
+    const bool restarted = writeReg(addr, RX8130_REG_CONTROL0, static_cast<uint8_t>(control & ~RX8130_STOP));
+    return written && restarted;
+  }
+  wire.beginTransmission(addr);
+  wire.write(s.rtcType == BoardConfig::RtcType::Pcf8563 ? PCF8563_REG_TIME : DS3231_REG_TIME);
+  wire.write(decToBcd(dt.second));  // also clears VL once a valid time is written
+  wire.write(decToBcd(dt.minute));
+  wire.write(decToBcd(dt.hour));
+  if (s.rtcType == BoardConfig::RtcType::Pcf8563) {
+    wire.write(decToBcd(dt.day));
+    wire.write(decToBcd(dt.weekday));
+    wire.write(static_cast<uint8_t>(decToBcd(dt.month) | centuryBit));
+  } else {
+    wire.write(decToBcd(dt.weekday == 0 ? 7 : dt.weekday));
+    wire.write(decToBcd(dt.day));
+    wire.write(decToBcd(dt.month));
+  }
+  wire.write(decToBcd(static_cast<uint8_t>(dt.year % 100)));
+  if (wire.endTransmission() != 0) return false;
+  if (s.rtcType == BoardConfig::RtcType::Ds3231) {
+    uint8_t status = 0;
+    if (readRegs(addr, DS3231_REG_STATUS, &status, 1)) {
+      writeReg(addr, DS3231_REG_STATUS, static_cast<uint8_t>(status & ~DS3231_STATUS_OSF));
+    }
+  }
+  return true;
+}
+
+bool Rtc::adjust(const int32_t seconds, DateTime* out) {
+  DateTime now{};
+  if (!this->now(now)) return false;
+  // Round-trip through mktime so day/month/year carries are calendar-correct
+  // (mktime normalizes out-of-range fields; the fixed offset cancels).
+  struct tm t{};
+  t.tm_year = now.year - 1900;
+  t.tm_mon = now.month - 1;
+  t.tm_mday = now.day;
+  t.tm_hour = now.hour;
+  t.tm_min = now.minute;
+  t.tm_sec = now.second;
+  time_t epoch = mktime(&t) + seconds;
+  localtime_r(&epoch, &t);
+  const DateTime dt{static_cast<uint16_t>(t.tm_year + 1900), static_cast<uint8_t>(t.tm_mon + 1),
+                    static_cast<uint8_t>(t.tm_mday),         static_cast<uint8_t>(t.tm_hour),
+                    static_cast<uint8_t>(t.tm_min),          static_cast<uint8_t>(t.tm_sec),
+                    static_cast<uint8_t>(t.tm_wday)};
+  if (!set(dt)) return false;
+  if (out) *out = dt;
+  return true;
+}
+
+}  // namespace freeink
+
+#else  // FREEINK_CAP_RTC — no RTC on this board.
+
+namespace freeink {
+bool Rtc::begin() { return false; }
+bool Rtc::now(DateTime&) { return false; }
+bool Rtc::set(const DateTime&) { return false; }
+bool Rtc::adjust(int32_t, DateTime*) { return false; }
+}  // namespace freeink
+
+#endif  // FREEINK_CAP_RTC

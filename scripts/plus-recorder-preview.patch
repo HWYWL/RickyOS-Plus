@@ -1,0 +1,202 @@
+--- a/platformio.ini
++++ b/platformio.ini
+@@ -455,6 +455,7 @@
+ extra_scripts =
+   ${env:simulator.extra_scripts}
+   post:scripts/patch_rickyos_simulator.py
++  post:scripts/patch_plus_preview_clock.py
+ build_src_filter =
+   ${env:simulator.build_src_filter}
+   ${rickyos_app_profile.build_src_filter}
+@@ -462,6 +463,8 @@
+   ${env:simulator_readpico.build_flags}
+   ${rickyos_flash_trim.build_flags}
+   -DRICKYOS_PRODUCT=1
++  -DRICKYOS_SIMULATOR_PLUS=1
++  -Ipreview-generated
+   -DRICKYOS_USB_PREVIEW=1
+   -DCROSSPOINT_PRODUCT_NAME=\"RickyOS\"
+ custom_i18n_builtin_langs = ${rickyos_flash_trim.custom_i18n_builtin_langs}
+--- a/src/activities/ActivityManager.cpp
++++ b/src/activities/ActivityManager.cpp
+@@ -15,7 +15,7 @@
+ #include "CrossPointSettings.h"
+ #include "apps/AppsMenuActivity.h"
+ #include "apps/calculator/CalculatorActivity.h"
+-#if FREEINK_DEVICE_METALIO_PLUS
++#if FREEINK_DEVICE_METALIO_PLUS || defined(RICKYOS_SIMULATOR_PLUS)
+ #include "apps/recorder/RecorderActivity.h"
+ #endif
+ #include "apps/gomoku/GomokuMenuActivity.h"
+@@ -808,7 +808,7 @@
+ void ActivityManager::goToGomoku() { replaceActivityWith<GomokuMenuActivity>(); }
+ 
+ void ActivityManager::goToCalculator() { replaceActivityWith<CalculatorActivity>(); }
+-#if FREEINK_DEVICE_METALIO_PLUS
++#if FREEINK_DEVICE_METALIO_PLUS || defined(RICKYOS_SIMULATOR_PLUS)
+ void ActivityManager::goToRecorder() { replaceActivityWith<RecorderActivity>(); }
+ #endif
+ 
+--- a/src/activities/ActivityManager.h
++++ b/src/activities/ActivityManager.h
+@@ -158,7 +158,7 @@
+   void goToApps();
+   void goToGomoku();
+   void goToCalculator();
+-#if FREEINK_DEVICE_METALIO_PLUS
++#if FREEINK_DEVICE_METALIO_PLUS || defined(RICKYOS_SIMULATOR_PLUS)
+   void goToRecorder();
+ #endif
+   void goToStandby();
+--- a/src/activities/apps/AppsMenuActivity.cpp
++++ b/src/activities/apps/AppsMenuActivity.cpp
+@@ -37,7 +37,7 @@
+     {AppId::ReadingStats, StrId::STR_READING_STATS, UIIcon::ReadingStats, &ActivityManager::goToRickyReadingStats},
+     {AppId::Gomoku, StrId::STR_GOMOKU_TITLE, UIIcon::Gomoku, &ActivityManager::goToGomoku},
+     {AppId::Calculator, StrId::STR_CALCULATOR_TITLE, UIIcon::Calculator, &ActivityManager::goToCalculator},
+-#if FREEINK_DEVICE_METALIO_PLUS
++#if FREEINK_DEVICE_METALIO_PLUS || defined(RICKYOS_SIMULATOR_PLUS)
+     {AppId::Recorder, StrId::STR_REC_TITLE, UIIcon::Recorder, &ActivityManager::goToRecorder},
+ #endif
+     // The one entry for Standby & power off (not repeated in Settings).
+--- a/src/activities/apps/recorder/RecorderActivity.cpp
++++ b/src/activities/apps/recorder/RecorderActivity.cpp
+@@ -1,5 +1,5 @@
+ #include "RecorderActivity.h"
+-#if FREEINK_DEVICE_METALIO_PLUS
++#if FREEINK_DEVICE_METALIO_PLUS || defined(RICKYOS_SIMULATOR_PLUS)
+ #include <I18n.h>
+ 
+ #include <algorithm>
+@@ -104,8 +104,10 @@
+   const auto now = HalRecorder::state();
+   const uint32_t seconds = HalRecorder::seconds();
+   const bool preparing = HalRecorder::preparing();
++#if FREEINK_DEVICE_METALIO_PLUS
+   if (shownPreparing && !preparing && now == HalRecorder::State::Recording && SETTINGS.plusTouchFeedback)
+     mappedInput.pulseHapticFeedback();
++#endif
+   if (now != before || now != shownState || preparing != shownPreparing) {
+     shownPreparing = preparing;
+     if (!HalRecorder::active())
+--- a/src/activities/apps/recorder/RecorderActivity.h
++++ b/src/activities/apps/recorder/RecorderActivity.h
+@@ -1,5 +1,5 @@
+ #pragma once
+-#if FREEINK_DEVICE_METALIO_PLUS
++#if FREEINK_DEVICE_METALIO_PLUS || defined(RICKYOS_SIMULATOR_PLUS)
+ #include <HalRecorder.h>
+ 
+ #include <array>
+--- a/src/activities/util/FrontlightPanelActivity.cpp
++++ b/src/activities/util/FrontlightPanelActivity.cpp
+@@ -51,7 +51,7 @@
+   std::array<uint8_t, 128> bits{};
+   for (auto& b : bits) b = 0xff;
+   for (int y = 6; y < 26; ++y) {
+-    const int extent = 20 - 2 * std::abs(y - 16);
++    const int extent = 20 - 2 * (y < 16 ? 16 - y : y - 16);
+     for (int x = 9; x < 9 + extent; ++x) bits[y * 4 + x / 8] &= ~(0x80 >> (x % 8));
+   }
+   return bits;
+--- a/lib/WeReadWebApi/src/WeReadClient.cpp
++++ b/lib/WeReadWebApi/src/WeReadClient.cpp
+@@ -10,7 +10,7 @@
+ #include <Memory.h>
+ #include <PngToBmpConverter.h>
+ #include <StreamingJsonParser.h>
+-#include <PlusSha256.h>
++#include <mbedtls/sha256.h>
+ #include <strings.h>
+ 
+ #include <algorithm>
+@@ -237,12 +237,12 @@
+ bool sha256Hex(const char* value, char* out, const size_t outSize) {
+   if (!value || !out || outSize < 65) return false;
+   uint8_t digest[32];
+-  PlusSha256Context context;
+-  plus_sha256_init(&context);
+-  const bool ok = plus_sha256_starts(&context, 0) == 0 &&
+-                  plus_sha256_update(&context, reinterpret_cast<const uint8_t*>(value), strlen(value)) == 0 &&
+-                  plus_sha256_finish(&context, digest) == 0;
+-  plus_sha256_free(&context);
++  mbedtls_sha256_context context;
++  mbedtls_sha256_init(&context);
++  const bool ok = mbedtls_sha256_starts(&context, 0) == 0 &&
++                  mbedtls_sha256_update(&context, reinterpret_cast<const uint8_t*>(value), strlen(value)) == 0 &&
++                  mbedtls_sha256_finish(&context, digest) == 0;
++  mbedtls_sha256_free(&context);
+   if (!ok) return false;
+   for (size_t i = 0; i < sizeof(digest); ++i) snprintf(out + i * 2, outSize - i * 2, "%02x", digest[i]);
+   out[64] = '\0';
+--- a/tools/rickyos-browser/index.html
++++ b/tools/rickyos-browser/index.html
+@@ -13,8 +13,8 @@
+   <main>
+     <aside>
+       <p class="eyebrow">LIVE FIRMWARE</p>
+-      <h1>先看效果，<br>再上实机。</h1>
+-      <p class="intro">当前画面来自 RickyOS 固件模拟器。直接点击屏幕，或按住拖动来滑动。</p>
++      <h1>Plus 录音机<br>界面预览。</h1>
++      <p class="intro">当前画面来自 RickyOS 固件模拟器。可以开始录音、停止保存、点击录音回放。声音为模拟状态，不采集电脑麦克风。</p>
+       <div class="status-panel"><span id="status-dot"></span><span id="status" role="status" aria-live="polite">正在启动…</span><small id="activity">等待第一帧</small></div>
+       <div class="controls" aria-label="模拟设备操作">
+         <button class="primary" data-key="BACK">← 返回</button>
+@@ -39,7 +39,7 @@
+       <div class="stage" id="stage">
+         <div class="device"><img id="screen" alt="RickyOS 实时屏幕，可点击或滑动" width="684" height="1216" tabindex="0" draggable="false"><div id="loading">正在启动 RickyOS…</div></div>
+       </div>
+-      <div class="caption"><span id="frame-status">等待固件画面</span><span>MindReset Read Pico · 原生分辨率</span></div>
++      <div class="caption"><span id="frame-status">等待固件画面</span><span>Metalio E-INK4 Plus · 原生分辨率</span></div>
+     </section>
+   </main>
+   <footer><span>Ricky AI Studio</span><span>预览用于布局与交互。残影、功耗、联网及设备内存仍需实机验证。</span><span id="build-time"></span></footer>
+--- /dev/null
++++ b/src/platform/PlusRecorderPreview.cpp
+@@ -0,0 +1,35 @@
++#ifdef RICKYOS_SIMULATOR_PLUS
++#include <HalRecorder.h>
++#include <HalAudioOutput.h>
++#include <Arduino.h>
++#include <cstdio>
++#include <cstring>
++#include <array>
++namespace HalRecorder {
++static State current = State::Idle;
++static unsigned long started = 0;
++static uint32_t duration = 0;
++static std::array<Entry, 12> entries{};
++static size_t count = 0;
++bool active() { return current == State::Recording || current == State::Playing; }
++bool preparing() { return current == State::Recording && millis() - started < 1200; }
++uint32_t seconds() {
++  if (current == State::Recording) return preparing() ? 0 : (millis() - started - 1200) / 1000;
++  return active() ? (millis() - started) / 1000 : duration;
++}
++State state() { return current; }
++bool startRecording() { if(active()) return false; current=State::Recording; started=millis(); duration=0; return true; }
++bool play(const char* name, uint8_t) { if(active()) return false; for(size_t i=0;i<count;++i) if(!strcmp(name,entries[i].name)) { duration=entries[i].seconds; current=State::Playing; started=millis(); return true; } return false; }
++void stop() { if(current==State::Recording) { duration=seconds(); if(count<entries.size()) { auto& e=entries[count++]; snprintf(e.name,sizeof(e.name),"REC_20261013_1200%02u_00.wav",unsigned(count)); e.seconds=duration; } current=State::Saved; } else if(current==State::Playing) current=State::Idle; }
++void poll() { if(current==State::Playing && seconds()>=duration) current=State::Idle; }
++size_t list(size_t offset, Entry* out, size_t capacity, bool& more) { size_t n=0; while(offset+n<count && n<capacity) { out[n]=entries[offset+n]; ++n; } more=offset+n<count; return n; }
++}
++namespace HalAudioOutput {
++bool present() { return true; }
++bool preview(uint8_t) { return false; }
++bool playPcm(ReadCallback, SeekCallback, uint32_t, uint8_t, uint8_t) { return false; }
++bool restart(uint8_t) { return false; }
++void setVolume(uint8_t) {}
++void shutdown() { HalRecorder::stop(); }
++}
++#endif
+--- /dev/null
++++ b/scripts/patch_plus_preview_clock.py
+@@ -0,0 +1,8 @@
++from pathlib import Path
++Import('env')
++if env.subst('$PIOENV') == 'simulator_rickyos':
++    p = Path(env.subst('$PROJECT_LIBDEPS_DIR')) / 'simulator_rickyos/simulator/src/HalClock.h'
++    s = p.read_text()
++    if 'void cancelSync()' not in s:
++        assert s.count('  bool requestSync();') == 1
++        p.write_text(s.replace('  bool requestSync();', '  bool requestSync();\n  void cancelSync() { _syncState = ClockSyncState::Idle; }'))

@@ -1,0 +1,337 @@
+#include <HalDisplay.h>
+#include <HalGPIO.h>
+#if FREEINK_DEVICE_METALIO_PLUS
+#include <PlusDisplayProfile.h>
+#endif
+
+#if FREEINK_DEVICE_READPICO
+#include <BoardReadPico.h>
+#include <EpdiyLcd.h>
+#include <Logging.h>
+#endif
+
+// Global HalDisplay instance
+HalDisplay display;
+
+#define SD_SPI_MISO 7
+
+HalDisplay::HalDisplay() : einkDisplay(EPD_SCLK, EPD_MOSI, EPD_CS, EPD_DC, EPD_RST, EPD_BUSY) {}
+
+HalDisplay::~HalDisplay() {}
+
+HalDisplay::Controller HalDisplay::getController() const { return BoardConfig::ACTIVE.displayController; }
+
+void HalDisplay::begin(bool seamless) {
+  // Set X3-specific panel mode before initializing.
+  if (gpio.deviceIsX3()) {
+    einkDisplay.setDisplayX3();
+  }
+#if FREEINK_DEVICE_READPICO
+  // Precondition, not a gate: the SY7636A rails (EN P0.3, VCOM_EN P0.4), the EPD
+  // output enable (XOE P0.1) and the PGOOD sense (P0.5) all live behind the
+  // FCA9555, so the board must be up before the driver's power hooks can sequence
+  // anything (BoardReadPico::epdPowerOn -> read-pico.md 1.4). HalGPIO::begin()
+  // brings the expander up first; if it never answered, say so loudly and keep
+  // going — the panel will simply stay dark instead of aborting the boot.
+  if (!BoardReadPico::ready()) {
+    LOG_ERR("DISP", "FCA9555 expander is not up; EPD rails cannot be sequenced");
+  }
+  // epdiy owns 4bpp front/back/difference buffers in PSRAM (~1.59 MiB here),
+  // plus the SDK's B/W base and selector planes. Feed queues, DMA buffers and
+  // renderer tasks need internal RAM; track free space and largest blocks.
+  LOG_INF("DISP", "PSRAM free=%u maxBlock=%u internal free=%u maxBlock=%u before panel init",
+          static_cast<unsigned>(ESP.getFreePsram()), static_cast<unsigned>(ESP.getMaxAllocPsram()),
+          static_cast<unsigned>(ESP.getFreeHeap()), static_cast<unsigned>(ESP.getMaxAllocHeap()));
+#endif
+
+  einkDisplay.begin();
+
+#if FREEINK_DEVICE_READPICO
+  // The facade publishes the driver's real geometry (EpdiyLcdDriver::geometry():
+  // 1216 x 684 -> 152 bytes/row -> 103,968 bytes for Read Pico). Every consumer
+  // must read it from here; see the constants note in HalDisplay.h.
+  LOG_INF("DISP", "panel %ux%u (%u bytes/row, %u-byte framebuffer); PSRAM free=%u maxBlock=%u internal free=%u",
+          static_cast<unsigned>(getDisplayWidth()), static_cast<unsigned>(getDisplayHeight()),
+          static_cast<unsigned>(getDisplayWidthBytes()), static_cast<unsigned>(getBufferSize()),
+          static_cast<unsigned>(ESP.getFreePsram()), static_cast<unsigned>(ESP.getMaxAllocPsram()),
+          static_cast<unsigned>(ESP.getFreeHeap()));
+#endif
+
+  if (seamless) {
+    // Defuse the SDK's X3 _x3InitialFullSyncsRemaining counter (no-op on X4)
+    // so the first paint isn't promoted to FULL (~770ms). Skips the wakeup-
+    // gated requestResync() below for the same reason.
+    einkDisplay.skipInitialResync();
+    return;
+  }
+  // Request resync after specific wakeup events to ensure clean display state.
+  const auto wakeupReason = gpio.getWakeupReason();
+  if (wakeupReason == HalGPIO::WakeupReason::PowerButton || wakeupReason == HalGPIO::WakeupReason::AfterFlash ||
+      wakeupReason == HalGPIO::WakeupReason::Other) {
+    einkDisplay.requestResync();
+  }
+}
+
+void HalDisplay::clearScreen(uint8_t color) const { einkDisplay.clearScreen(color); }
+
+void HalDisplay::drawImage(const uint8_t* imageData, uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+                           bool fromProgmem) const {
+  einkDisplay.drawImage(imageData, x, y, w, h, fromProgmem);
+}
+
+void HalDisplay::drawImageTransparent(const uint8_t* imageData, uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+                                      bool fromProgmem) const {
+  einkDisplay.drawImageTransparent(imageData, x, y, w, h, fromProgmem);
+}
+
+EInkDisplay::RefreshMode convertRefreshMode(HalDisplay::RefreshMode mode) {
+  switch (mode) {
+    case HalDisplay::FULL_REFRESH:
+      return EInkDisplay::FULL_REFRESH;
+    case HalDisplay::HALF_REFRESH:
+      return EInkDisplay::HALF_REFRESH;
+    case HalDisplay::FAST_REFRESH:
+    default:
+      return EInkDisplay::FAST_REFRESH;
+  }
+}
+
+namespace {
+EInkDisplay::RefreshContext convertRefreshContext(DisplayRefreshContext context) {
+  switch (context) {
+    case DisplayRefreshContext::Normal:
+      return EInkDisplay::RefreshContext::Normal;
+    case DisplayRefreshContext::ContinuousReading:
+      return EInkDisplay::RefreshContext::ContinuousReading;
+    case DisplayRefreshContext::TextOnlyAntiAliasing:
+      return EInkDisplay::RefreshContext::TextOnlyAntiAliasing;
+    case DisplayRefreshContext::ImageReading:
+      return EInkDisplay::RefreshContext::ImageReading;
+  }
+  return EInkDisplay::RefreshContext::Normal;
+}
+}  // namespace
+
+void HalDisplay::displayBuffer(HalDisplay::RefreshMode mode, bool turnOffScreen, DisplayRefreshContext context) {
+  if (gpio.deviceIsX3() && mode == RefreshMode::HALF_REFRESH) {
+    einkDisplay.requestResync(1);
+  }
+
+  einkDisplay.displayBuffer(convertRefreshMode(mode), turnOffScreen, convertRefreshContext(context));
+}
+
+void HalDisplay::displayBufferAsync(HalDisplay::RefreshMode mode, DisplayRefreshContext context) {
+  if (gpio.deviceIsX3() && mode == RefreshMode::HALF_REFRESH) {
+    einkDisplay.requestResync(1);
+  }
+
+  einkDisplay.displayBufferAsyncNoShadow(convertRefreshMode(mode), convertRefreshContext(context));
+}
+
+void HalDisplay::waitRefreshComplete() { einkDisplay.waitRefreshComplete(); }
+
+bool HalDisplay::supportsAsyncRefresh() const { return einkDisplay.supportsAsyncRefresh(); }
+
+HalDisplay::GrayscaleCapabilities HalDisplay::grayscaleCapabilities(GrayscaleMode mode) const {
+  return einkDisplay.grayscaleCapabilities(mode);
+}
+
+bool HalDisplay::supportsAsyncGrayscaleBase() const { return grayscaleCapabilities().asyncBase; }
+
+void HalDisplay::refreshDisplay(HalDisplay::RefreshMode mode, bool turnOffScreen) {
+  if (gpio.deviceIsX3() && mode == RefreshMode::HALF_REFRESH) {
+    einkDisplay.requestResync(1);
+  }
+
+  einkDisplay.refreshDisplay(convertRefreshMode(mode), turnOffScreen);
+}
+
+void HalDisplay::setInverted(bool inverted) { einkDisplay.setInverted(inverted); }
+
+bool HalDisplay::toggleInverted() { return einkDisplay.toggleInverted(); }
+
+bool HalDisplay::isInverted() const { return einkDisplay.isInverted(); }
+
+void HalDisplay::deepSleep() { einkDisplay.deepSleep(); }
+
+uint8_t* HalDisplay::getFrameBuffer() const { return einkDisplay.getFrameBuffer(); }
+
+uint8_t* HalDisplay::lendFrameBufferStorage(uint32_t* sizeOut) { return einkDisplay.lendBuildStorage(sizeOut); }
+
+void HalDisplay::returnFrameBufferStorage() { einkDisplay.returnBuildStorage(); }
+
+bool HalDisplay::displayGrayscaleBase(GrayscaleMode mode, RefreshMode fallback, bool turnOffScreen) {
+  if (gpio.deviceIsX3() && fallback == HALF_REFRESH) einkDisplay.requestResync();
+  return einkDisplay.displayGrayscaleBase(mode, static_cast<EInkDisplay::RefreshMode>(fallback), turnOffScreen);
+}
+
+void HalDisplay::copyGrayscaleBuffers(const uint8_t* lsbBuffer, const uint8_t* msbBuffer) {
+  einkDisplay.copyGrayscaleBuffers(lsbBuffer, msbBuffer);
+}
+
+void HalDisplay::displayGrayscaleBase(RefreshMode fallback, bool turnOffScreen, DisplayRefreshContext context) {
+  // X3: a HALF fallback means the caller wants a clean base (e.g. the sleep
+  // cover, a full-screen swap from arbitrary prior content). Without this, the
+  // X3 grayscale base takes its gentle differential happy path and the prior
+  // home/reader frame ghosts through the soft aa_pre_bw_mid waveform. Forcing a
+  // resync makes displayGrayscaleBase clear first, matching displayBuffer(HALF).
+  // The reader's FAST path is deliberately left on the differential path so
+  // per-page grayscale stays cheap.
+  if (gpio.deviceIsX3() && fallback == RefreshMode::HALF_REFRESH) {
+    einkDisplay.requestResync(1);
+  }
+
+  einkDisplay.displayGrayscaleBase(convertRefreshMode(fallback), turnOffScreen, convertRefreshContext(context));
+}
+
+void HalDisplay::preconditionGrayscale() { einkDisplay.preconditionGrayscale(); }
+
+void HalDisplay::preconditionGrayscale(uint16_t x, uint16_t y, uint16_t w, uint16_t h) {
+  einkDisplay.preconditionGrayscale(x, y, w, h);
+}
+
+void HalDisplay::copyGrayscaleLsbBuffers(const uint8_t* lsbBuffer) { einkDisplay.copyGrayscaleLsbBuffers(lsbBuffer); }
+
+void HalDisplay::copyGrayscaleMsbBuffers(const uint8_t* msbBuffer) { einkDisplay.copyGrayscaleMsbBuffers(msbBuffer); }
+
+void HalDisplay::cleanupGrayscaleBuffers(const uint8_t* bwBuffer) { einkDisplay.cleanupGrayscaleBuffers(bwBuffer); }
+
+void HalDisplay::displayGrayBuffer(bool turnOffScreen) { einkDisplay.displayGrayBuffer(turnOffScreen); }
+
+void HalDisplay::writeGrayscalePlaneStrip(bool lsbPlane, const uint8_t* rows, uint16_t yStart, uint16_t numRows) {
+  einkDisplay.writeGrayscalePlaneStrip(lsbPlane ? EInkDisplay::GRAY_PLANE_LSB : EInkDisplay::GRAY_PLANE_MSB, rows,
+                                       yStart, numRows);
+}
+
+bool HalDisplay::supportsStripGrayscale() const { return grayscaleCapabilities().stripUploads; }
+
+bool HalDisplay::combinesGrayscaleBase() const { return grayscaleCapabilities().base == GrayscaleBase::Combined; }
+
+bool HalDisplay::supportsTextOnlyCombinedBase() const { return einkDisplay.supportsTextOnlyCombinedBase(); }
+bool HalDisplay::supportsReaderTransitions() const { return einkDisplay.supportsReaderTransitions(); }
+bool HalDisplay::supportsContinuousImageReading() const { return einkDisplay.supportsContinuousImageReading(); }
+bool HalDisplay::canUseTextTransition() const { return einkDisplay.canUseTextTransition(); }
+
+void HalDisplay::cancelGrayscale() {
+  if (!einkDisplay.combinesGrayscaleBase()) return;
+  einkDisplay.abortPostRefresh();
+  // Discard staged planes and re-arm the next render without touching the glass.
+  einkDisplay.beginDisplayWork();
+}
+
+uint16_t HalDisplay::getDisplayWidth() const { return einkDisplay.getDisplayWidth(); }
+
+uint16_t HalDisplay::getDisplayHeight() const { return einkDisplay.getDisplayHeight(); }
+uint8_t HalDisplay::getGrayscaleLevels() const { return einkDisplay.getGrayscaleLevels(); }
+uint8_t* HalDisplay::beginGrayscale16() { return einkDisplay.beginGrayscale16(); }
+uint8_t* HalDisplay::beginRetainedGrayscale16() {
+#if FREEINK_DEVICE_METALIO_PLUS
+  uint8_t* frame = einkDisplay.beginGrayscale16();
+  if (!frame) return nullptr;
+  if (freeink::metalioPlusRestoreGray16Baseline(einkDisplay.getFrameBuffer())) {
+    freeink::metalioPlusSetGray16Profile(1);
+    return frame;
+  }
+  einkDisplay.cancelGrayscale16();
+#elif FREEINK_DEVICE_READPICO
+  uint8_t* frame = einkDisplay.beginGrayscale16();
+  if (!frame) return nullptr;
+  if (freeink::epdiyLcdRestoreGray16Baseline(einkDisplay.getFrameBuffer())) {
+    freeink::epdiyLcdSetGray16Profile(1);  // Held-diagonal waveform; unchanged page gray stays untouched.
+    return frame;
+  }
+  einkDisplay.cancelGrayscale16();
+#endif
+  return nullptr;
+}
+bool HalDisplay::commitGrayscale16() { return einkDisplay.commitGrayscale16(); }
+
+void HalDisplay::setNextGray16Profile(const uint8_t profile) {
+#if FREEINK_DEVICE_METALIO_PLUS
+  freeink::metalioPlusSetGray16Profile(profile);
+#elif FREEINK_DEVICE_READPICO
+  freeink::epdiyLcdSetGray16Profile(profile);  // added by scripts/patch_rickyos_epdiy.py
+#else
+  (void)profile;
+#endif
+}
+void HalDisplay::setNextPageTurn(uint8_t style, uint8_t orientation, bool fromRight, int originX, int originY) {
+  (void)originX;
+  (void)originY;
+#if FREEINK_DEVICE_METALIO_PLUS
+  freeink::metalioPlusSetPageTurn(style, orientation, fromRight, originX, originY);
+#elif FREEINK_DEVICE_READPICO
+  freeink::epdiyLcdSetPageTurn(style, orientation, fromRight);
+#else
+  (void)style;
+  (void)orientation;
+  (void)fromRight;
+#endif
+}
+void HalDisplay::setNextGray16ReaderRefresh(int x, int y, int width, int height) {
+#if FREEINK_DEVICE_METALIO_PLUS
+  freeink::metalioPlusSetGray16ReaderRefresh(x, y, width, height);
+#else
+  (void)x;
+  (void)y;
+  (void)width;
+  (void)height;
+#endif
+}
+void HalDisplay::setReaderFastRefresh(const bool on) {
+#if FREEINK_DEVICE_METALIO_PLUS
+  freeink::metalioPlusSetReaderFastRefresh(on);
+#else
+  (void)on;
+#endif
+}
+void HalDisplay::setNextMainTabTurn(uint8_t orientation, bool fromRight, int x, int y, int width, int height) {
+#if FREEINK_DEVICE_METALIO_PLUS
+  freeink::metalioPlusSetMainTabTurn(orientation, fromRight, x, y, width, height);
+#else
+  (void)orientation; (void)fromRight; (void)x; (void)y; (void)width; (void)height;
+#endif
+}
+
+void HalDisplay::setNextGray16ReaderTextFinish(bool enabled) {
+#if FREEINK_DEVICE_METALIO_PLUS
+  freeink::metalioPlusSetGray16ReaderTextFinish(enabled);
+#else
+  (void)enabled;
+#endif
+}
+void HalDisplay::setNextGray16UiRefresh(int x, int y, int width, int height, uint8_t contentEvery, uint8_t smallEvery,
+                                      bool adaptive) {
+  (void)adaptive;
+#if FREEINK_DEVICE_METALIO_PLUS
+  freeink::metalioPlusSetGray16UiRefresh(x, y, width, height, contentEvery, smallEvery, adaptive);
+#elif FREEINK_DEVICE_READPICO
+  freeink::epdiyLcdSetGray16UiRefresh(x, y, width, height, contentEvery, smallEvery);
+#else
+  (void)x;
+  (void)y;
+  (void)width;
+  (void)height;
+  (void)contentEvery;
+  (void)smallEvery;
+#endif
+}
+void HalDisplay::railsOffIfIdle(const uint32_t idleMs) {
+#if FREEINK_DEVICE_READPICO
+  freeink::epdiyLcdRailsOffIfIdle(idleMs);  // added by scripts/patch_rickyos_epdiy.py
+#else
+  (void)idleMs;
+#endif
+}
+bool HalDisplay::restartPanel() {
+#if FREEINK_DEVICE_READPICO
+  return freeink::epdiyLcdRestart();  // added by scripts/patch_rickyos_epdiy.py
+#else
+  return false;
+#endif
+}
+void HalDisplay::cancelGrayscale16() { einkDisplay.cancelGrayscale16(); }
+
+uint16_t HalDisplay::getDisplayWidthBytes() const { return einkDisplay.getDisplayWidthBytes(); }
+
+uint32_t HalDisplay::getBufferSize() const { return einkDisplay.getBufferSize(); }

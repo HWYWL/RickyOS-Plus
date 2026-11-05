@@ -1,0 +1,38 @@
+{
+  "source_restore": "2826 pinned files / 79 source adaptations; isolated restoration from actual commit package; all SHA checks passed",
+  "tests": [
+    {
+      "test": "test_plus_clock_radio",
+      "result": "passed"
+    },
+    {
+      "test": "test_plus_tcp_timeout",
+      "result": "passed"
+    },
+    {
+      "test": "test_plus_tcp_trace",
+      "result": "passed"
+    },
+    {
+      "test": "test_plus_radio_compare",
+      "result": "passed"
+    },
+    {
+      "test": "test_plus_radio_auto",
+      "result": "passed"
+    },
+    {
+      "test": "test_plus_wifi_tx_config",
+      "result": "passed"
+    },
+    {
+      "test": "test_plus_acceptance_integrity",
+      "result": "passed"
+    }
+  ],
+  "full_build": "Passed before packaging; same source files and byte-for-byte patch restored",
+  "ordinary_app_sha256": "9287f68b978ee5c7ed84eee7cceb2324467722404024e16c99fd91744d7aad9b",
+  "binary_not_committed": true,
+  "raw_serial_logs_not_committed": true,
+  "flash_backups_not_committed": true
+}

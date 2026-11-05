@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-12",
+  "requested_version": "RickyOS 1.2",
+  "source_path": "/Users/rick/rickyos/RickyOS",
+  "source_branch": "codex/rickyos-1.2-design",
+  "source_commit": "24c05ff7ffb06254879d9928d8531db6839e7ad1",
+  "design_spec": "/Users/rick/rickyos/RickyOS/docs/design-system.md",
+  "design_mockups": "/Users/rick/rickyos/RickyOS/docs/design-system/rickyos-1.2-mockups.html",
+  "existing_plus_prototype": "/Users/rick/rickyos/rickyos-plus",
+  "prototype_is_full_migration": false,
+  "target": "Metalio E-Ink4-Plus V1.5 / ESP32-S31 / parallel 4.7 inch / FT6336 / warm-cool frontlight",
+  "device_current_app": "RickyOS 1.2.0-plus-dev / 24c05ff7 / ELF 525bf1674 / ota_1 / control-center volume",
+  "status": "Volume candidate installed and booted; factory slot preserved; speaker/volume physical acceptance pending; peripheral inventory recorded; network investigation deferred",
+  "independent_port": "firmware/rickyos-plus-1.2",
+  "experimental_sources_used": false,
+  "candidate": "firmware/rickyos-plus-1.2/dist/RickyOS-1.2.0-plus-design-24c05ff7-volume.bin",
+  "installed": true,
+  "remote_sync": {
+    "date": "2026-10-11",
+    "remote": "https://github.com/chinoryunqin/RickyOS-dev.git",
+    "branch": "codex/rickyos-1.2-design",
+    "remote_commit": "24c05ff7ffb06254879d9928d8531db6839e7ad1",
+    "matches_port_baseline": true,
+    "fetch_passed": true,
+    "user_confirmed_target": true,
+    "newly_pushed_branch": true
+  },
+  "previous_source_commit": "185bfe78004092174dcbb4e668e3697c4dee7e88",
+  "factory_recovery": {
+    "date": "2026-10-12",
+    "prior_md5": "66078cc8cc10cb47ac93fc1447280008",
+    "restored_md5": "372e9c0ddcaa8d637d12fcf00f9fc228",
+    "changed_region": "0x80000..0x267000",
+    "audit_snapshot": ".local/device-installations/rickyos-plus-1.2-first-install/factory-slot-audit.bin",
+    "cause_known": false,
+    "recovery_verified": true
+  }
+}

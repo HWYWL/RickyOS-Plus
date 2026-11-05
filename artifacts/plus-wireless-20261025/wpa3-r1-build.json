@@ -1,0 +1,74 @@
+{
+  "bytes": 5050608,
+  "sha256": "1e4a62d92ed6f81d03cc5fb881a6585f91aee598a0f1a3dd5f0ea68e7f8d1f25",
+  "elf_sha256": "4f8239150daedff453d13360fa9ad42d4c686442135f6c802b2b5619e54398b1",
+  "version": "1.2.7-netmem",
+  "idf_commit": "9a97f6c54ec638111ce55cd36581b3c192f15207",
+  "sdkconfig_changes": {
+    "CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL": {
+      "before": "CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=16384",
+      "after": "CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=2048"
+    },
+    "CONFIG_ESP_WIFI_ENABLE_WPA3_SAE": {
+      "before": "# CONFIG_ESP_WIFI_ENABLE_WPA3_SAE is not set",
+      "after": "CONFIG_ESP_WIFI_ENABLE_WPA3_SAE=y"
+    },
+    "CONFIG_ESP_WIFI_ENABLE_SAE_H2E": {
+      "before": null,
+      "after": "CONFIG_ESP_WIFI_ENABLE_SAE_H2E=y"
+    },
+    "CONFIG_ESP_WIFI_ENABLE_SAE_PK": {
+      "before": null,
+      "after": "# CONFIG_ESP_WIFI_ENABLE_SAE_PK is not set"
+    },
+    "CONFIG_ESP_WIFI_SOFTAP_SAE_SUPPORT": {
+      "before": null,
+      "after": "# CONFIG_ESP_WIFI_SOFTAP_SAE_SUPPORT is not set"
+    },
+    "CONFIG_ESP_WIFI_WPA3_COMPATIBLE_SUPPORT": {
+      "before": null,
+      "after": "CONFIG_ESP_WIFI_WPA3_COMPATIBLE_SUPPORT=y"
+    },
+    "CONFIG_ESP32_WIFI_ENABLE_WPA3_SAE": {
+      "before": "# CONFIG_ESP32_WIFI_ENABLE_WPA3_SAE is not set",
+      "after": "CONFIG_ESP32_WIFI_ENABLE_WPA3_SAE=y"
+    }
+  },
+  "wrappers_have_external_callsites": {
+    "__wrap_pbuf_alloc": 27,
+    "__wrap_esp_netif_transmit_wrap": 1,
+    "__wrap_esp_wifi_internal_tx": 4,
+    "__wrap_esp_wifi_internal_tx_by_ref": 1,
+    "__wrap_esp_wifi_set_config": 6,
+    "__wrap_heap_caps_malloc": 44,
+    "__wrap_heap_caps_calloc": 44,
+    "__wrap_heap_caps_realloc": 6
+  },
+  "heap_hook_direct_calls_iram": {
+    "_ZN12_GLOBAL__N_1L16allocationFailedEjjmj": [
+      "vPortExitCriticalMultiCore",
+      "xPortEnterCriticalTimeout",
+      "xPortInIsrContext"
+    ],
+    "__wrap_heap_caps_calloc": [
+      "_ZN12_GLOBAL__N_1L16allocationFailedEjjmj",
+      "heap_caps_calloc"
+    ],
+    "__wrap_heap_caps_malloc": [
+      "_ZN12_GLOBAL__N_1L16allocationFailedEjjmj",
+      "heap_caps_malloc"
+    ],
+    "__wrap_heap_caps_realloc": [
+      "_ZN12_GLOBAL__N_1L16allocationFailedEjjmj",
+      "heap_caps_realloc"
+    ]
+  },
+  "schema": "plus-wpa3-build/1",
+  "hardware": "Metalio E-Ink4 Plus / ESP32-S31",
+  "wpa3_only_real_ap_tested": false,
+  "device_validation": "initial WPA2 association succeeded; first direct-config-replay reconnect failed on two boots",
+  "host_security_tests_passed": true,
+  "diagnostic": true,
+  "published": false,
+  "validation_report": "wpa3-r1-run1.json; wpa3-r1-run2.json"
+}

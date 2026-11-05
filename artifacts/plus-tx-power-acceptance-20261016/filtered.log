@@ -1,0 +1,37 @@
+[ACCEPT] name=wallpapers joined=1 route=1 join_ms=6892 rssi=-55
+TX power lease: previous=80 applied=20 owners=1
+Last TX power owner released: restored=80 result=0
+[ACCEPT] name=wallpapers result=0 download_ms=827 bytes=3965 crc32=252721562 content_match=1 cleanup=1 only_cos=-1
+[ACCEPT] name=wallpapers after_power_read=0 after_power=80 radio_owners=0
+[ACCEPT] name=fonts joined=1 route=1 join_ms=7396 rssi=-55
+TX power lease: previous=80 applied=20 owners=1
+Last TX power owner released: restored=80 result=0
+[ACCEPT] name=fonts result=0 download_ms=676 bytes=9024 crc32=2970146193 content_match=1 cleanup=1 only_cos=-1
+[ACCEPT] name=fonts after_power_read=0 after_power=80 radio_owners=0
+[ACCEPT] name=font12 joined=1 route=1 join_ms=6127 rssi=-55
+TX power lease: previous=80 applied=20 owners=1
+[ACCEPT] font_progress bytes=263462 total=1763452 ms=1665
+[ACCEPT] font_progress bytes=527390 total=1763452 ms=2452
+[ACCEPT] font_progress bytes=791326 total=1763452 ms=3429
+[ACCEPT] font_progress bytes=1055225 total=1763452 ms=4295
+[ACCEPT] font_progress bytes=1319161 total=1763452 ms=5227
+[ACCEPT] font_progress bytes=1583097 total=1763452 ms=6116
+Last TX power owner released: restored=80 result=0
+[ACCEPT] name=font12 result=0 download_ms=6702 bytes=1763452 crc32=2837099957 content_match=1 cleanup=1 only_cos=1
+[ACCEPT] name=font12 after_power_read=0 after_power=80 radio_owners=0
+[ACCEPT] name=clock joined=1 route=1 join_ms=6180 rssi=-57
+TX power lease: previous=80 applied=20 owners=1
+Last TX power owner released: restored=80 result=0
+[ACCEPT] clock began=1 success=1 valid_time=1 epoch=1792118350 ms=1096 radio_owners=0
+[ACCEPT] name=wallpapers-repeat joined=1 route=1 join_ms=6992 rssi=-56
+TX power lease: previous=80 applied=20 owners=1
+Last TX power owner released: restored=80 result=0
+[ACCEPT] name=wallpapers result=0 download_ms=565 bytes=3965 crc32=252721562 content_match=1 cleanup=1 only_cos=-1
+[ACCEPT] name=wallpapers after_power_read=0 after_power=80 radio_owners=0
+[ACCEPT] done downloads_passed=4 expected=4 auto_reconnect_restored=1
+TXDONE total=15 ok=15 failed=0 recorded=15
+TXDONE total=15 ok=15 failed=0 recorded=15
+TXDONE total=761 ok=761 failed=0 recorded=48
+[CLK] NTP reply received: UTC epoch=1792118350
+[CLK] System UTC clock synchronized
+TXDONE total=14 ok=14 failed=0 recorded=14

@@ -1,0 +1,29 @@
+{
+  "version": "1.2.4",
+  "board": "metalio-plus-s31",
+  "chipId": 32,
+  "bytes": 4906992,
+  "sha256": "d633d920853646ccade0f171f2dbcdcc4f34406e8c91ed057c935604f951f903",
+  "elfSha256": "a60ba2eaba332e657db0b2053af1b4d8df02b41f09e1e864d72ecc71ad3ad847",
+  "sourceCommit": "6b888abf287c0fc258ef4c1a06badb98c8b8216b",
+  "privateSourceTag": "plus-v1.2.4",
+  "webCommit": "36e5cd9b46338ff08eb589868441a5feb268ac92",
+  "otaCommit": "b0c2d6aeb2a426965cdc353e9d9070be03ccb2e2",
+  "websiteTestsPassed": 71,
+  "fullPlusHostSuitePassed": true,
+  "actualSdkConfigurationChecked": true,
+  "sameApplicationAsAcceptedDevice": true,
+  "firstBatchPublicChecks": {"passed": 22, "total": 23},
+  "failedCheckRecheck": {
+    "provider": "COS",
+    "reason": "connection reset by peer",
+    "fullDownloadBytesAndSha256Passed": true
+  },
+  "applicationProvidersVerified": [
+    "https://rickyaistudio.com/firmware/RickyOS-Plus-1.2.4.bin",
+    "https://chinoryunqin.github.io/RickyOS-site/firmware/RickyOS-Plus-1.2.4.bin",
+    "https://rickyos-1309217881.cos.ap-guangzhou.myqcloud.com/ota/firmware/RickyOS-Plus-1.2.4.bin"
+  ],
+  "unchangedDeviceVersions": {"readpico": "1.2.2", "eego_a4": "1.2.5"},
+  "newDeviceOtaWriteTestPerformed": false
+}

@@ -1,0 +1,45 @@
+#pragma once
+
+#include <cstdint>
+#include <memory>
+#include <vector>
+
+class GfxRenderer;
+class TextBlock;
+
+namespace textsettings {
+
+// Settings + geometry that determine the laid-out lines; used to invalidate the cache.
+struct PreviewKey {
+  int fontId = -1;
+  int fontPointSize = -1;
+  int marginLeft = -1;
+  int textWidth = -1;
+  int maxLines = -1;
+  float lineCompression = -1.0f;
+  uint8_t alignment = 0xFF;
+  uint8_t extraParagraphSpacing = 0;  // 0=off, 1..5=0.5x/0.75x/1x/1.25x/1.5x
+  uint8_t firstLineIndent = 0;
+  uint8_t paragraphIndentSpaces = 3;
+  int8_t characterSpacing = 0;
+  uint8_t wordSpacingPercent = 100;
+  bool focusReading = false;
+  bool hyphenation = false;
+  bool operator==(const PreviewKey&) const = default;
+};
+
+// Cached engine preview lines + the key that produced them. The vector is
+// bounded to the visible line capacity of the preview pane.
+struct PreviewLayout {
+  std::vector<std::unique_ptr<TextBlock>> lines;
+  PreviewKey key;
+
+  PreviewLayout();
+  ~PreviewLayout();
+};
+
+// Draws the sample-text pane via the reader engine, reusing layout across redraws
+void renderPreview(const GfxRenderer& renderer, PreviewLayout& layout, int previewPadding, int labelGap, int top,
+                   int height, const char* familyName, const char* sizeName);
+
+}  // namespace textsettings

@@ -1,0 +1,107 @@
+{
+  "profile": "runtime-small-allocation-policy-2048",
+  "index_samples": [
+    {
+      "bytes": 9024,
+      "total_ms": 649,
+      "write_ms": 11,
+      "input_ms": 0,
+      "writes": 6,
+      "result": 0
+    },
+    {
+      "bytes": 9024,
+      "total_ms": 640,
+      "write_ms": 10,
+      "input_ms": 0,
+      "writes": 6,
+      "result": 0
+    },
+    {
+      "bytes": 9024,
+      "total_ms": 716,
+      "write_ms": 90,
+      "input_ms": 0,
+      "writes": 6,
+      "result": 0
+    },
+    {
+      "bytes": 9024,
+      "total_ms": 620,
+      "write_ms": 11,
+      "input_ms": 0,
+      "writes": 6,
+      "result": 0
+    },
+    {
+      "bytes": 9024,
+      "total_ms": 598,
+      "write_ms": 10,
+      "input_ms": 0,
+      "writes": 5,
+      "result": 0
+    },
+    {
+      "bytes": 9024,
+      "total_ms": 642,
+      "write_ms": 10,
+      "input_ms": 0,
+      "writes": 6,
+      "result": 0
+    },
+    {
+      "bytes": 9024,
+      "total_ms": 634,
+      "write_ms": 10,
+      "input_ms": 0,
+      "writes": 6,
+      "result": 0
+    },
+    {
+      "bytes": 9024,
+      "total_ms": 747,
+      "write_ms": 81,
+      "input_ms": 0,
+      "writes": 6,
+      "result": 0
+    },
+    {
+      "bytes": 9024,
+      "total_ms": 625,
+      "write_ms": 10,
+      "input_ms": 0,
+      "writes": 6,
+      "result": 0
+    },
+    {
+      "bytes": 9024,
+      "total_ms": 656,
+      "write_ms": 11,
+      "input_ms": 0,
+      "writes": 5,
+      "result": 0
+    },
+    {
+      "bytes": 9024,
+      "total_ms": 701,
+      "write_ms": 11,
+      "input_ms": 0,
+      "writes": 6,
+      "result": 0
+    },
+    {
+      "bytes": 9024,
+      "total_ms": 603,
+      "write_ms": 11,
+      "input_ms": 0,
+      "writes": 6,
+      "result": 0
+    }
+  ],
+  "median_transfer_ms": 641.0,
+  "range_transfer_ms": [
+    598,
+    747
+  ],
+  "only_index_not_throughput_upper_bound": true
+}

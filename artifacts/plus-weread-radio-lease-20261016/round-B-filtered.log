@@ -1,0 +1,19 @@
+[83529] [INF] [ACCEPT] name=weread joined=1 route=1 join_ms=7547 rssi=-55
+[83538] [INF] [WIFI] TX power lease: previous=80 applied=20 owners=1
+[83978] [INF] [TLS] DNS result=1 for weread.qq.com -> 124.223.145.201 (v4) in 438 ms
+[84056] [INF] [TLS] TCP result=1 for weread.qq.com:443 at 516 ms
+[84482] [INF] [WIFI] Last TX power owner released: restored=80 result=0
+[84490] [INF] [ACCEPT] name=weread round=1 event=1 error=0 ms=960 ok=1 power_before=80 power_after=80
+[92246] [INF] [ACCEPT] name=weread joined=1 route=1 join_ms=7749 rssi=-56
+[92254] [INF] [WIFI] TX power lease: previous=80 applied=20 owners=1
+[92262] [INF] [TLS] DNS result=1 for weread.qq.com -> 124.223.145.201 (v4) in 5 ms
+[92347] [INF] [TLS] TCP result=1 for weread.qq.com:443 at 90 ms
+[92758] [INF] [WIFI] Last TX power owner released: restored=80 result=0
+[92765] [INF] [ACCEPT] name=weread round=2 event=1 error=0 ms=518 ok=1 power_before=80 power_after=80
+[100338] [INF] [ACCEPT] name=weread joined=1 route=1 join_ms=7565 rssi=-55
+[100348] [INF] [WIFI] TX power lease: previous=80 applied=20 owners=1
+[100359] [INF] [TLS] DNS result=1 for weread.qq.com -> 124.223.145.201 (v4) in 5 ms
+[100836] [INF] [TLS] TCP result=1 for weread.qq.com:443 at 482 ms
+[101303] [INF] [WIFI] Last TX power owner released: restored=80 result=0
+[101311] [INF] [ACCEPT] name=weread round=3 event=1 error=0 ms=972 ok=1 power_before=80 power_after=80
+[101318] [INF] [ACCEPT] weread_passed=3 expected=3

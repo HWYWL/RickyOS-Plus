@@ -1,0 +1,13 @@
+{
+  "schema": "plus-wpa3-ap/1",
+  "configured_security": "WPA3 Personal only",
+  "channel": 11,
+  "band": "2.4 GHz",
+  "upstream": "iPhone USB",
+  "verification": "macOS Internet Sharing settings UI",
+  "ssid_omitted": true,
+  "password_omitted": true,
+  "preserve_sharing_enabled_after_test": true,
+  "device_validation": "WPA3-only AP: 12/12 associations and font indices; 2/2 complete font CRCs; WeRead needs login",
+  "validation_report": "wpa3-only-ap-r2-run1.json"
+}

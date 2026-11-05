@@ -1,0 +1,32 @@
+# The firmware, the restored snapshot and every patch are hash-verified. A Windows
+# checkout with core.autocrlf=true would rewrite them to CRLF, which breaks both
+# the SHA-256 manifest check and `git apply` context, so LF is enforced here.
+* text=auto eol=lf
+
+*.patch text eol=lf whitespace=-blank-at-eol
+*.diff text eol=lf
+
+*.bin binary
+*.elf binary
+*.ttf binary
+*.otf binary
+*.ttc binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.epub binary
+*.mobi binary
+*.azw3 binary
+*.wav binary
+*.zip binary
+*.tar binary
+*.gz binary
+
+# These carry CRLF upstream and are byte-locked: source-manifest.json stores the
+# SHA-256 of the raw bytes, and the restore patch must keep its apply context.
+# Normalising them to LF would make scripts/check_rickyos_plus_sources.py fail
+# on a fresh clone, so Git must not touch them.
+firmware/rickyos-plus-1.2/upstream/lib/EpdFont/builtinFonts/source/**/*.txt -text
+firmware/rickyos-plus-1.2/upstream/lib/EpdFont/scripts/chars_3500_common.txt -text
+firmware/rickyos-plus-1.2/upstream/test/hyphenation_eval/resources/swedish_hyphenation_tests.txt -text
+firmware/rickyos-plus-1.2/upstream-plus.patch -text

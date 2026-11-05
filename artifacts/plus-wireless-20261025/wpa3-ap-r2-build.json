@@ -1,0 +1,77 @@
+{
+  "version": "1.2.7-netmem",
+  "bytes": 5049664,
+  "sha256": "323774ad38bd2430374c41bdf35cf498e7c6d2fb19b77bd0598b2f6d1cca6667",
+  "elf_sha256": "49767b990c4cd0988b2168df006215e2ab3e7e6d6c975a28b41066b8edeb08d0",
+  "idf_commit": "9a97f6c54ec638111ce55cd36581b3c192f15207",
+  "sdkconfig_changes": {
+    "CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL": {
+      "before": "CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=16384",
+      "after": "CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=2048"
+    },
+    "CONFIG_ESP_WIFI_ENABLE_WPA3_SAE": {
+      "before": "# CONFIG_ESP_WIFI_ENABLE_WPA3_SAE is not set",
+      "after": "CONFIG_ESP_WIFI_ENABLE_WPA3_SAE=y"
+    },
+    "CONFIG_ESP_WIFI_ENABLE_SAE_H2E": {
+      "before": null,
+      "after": "CONFIG_ESP_WIFI_ENABLE_SAE_H2E=y"
+    },
+    "CONFIG_ESP_WIFI_ENABLE_SAE_PK": {
+      "before": null,
+      "after": "# CONFIG_ESP_WIFI_ENABLE_SAE_PK is not set"
+    },
+    "CONFIG_ESP_WIFI_SOFTAP_SAE_SUPPORT": {
+      "before": null,
+      "after": "# CONFIG_ESP_WIFI_SOFTAP_SAE_SUPPORT is not set"
+    },
+    "CONFIG_ESP_WIFI_WPA3_COMPATIBLE_SUPPORT": {
+      "before": null,
+      "after": "CONFIG_ESP_WIFI_WPA3_COMPATIBLE_SUPPORT=y"
+    },
+    "CONFIG_ESP32_WIFI_ENABLE_WPA3_SAE": {
+      "before": "# CONFIG_ESP32_WIFI_ENABLE_WPA3_SAE is not set",
+      "after": "CONFIG_ESP32_WIFI_ENABLE_WPA3_SAE=y"
+    }
+  },
+  "wrappers_have_external_callsites": {
+    "__wrap_pbuf_alloc": 27,
+    "__wrap_esp_netif_transmit_wrap": 1,
+    "__wrap_esp_wifi_internal_tx": 4,
+    "__wrap_esp_wifi_internal_tx_by_ref": 1,
+    "__wrap_esp_wifi_set_config": 5,
+    "__wrap_heap_caps_malloc": 44,
+    "__wrap_heap_caps_calloc": 44,
+    "__wrap_heap_caps_realloc": 6
+  },
+  "heap_hook_direct_calls_iram": {
+    "_ZN12_GLOBAL__N_1L16allocationFailedEjjmj": [
+      "vPortExitCriticalMultiCore",
+      "xPortEnterCriticalTimeout",
+      "xPortInIsrContext"
+    ],
+    "__wrap_heap_caps_calloc": [
+      "_ZN12_GLOBAL__N_1L16allocationFailedEjjmj",
+      "heap_caps_calloc"
+    ],
+    "__wrap_heap_caps_malloc": [
+      "_ZN12_GLOBAL__N_1L16allocationFailedEjjmj",
+      "heap_caps_malloc"
+    ],
+    "__wrap_heap_caps_realloc": [
+      "_ZN12_GLOBAL__N_1L16allocationFailedEjjmj",
+      "heap_caps_realloc"
+    ]
+  },
+  "schema": "plus-wpa3-build/1",
+  "diagnostic": true,
+  "contains_private_test_profile": true,
+  "requires_private_image_handling": true,
+  "configured_ap_security": "WPA3 Personal only",
+  "channel": 11,
+  "saved_network_store_written": false,
+  "source_branch": "codex/plus-wifi6-wpa3-20261025",
+  "published": false,
+  "device_validation": "WPA3-only AP: 12/12 associations and font indices; 2/2 complete font CRCs; WeRead needs login",
+  "validation_report": "wpa3-only-ap-r2-run1.json"
+}

@@ -1,0 +1,1266 @@
+{
+  "schema": "plus-netauto-summary/1",
+  "samples": [
+    {
+      "round": 1,
+      "phase": 0,
+      "copy_tx": false,
+      "joined": true,
+      "join_ms": 6234,
+      "before": {
+        "pbuf": {
+          "calls": 23,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 16,
+          "failed": 1,
+          "nomem": 0,
+          "max_failed_bytes": 42,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 4,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "wifi-ref": {
+          "calls": 16,
+          "failed": 1,
+          "nomem": 0,
+          "max_failed_bytes": 42,
+          "last": 12294
+        }
+      },
+      "ok": 1,
+      "cleanup": 1,
+      "request_ms": 1152,
+      "families": 7,
+      "files": 77,
+      "clock_started": 1,
+      "after": {
+        "pbuf": {
+          "calls": 43,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 36,
+          "failed": 1,
+          "nomem": 0,
+          "max_failed_bytes": 42,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 4,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "wifi-ref": {
+          "calls": 36,
+          "failed": 1,
+          "nomem": 0,
+          "max_failed_bytes": 42,
+          "last": 12294
+        }
+      },
+      "memory_after": {
+        "internal_free": 53423,
+        "internal_largest": 25600,
+        "dma_free": 26983,
+        "dma_largest": 9216
+      },
+      "delta": {
+        "pbuf": {
+          "calls": 20,
+          "failed": 0,
+          "nomem": 0
+        },
+        "netif": {
+          "calls": 20,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-copy": {
+          "calls": 0,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-ref": {
+          "calls": 20,
+          "failed": 0,
+          "nomem": 0
+        }
+      }
+    },
+    {
+      "round": 2,
+      "phase": 0,
+      "copy_tx": false,
+      "joined": true,
+      "join_ms": 6136,
+      "before": {
+        "pbuf": {
+          "calls": 51,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 44,
+          "failed": 2,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 6,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "wifi-ref": {
+          "calls": 44,
+          "failed": 2,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "ok": 1,
+      "cleanup": 1,
+      "request_ms": 1111,
+      "families": 7,
+      "files": 77,
+      "clock_started": 1,
+      "after": {
+        "pbuf": {
+          "calls": 71,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 64,
+          "failed": 2,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 6,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "wifi-ref": {
+          "calls": 64,
+          "failed": 2,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "memory_after": {
+        "internal_free": 53423,
+        "internal_largest": 25600,
+        "dma_free": 26983,
+        "dma_largest": 10240
+      },
+      "delta": {
+        "pbuf": {
+          "calls": 20,
+          "failed": 0,
+          "nomem": 0
+        },
+        "netif": {
+          "calls": 20,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-copy": {
+          "calls": 0,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-ref": {
+          "calls": 20,
+          "failed": 0,
+          "nomem": 0
+        }
+      }
+    },
+    {
+      "round": 3,
+      "phase": 0,
+      "copy_tx": false,
+      "joined": true,
+      "join_ms": 6193,
+      "before": {
+        "pbuf": {
+          "calls": 79,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 72,
+          "failed": 3,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 8,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "wifi-ref": {
+          "calls": 72,
+          "failed": 3,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "ok": 1,
+      "cleanup": 1,
+      "request_ms": 1068,
+      "families": 7,
+      "files": 77,
+      "clock_started": 1,
+      "after": {
+        "pbuf": {
+          "calls": 100,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 93,
+          "failed": 3,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 8,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "wifi-ref": {
+          "calls": 93,
+          "failed": 3,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "memory_after": {
+        "internal_free": 53395,
+        "internal_largest": 25600,
+        "dma_free": 26955,
+        "dma_largest": 4096
+      },
+      "delta": {
+        "pbuf": {
+          "calls": 21,
+          "failed": 0,
+          "nomem": 0
+        },
+        "netif": {
+          "calls": 21,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-copy": {
+          "calls": 0,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-ref": {
+          "calls": 21,
+          "failed": 0,
+          "nomem": 0
+        }
+      }
+    },
+    {
+      "round": 4,
+      "phase": 0,
+      "copy_tx": false,
+      "joined": true,
+      "join_ms": 6255,
+      "before": {
+        "pbuf": {
+          "calls": 108,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 101,
+          "failed": 4,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 10,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "wifi-ref": {
+          "calls": 101,
+          "failed": 4,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "ok": 1,
+      "cleanup": 1,
+      "request_ms": 1323,
+      "families": 7,
+      "files": 77,
+      "clock_started": 1,
+      "after": {
+        "pbuf": {
+          "calls": 127,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 120,
+          "failed": 4,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 10,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "wifi-ref": {
+          "calls": 120,
+          "failed": 4,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "memory_after": {
+        "internal_free": 53419,
+        "internal_largest": 25600,
+        "dma_free": 26979,
+        "dma_largest": 3840
+      },
+      "delta": {
+        "pbuf": {
+          "calls": 19,
+          "failed": 0,
+          "nomem": 0
+        },
+        "netif": {
+          "calls": 19,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-copy": {
+          "calls": 0,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-ref": {
+          "calls": 19,
+          "failed": 0,
+          "nomem": 0
+        }
+      }
+    },
+    {
+      "round": 5,
+      "phase": 1,
+      "copy_tx": true,
+      "joined": true,
+      "join_ms": 6152,
+      "before": {
+        "pbuf": {
+          "calls": 135,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 128,
+          "failed": 5,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 19,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "wifi-ref": {
+          "calls": 128,
+          "failed": 5,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "ok": 1,
+      "cleanup": 1,
+      "request_ms": 1302,
+      "families": 7,
+      "files": 77,
+      "clock_started": 1,
+      "after": {
+        "pbuf": {
+          "calls": 155,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 148,
+          "failed": 5,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 39,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "wifi-ref": {
+          "calls": 148,
+          "failed": 5,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "memory_after": {
+        "internal_free": 53455,
+        "internal_largest": 25600,
+        "dma_free": 27015,
+        "dma_largest": 5632
+      },
+      "delta": {
+        "pbuf": {
+          "calls": 20,
+          "failed": 0,
+          "nomem": 0
+        },
+        "netif": {
+          "calls": 20,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-copy": {
+          "calls": 20,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-ref": {
+          "calls": 20,
+          "failed": 0,
+          "nomem": 0
+        }
+      }
+    },
+    {
+      "round": 6,
+      "phase": 1,
+      "copy_tx": true,
+      "joined": true,
+      "join_ms": 6205,
+      "before": {
+        "pbuf": {
+          "calls": 163,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 156,
+          "failed": 6,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 49,
+          "failed": 1,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-ref": {
+          "calls": 156,
+          "failed": 6,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "ok": 1,
+      "cleanup": 1,
+      "request_ms": 1270,
+      "families": 7,
+      "files": 77,
+      "clock_started": 1,
+      "after": {
+        "pbuf": {
+          "calls": 183,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 176,
+          "failed": 6,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 69,
+          "failed": 1,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-ref": {
+          "calls": 176,
+          "failed": 6,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "memory_after": {
+        "internal_free": 53447,
+        "internal_largest": 25600,
+        "dma_free": 27007,
+        "dma_largest": 7424
+      },
+      "delta": {
+        "pbuf": {
+          "calls": 20,
+          "failed": 0,
+          "nomem": 0
+        },
+        "netif": {
+          "calls": 20,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-copy": {
+          "calls": 20,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-ref": {
+          "calls": 20,
+          "failed": 0,
+          "nomem": 0
+        }
+      }
+    },
+    {
+      "round": 7,
+      "phase": 1,
+      "copy_tx": true,
+      "joined": true,
+      "join_ms": 6198,
+      "before": {
+        "pbuf": {
+          "calls": 191,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 184,
+          "failed": 7,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 79,
+          "failed": 2,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-ref": {
+          "calls": 184,
+          "failed": 7,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "ok": 1,
+      "cleanup": 1,
+      "request_ms": 1277,
+      "families": 7,
+      "files": 77,
+      "clock_started": 1,
+      "after": {
+        "pbuf": {
+          "calls": 212,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 205,
+          "failed": 7,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 100,
+          "failed": 2,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-ref": {
+          "calls": 205,
+          "failed": 7,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "memory_after": {
+        "internal_free": 53427,
+        "internal_largest": 25600,
+        "dma_free": 26987,
+        "dma_largest": 7424
+      },
+      "delta": {
+        "pbuf": {
+          "calls": 21,
+          "failed": 0,
+          "nomem": 0
+        },
+        "netif": {
+          "calls": 21,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-copy": {
+          "calls": 21,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-ref": {
+          "calls": 21,
+          "failed": 0,
+          "nomem": 0
+        }
+      }
+    },
+    {
+      "round": 8,
+      "phase": 1,
+      "copy_tx": true,
+      "joined": true,
+      "join_ms": 6254,
+      "before": {
+        "pbuf": {
+          "calls": 220,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 213,
+          "failed": 8,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 110,
+          "failed": 3,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-ref": {
+          "calls": 213,
+          "failed": 8,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "ok": 1,
+      "cleanup": 1,
+      "request_ms": 1375,
+      "families": 7,
+      "files": 77,
+      "clock_started": 1,
+      "after": {
+        "pbuf": {
+          "calls": 239,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 232,
+          "failed": 8,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 129,
+          "failed": 3,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-ref": {
+          "calls": 232,
+          "failed": 8,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "memory_after": {
+        "internal_free": 53431,
+        "internal_largest": 25600,
+        "dma_free": 26991,
+        "dma_largest": 3840
+      },
+      "delta": {
+        "pbuf": {
+          "calls": 19,
+          "failed": 0,
+          "nomem": 0
+        },
+        "netif": {
+          "calls": 19,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-copy": {
+          "calls": 19,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-ref": {
+          "calls": 19,
+          "failed": 0,
+          "nomem": 0
+        }
+      }
+    },
+    {
+      "round": 9,
+      "phase": 2,
+      "copy_tx": false,
+      "joined": true,
+      "join_ms": 6203,
+      "before": {
+        "pbuf": {
+          "calls": 247,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 240,
+          "failed": 9,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 132,
+          "failed": 4,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-ref": {
+          "calls": 240,
+          "failed": 9,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "ok": 1,
+      "cleanup": 1,
+      "request_ms": 1086,
+      "families": 7,
+      "files": 77,
+      "clock_started": 1,
+      "after": {
+        "pbuf": {
+          "calls": 265,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 258,
+          "failed": 9,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 132,
+          "failed": 4,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-ref": {
+          "calls": 258,
+          "failed": 9,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "memory_after": {
+        "internal_free": 53443,
+        "internal_largest": 25600,
+        "dma_free": 27003,
+        "dma_largest": 6144
+      },
+      "delta": {
+        "pbuf": {
+          "calls": 18,
+          "failed": 0,
+          "nomem": 0
+        },
+        "netif": {
+          "calls": 18,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-copy": {
+          "calls": 0,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-ref": {
+          "calls": 18,
+          "failed": 0,
+          "nomem": 0
+        }
+      }
+    },
+    {
+      "round": 10,
+      "phase": 2,
+      "copy_tx": false,
+      "joined": true,
+      "join_ms": 6208,
+      "before": {
+        "pbuf": {
+          "calls": 275,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 268,
+          "failed": 10,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 134,
+          "failed": 4,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-ref": {
+          "calls": 268,
+          "failed": 10,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "ok": 1,
+      "cleanup": 1,
+      "request_ms": 1246,
+      "families": 7,
+      "files": 77,
+      "clock_started": 1,
+      "after": {
+        "pbuf": {
+          "calls": 293,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 286,
+          "failed": 10,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 134,
+          "failed": 4,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-ref": {
+          "calls": 286,
+          "failed": 10,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "memory_after": {
+        "internal_free": 53455,
+        "internal_largest": 25600,
+        "dma_free": 27015,
+        "dma_largest": 9216
+      },
+      "delta": {
+        "pbuf": {
+          "calls": 18,
+          "failed": 0,
+          "nomem": 0
+        },
+        "netif": {
+          "calls": 18,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-copy": {
+          "calls": 0,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-ref": {
+          "calls": 18,
+          "failed": 0,
+          "nomem": 0
+        }
+      }
+    },
+    {
+      "round": 11,
+      "phase": 2,
+      "copy_tx": false,
+      "joined": true,
+      "join_ms": 6209,
+      "before": {
+        "pbuf": {
+          "calls": 301,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 294,
+          "failed": 11,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 136,
+          "failed": 4,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-ref": {
+          "calls": 294,
+          "failed": 11,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "ok": 1,
+      "cleanup": 1,
+      "request_ms": 1312,
+      "families": 7,
+      "files": 77,
+      "clock_started": 1,
+      "after": {
+        "pbuf": {
+          "calls": 319,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 312,
+          "failed": 11,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 136,
+          "failed": 4,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-ref": {
+          "calls": 312,
+          "failed": 11,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "memory_after": {
+        "internal_free": 53451,
+        "internal_largest": 25600,
+        "dma_free": 27011,
+        "dma_largest": 6400
+      },
+      "delta": {
+        "pbuf": {
+          "calls": 18,
+          "failed": 0,
+          "nomem": 0
+        },
+        "netif": {
+          "calls": 18,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-copy": {
+          "calls": 0,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-ref": {
+          "calls": 18,
+          "failed": 0,
+          "nomem": 0
+        }
+      }
+    },
+    {
+      "round": 12,
+      "phase": 2,
+      "copy_tx": false,
+      "joined": true,
+      "join_ms": 6260,
+      "before": {
+        "pbuf": {
+          "calls": 329,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 322,
+          "failed": 12,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 138,
+          "failed": 4,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-ref": {
+          "calls": 322,
+          "failed": 12,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "ok": 1,
+      "cleanup": 1,
+      "request_ms": 1217,
+      "families": 7,
+      "files": 77,
+      "clock_started": 1,
+      "after": {
+        "pbuf": {
+          "calls": 348,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 341,
+          "failed": 12,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 138,
+          "failed": 4,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        },
+        "wifi-ref": {
+          "calls": 341,
+          "failed": 12,
+          "nomem": 0,
+          "max_failed_bytes": 350,
+          "last": 12294
+        }
+      },
+      "memory_after": {
+        "internal_free": 53443,
+        "internal_largest": 25600,
+        "dma_free": 27003,
+        "dma_largest": 4096
+      },
+      "delta": {
+        "pbuf": {
+          "calls": 19,
+          "failed": 0,
+          "nomem": 0
+        },
+        "netif": {
+          "calls": 19,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-copy": {
+          "calls": 0,
+          "failed": 0,
+          "nomem": 0
+        },
+        "wifi-ref": {
+          "calls": 19,
+          "failed": 0,
+          "nomem": 0
+        }
+      }
+    }
+  ],
+  "groups": [
+    {
+      "phase": 0,
+      "mode": "reference",
+      "completed": 4,
+      "success": 4,
+      "failure": 0,
+      "success_request_median_ms": 1131.5,
+      "wifi_reference_nomem": 0,
+      "wifi_copy_nomem": 0,
+      "pbuf_allocation_failures": 0
+    },
+    {
+      "phase": 1,
+      "mode": "copy",
+      "completed": 4,
+      "success": 4,
+      "failure": 0,
+      "success_request_median_ms": 1289.5,
+      "wifi_reference_nomem": 0,
+      "wifi_copy_nomem": 0,
+      "pbuf_allocation_failures": 0
+    },
+    {
+      "phase": 2,
+      "mode": "reference",
+      "completed": 4,
+      "success": 4,
+      "failure": 0,
+      "success_request_median_ms": 1231.5,
+      "wifi_reference_nomem": 0,
+      "wifi_copy_nomem": 0,
+      "pbuf_allocation_failures": 0
+    }
+  ],
+  "final": {
+    "attempted": 12,
+    "passed": 12,
+    "expected": 12,
+    "elapsed_ms": 101263,
+    "auto_reconnect_restored": 1
+  },
+  "completed_all_rounds": true,
+  "limitations": [
+    "core download/parser lifecycle, not full UI navigation",
+    "small ordered sample, not a population failure rate",
+    "driver accepts a packet is not proof of remote delivery",
+    "not sustained throughput or CPU/power upper bound"
+  ]
+}

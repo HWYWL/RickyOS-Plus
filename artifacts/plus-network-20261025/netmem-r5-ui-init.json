@@ -1,0 +1,92 @@
+{
+  "schema": "plus-netauto-summary/1",
+  "samples": [
+    {
+      "round": 1,
+      "phase": 0,
+      "copy_tx": false,
+      "joined": false,
+      "join_ms": 224,
+      "before": {
+        "pbuf": {
+          "calls": 15,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "netif": {
+          "calls": 8,
+          "failed": 1,
+          "nomem": 0,
+          "max_failed_bytes": 42,
+          "last": 12294
+        },
+        "wifi-copy": {
+          "calls": 2,
+          "failed": 0,
+          "nomem": 0,
+          "max_failed_bytes": 0,
+          "last": 0
+        },
+        "wifi-ref": {
+          "calls": 8,
+          "failed": 1,
+          "nomem": 0,
+          "max_failed_bytes": 42,
+          "last": 12294
+        }
+      }
+    }
+  ],
+  "groups": [
+    {
+      "phase": 0,
+      "mode": "reference",
+      "completed": 0,
+      "success": 0,
+      "failure": 0,
+      "success_request_median_ms": null,
+      "wifi_reference_nomem": 0,
+      "wifi_copy_nomem": 0,
+      "pbuf_allocation_failures": 0
+    },
+    {
+      "phase": 1,
+      "mode": "copy",
+      "completed": 0,
+      "success": 0,
+      "failure": 0,
+      "success_request_median_ms": null,
+      "wifi_reference_nomem": 0,
+      "wifi_copy_nomem": 0,
+      "pbuf_allocation_failures": 0
+    },
+    {
+      "phase": 2,
+      "mode": "reference",
+      "completed": 0,
+      "success": 0,
+      "failure": 0,
+      "success_request_median_ms": null,
+      "wifi_reference_nomem": 0,
+      "wifi_copy_nomem": 0,
+      "pbuf_allocation_failures": 0
+    }
+  ],
+  "final": {
+    "attempted": 0,
+    "passed": 0,
+    "expected": 12,
+    "elapsed_ms": 2013,
+    "auto_reconnect_restored": 1
+  },
+  "completed_all_rounds": false,
+  "limitations": [
+    "real Settings/FontLibrary/FontDownload lifecycle and display; automated navigation differs from human timing",
+    "small ordered sample, not a population failure rate",
+    "driver accepts a packet is not proof of remote delivery",
+    "not sustained throughput or CPU/power upper bound"
+  ],
+  "profile": "full-parent-ui-with-drained-transitions"
+}

@@ -1,0 +1,451 @@
+#pragma once
+
+#include <atomic>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <string>
+#include <vector>
+
+#include "activities/MainTab.h"
+#include "components/Rect.h"
+#include "fontIds.h"
+
+class Bitmap;
+class GfxRenderer;
+struct RecentBook;
+namespace freeink {
+namespace ui {
+struct HeaderProps;
+struct BitmapRef;
+struct ListItem;
+}  // namespace ui
+}  // namespace freeink
+
+struct TabInfo {
+  const char* label;
+  bool selected;
+};
+
+struct ThemeMetrics {
+  int batteryWidth;
+  int batteryHeight;
+
+  int topPadding;
+  int batteryBarHeight;
+  int headerHeight;
+  int verticalSpacing;
+
+  int previewPadding;
+  int previewHeightPercent;
+
+  int contentSidePadding;
+  int listRowHeight;
+  int listWithSubtitleRowHeight;
+  // FreeInkUI list shape, consumed by uiThemeTokens() for screens rendered
+  // through FreeInkApp: the theme supplies geometry and selection style, the
+  // uiScale fonts supply the sizes. Plain data by design — the eventual
+  // SD-card theme files will provide exactly these values.
+  int listRowGap;              // vertical gap between rows
+  int listRowRadius;           // row corner radius (RoundedRaff cards, Lyra pill)
+  int listInset;               // horizontal inset of the whole list band
+  int listSidePadding;         // text inset within a row
+  int listSelectionStyle;      // 0=invert fill, 1=light pill, 2=underline, 3=triangle (fui::SelectionStyle order)
+  int listScrollWidth;         // scroll indicator thickness
+  int listScrollSide;          // 0 = right edge, 1 = left edge
+  bool listTitleBold;          // bold row titles (RoundedRaff)
+  int listSeparatorStyle = 0;  // fui::SeparatorStyle order
+  int listValueMaxWidth = 0;   // 0 = unlimited
+  bool listSelectionCoversScrollReservation = false;
+  // FreeInkUI header shape, same contract as the list fields above.
+  int headerSidePadding;    // title text inset
+  int headerUnderlineSize;  // bottom rule thickness (Lyra), 0 = none
+  int headerTitleAlign;     // 0 = left, 1 = center, 2 = right (fui::TextAlign order)
+  int headerBatterySide;    // 0 = right edge, 1 = left edge
+  // Header clock opt-out for themes whose title layout can't spare the left
+  // reserve (RoundedRaff); the user setting still governs the themes that can.
+  bool headerShowsClock = true;
+  // Clock slot: centered on the band, or on the left after the back arrow.
+  bool headerClockCentered = true;
+  int menuRowHeight;
+  int menuSpacing;
+
+  int tabSpacing;
+  int tabBarHeight;
+  int coverGridTabBarHeight = 72;
+  // Selected-tab pill fills its equal-width slot (legacy RoundedRaff tabs)
+  // instead of shrinking to hug the label (legacy Lyra tabs).
+  bool tabPillFullSlot = false;
+
+  int scrollBarWidth;
+  int scrollBarRightOffset;
+
+  int homeTopPadding;
+  int homeCoverHeight;
+  int homeCoverTileHeight;
+  int homeRecentBooksCount;
+  bool homeShowRecentBookTitle = false;
+  bool homeContinueReadingInMenu;
+  int homeMenuTopOffset;
+
+  int buttonHintsHeight;
+  int sideButtonHintsWidth;
+
+  int progressBarHeight;
+  int progressBarMarginTop;
+  int statusBarHorizontalMargin;
+  int statusBarVerticalMargin;
+  int keyboardKeyHeight;
+  int keyboardKeySpacing;
+  bool keyboardCenteredText;
+  int keyboardVerticalOffset;
+  int keyboardTextFieldWidthPercent;
+  int keyboardWidthPercent;
+
+  float popupTopOffsetRatio;
+  int popupMarginX;
+  int popupMarginY;
+  int popupFrameThickness;
+  int popupCornerRadius;
+  bool popupTextBold;
+  bool popupTextInverted;
+  int popupTextBaselineOffsetY;
+  int popupProgressBarHeight;
+  bool popupProgressDrawOutline;
+  bool popupProgressClampPercent;
+  bool popupProgressFillInverted;
+  bool popupProgressOutlineInverted;
+
+  int optionPopupItemSpacing;
+  int optionPopupInnerPadding;
+  int optionPopupSelectionHPadding = 0;
+  int optionPopupSelectionVPadding;
+  int optionPopupTitleGap = 0;
+  bool optionPopupUseSmallFont = false;
+  bool optionPopupOptionFontBold = false;
+  int optionPopupSelectionRadius = 0;
+  bool optionPopupSelectionLight = false;
+  bool optionPopupDrawAllRows = false;
+  int optionPopupDialogSideMargin;
+  bool optionPopupTitleSeparator = false;
+
+  int textFieldHorizontalPadding;
+  int textFieldNormalThickness;
+  int textFieldCursorThickness;
+  int textFieldLineEndOffset;
+
+  // FreeInkUI control shape (the control center panel), same contract as the
+  // list fields above: quick-setting tiles and slider step buttons, the
+  // sheet's free-edge corners, and the capsule slider's corners (255 = full
+  // stadium, i.e. radius = half the control height).
+  int controlRadius;
+  int sheetRadius;
+  int capsuleRadius;
+  bool headerBatteryDetached = false;
+};
+
+enum UIIcon {
+  None = 0,
+  Folder,
+  Text,
+  Image,
+  Book,
+  File,
+  Recent,
+  Settings,
+  Transfer,
+  Library,
+  Plugins,
+  Wifi,
+  Hotspot,
+  Bookmark,
+  Apps,
+  Sudoku,
+  Sokoban,
+  Gomoku,
+  ChineseChess,
+  WeRead,
+  Minesweeper,
+  Avatar,
+  Standby,
+  Game2048,
+  Buddy,
+  PixelSwitch,
+  Opds,
+  ReadingStats,
+  AirPage,
+  ReadingHeatmap,
+  ReadingProfile,
+  Achievements,
+  Calculator,
+  Woodfish,
+  Usb,
+  Blocks,
+  Recorder,
+  Gallery,
+  Wallpaper
+};
+
+// Default theme implementation (Classic Theme)
+// Additional themes can inherit from this and override methods as needed
+
+namespace UiHighDpiProfile {
+constexpr void apply(ThemeMetrics& metrics) {
+  if (enabled) {
+    metrics.batteryWidth = batteryWidth;
+    metrics.batteryHeight = batteryHeight;
+    metrics.statusBarVerticalMargin = readerStatusHeight;
+    metrics.statusBarHorizontalMargin = readerStatusHorizontalMargin;
+    metrics.headerHeight = headerHeight;
+    metrics.contentSidePadding = contentPadding;
+    metrics.headerSidePadding = contentPadding;
+    metrics.verticalSpacing = controlGap;
+    metrics.keyboardKeyHeight = buttonHeight;
+    metrics.keyboardKeySpacing = controlGap;
+    metrics.listRowHeight = rowHeight;
+    metrics.listWithSubtitleRowHeight = subtitleRowHeight;
+    metrics.listSidePadding = contentPadding;
+    metrics.listValueMaxWidth = 260;
+    metrics.menuRowHeight = rowHeight;
+    metrics.tabBarHeight = 72;
+    metrics.batteryBarHeight = statusHeight;
+  }
+}
+}  // namespace UiHighDpiProfile
+
+namespace BaseMetrics {
+constexpr ThemeMetrics values = {.batteryWidth = 15,
+                                 .batteryHeight = 12,
+                                 .topPadding = 5,
+                                 .batteryBarHeight = 20,
+                                 .headerHeight = 84,
+                                 .verticalSpacing = 10,
+                                 .previewPadding = 12,
+                                 .previewHeightPercent = 30,
+                                 .contentSidePadding = 20,
+                                 .listRowHeight = 30,
+                                 .listWithSubtitleRowHeight = 50,
+                                 .listRowGap = 0,
+                                 .listRowRadius = 0,
+                                 .listInset = 0,
+                                 .listSidePadding = 20,
+                                 .listSelectionStyle = 0,  // invert fill
+                                 .listScrollWidth = 4,
+                                 .listScrollSide = 0,
+                                 .listTitleBold = false,
+                                 .listSeparatorStyle = 0,
+                                 .listValueMaxWidth = 0,
+                                 .listSelectionCoversScrollReservation = false,
+                                 .headerSidePadding = 18,
+                                 .headerUnderlineSize = 0,
+                                 .headerTitleAlign = 1,  // centered
+                                 .headerBatterySide = 0,
+                                 // Corner clock: a centered clock would collide with the centered title.
+                                 .headerClockCentered = false,
+                                 .menuRowHeight = 45,
+                                 .menuSpacing = 8,
+                                 .tabSpacing = 10,
+                                 .tabBarHeight = 50,
+                                 .scrollBarWidth = 4,
+                                 .scrollBarRightOffset = 5,
+                                 .homeTopPadding = 40,
+                                 .homeCoverHeight = 400,
+                                 .homeCoverTileHeight = 400,
+                                 .homeRecentBooksCount = 1,
+                                 .homeContinueReadingInMenu = false,
+                                 .homeMenuTopOffset = 10,
+                                 .buttonHintsHeight = 40,
+                                 .sideButtonHintsWidth = 30,
+                                 .progressBarHeight = 16,
+                                 .progressBarMarginTop = 1,
+                                 .statusBarHorizontalMargin = 5,
+                                 .statusBarVerticalMargin = 19,
+                                 .keyboardKeyHeight = 56,
+                                 .keyboardKeySpacing = 0,
+                                 .keyboardCenteredText = false,
+                                 .keyboardVerticalOffset = -13,
+                                 .keyboardTextFieldWidthPercent = 85,
+                                 .keyboardWidthPercent = 94,
+                                 .popupTopOffsetRatio = 0.075f,
+                                 .popupMarginX = 15,
+                                 .popupMarginY = 15,
+                                 .popupFrameThickness = 2,
+                                 .popupCornerRadius = 0,
+                                 .popupTextBold = true,
+                                 .popupTextInverted = true,
+                                 .popupTextBaselineOffsetY = -2,
+                                 .popupProgressBarHeight = 4,
+                                 .popupProgressDrawOutline = false,
+                                 .popupProgressClampPercent = false,
+                                 .popupProgressFillInverted = true,
+                                 .popupProgressOutlineInverted = true,
+                                 .optionPopupItemSpacing = 6,
+                                 .optionPopupInnerPadding = 16,
+                                 .optionPopupSelectionVPadding = 4,
+                                 .optionPopupDialogSideMargin = 20,
+                                 .textFieldHorizontalPadding = 6,
+                                 .textFieldNormalThickness = 1,
+                                 .textFieldCursorThickness = 3,
+                                 .textFieldLineEndOffset = 0,
+                                 .controlRadius = 0,
+                                 .sheetRadius = 0,
+                                 .capsuleRadius = 0};
+}
+
+class BaseTheme {
+ public:
+  static constexpr int STATUS_NUMERIC_FONT_ID = -858375107;
+
+  virtual ~BaseTheme() = default;
+
+ private:
+  // Last fixed row cadence rendered by the legacy list adapter, used by its
+  // existing button/touch navigation. INX owns its separate legacy geometry.
+  mutable std::atomic<int> listRowStep_[2] = {};
+
+ public:
+  static freeink::ui::BitmapRef checkboxIcon(bool checked);
+  static void setCheckboxRow(freeink::ui::ListItem& item, bool checked);
+
+  // Component drawing methods
+  int measureProgressBarHeight(const GfxRenderer& renderer, int barHeight, bool showPercentage = true) const;
+  int drawProgressBar(const GfxRenderer& renderer, Rect rect, size_t current, size_t total,
+                      bool showPercentage = true) const;
+  static void drawCoverPlaceholder(const GfxRenderer& renderer, Rect rect);
+  // Draws a pre-dithered cover thumb 1:1, centered and clipped to fill the
+  // slot. Rescaling a dithered bitmap aliases badly, so overflow is cropped.
+  static bool drawCoverThumbFill(const GfxRenderer& renderer, const Bitmap& bitmap, Rect slot, int xOffset = 0);
+  void drawBatteryLeft(const GfxRenderer& renderer, Rect rect,
+                       bool showPercentage = true) const;  // Left aligned (reader mode)
+  void drawBatteryRight(const GfxRenderer& renderer, Rect rect, bool showPercentage = true,
+                        int numericFontId = STATUS_NUMERIC_FONT_ID) const;
+  virtual void fillBatteryIcon(const GfxRenderer& renderer, Rect rect, uint16_t percentage) const;
+  void drawButtonHintsWithStyle(GfxRenderer& renderer, const char* btn1, const char* btn2, const char* btn3,
+                                const char* btn4, bool upstreamStyle) const;
+  virtual void drawButtonHints(GfxRenderer& renderer, const char* btn1, const char* btn2, const char* btn3,
+                               const char* btn4) const;
+  bool buttonHintsVisible() const;
+  void drawActionButton(const GfxRenderer& renderer, Rect rect, const char* label, bool active = false) const;
+  // Shared by every theme's drawButtonHints(): centres a hint label in its box,
+  // wrapping to two lines rather than overflowing when it's too wide to fit.
+  static void drawHintLabel(const GfxRenderer& renderer, int fontId, const char* label, int x, int boxWidth, int boxTop,
+                            int boxHeight, int singleLineYOffset);
+  virtual void drawSideButtonHints(const GfxRenderer& renderer, const char* topBtn, const char* bottomBtn) const;
+  // Menu row height as DRAWN by drawButtonMenu. HomeActivity builds its touch
+  // grid from this, so hit bands always match the visuals (RoundedRaff derives
+  // its row height from the font, not the metrics table).
+  virtual int getMenuRowHeight(const GfxRenderer& renderer) const;
+  virtual int getListRowStep(bool hasSubtitle) const;
+  virtual int getListPageItems(int contentHeight, bool hasSubtitle) const;
+  void drawSideScrollBar(const GfxRenderer& renderer, Rect rect, int itemCount, int pageStartIndex,
+                         int pageItems) const;
+  virtual void drawList(const GfxRenderer& renderer, Rect rect, int itemCount, int selectedIndex,
+                        const std::function<std::string(int index)>& rowTitle,
+                        const std::function<std::string(int index)>& rowSubtitle = nullptr,
+                        const std::function<UIIcon(int index)>& rowIcon = nullptr,
+                        const std::function<std::string(int index)>& rowValue = nullptr, bool highlightValue = false,
+                        const std::function<bool(int index)>& rowDimmed = nullptr, bool showSelection = true,
+                        const std::function<bool(int index)>& rowHeading = nullptr) const;
+  virtual void drawMainTabBar(const GfxRenderer& renderer, Rect rect, MainTab selected) const;
+  virtual void drawMainTabStatusBar(const GfxRenderer& renderer, Rect rect) const;
+  static void drawSplash(const GfxRenderer& renderer, const char* status, const char* version = nullptr);
+  static void drawRickyPowerScreen(const GfxRenderer& renderer, bool sleeping, bool transition,
+                                   const char* version = nullptr, uint8_t reveal = 3);
+  // A small framed label in the bottom-right corner over whatever the screen shows
+  // ("Standby", or "Off" on the power-off screen); returns where it drew.
+  static Rect drawRickyStandbyIndicator(const GfxRenderer& renderer, bool poweredOff = false);
+  // `header` false draws only the footer (the puppy reading mode puts its dog where the header sits).
+  // `area` draws into a smaller page (the status-bar settings preview); null is the screen.
+  static void drawRickyReaderChrome(GfxRenderer& renderer, float bookProgress, int currentPage, int pageCount,
+                                    const char* title, bool bookmarked, bool estimated, bool header = true,
+                                    const Rect* area = nullptr);
+  // Also draws the wall clock opposite the battery when the user enabled
+  // SETTINGS.clockShowInHeader and system time is valid. On touch boards a
+  // tappable back button leads the band (see HeaderBackTapTarget); root
+  // screens that own their stack bottom pass backButton = false.
+  virtual void drawHeader(const GfxRenderer& renderer, Rect rect, const char* title, const char* subtitle = nullptr,
+                          bool backButton = true) const;
+  static void drawHeaderWithStyle(const GfxRenderer& renderer, Rect rect, const char* title, const char* subtitle,
+                                  bool backButton, bool upstreamStyle, int trailingReserve = 0);
+  // Fill the battery/clock status chrome (settings + theme metrics) into
+  // header props, so FUI-native screens drawing their own interactive header
+  // carry the same band as drawHeader. Status text is styled with the
+  // FONT_LABEL slot (bound to the fixed small font by makeUiTarget and
+  // drawHeader). The label strings point at internal static buffers refreshed
+  // per call (headers draw on the single render task).
+  static void applyHeaderStatus(const GfxRenderer& renderer, freeink::ui::HeaderProps& props,
+                                bool upstreamStyle = false);
+  // Edge inset drawHeader uses for the clock/battery status line (detached
+  // layouts hug the corner with a legacy 12px inset instead of the padding).
+  static int headerStatusInset(bool upstreamStyle = false);
+  virtual void drawSubHeader(const GfxRenderer& renderer, Rect rect, const char* label,
+                             const char* rightLabel = nullptr) const;
+  virtual void drawTabBar(const GfxRenderer& renderer, Rect rect, const std::vector<TabInfo>& tabs,
+                          bool selected) const;
+  virtual bool tabIndexFromPoint(const GfxRenderer& renderer, Rect rect, const std::vector<TabInfo>& tabs, int x, int y,
+                                 int& index) const;
+  virtual void drawRecentBookCover(GfxRenderer& renderer, Rect rect, const std::vector<RecentBook>& recentBooks,
+                                   const int selectorIndex, bool& coverRendered, bool& coverBufferStored,
+                                   bool& bufferRestored, std::function<bool()> storeCoverBuffer) const;
+  // Map a horizontal tap position inside the recent-books cover strip on the
+  // home screen to the index of the cover that was touched. Single-cover
+  // themes render only one tile and return 0; multi-cover themes (Lyra3Covers
+  // and the like) override this so a touch directly selects the book whose
+  // cover the finger is on, matching what the page-turn keys already do.
+  virtual int recentBookIndexAt(int x, int screenWidth) const;
+  virtual void drawButtonMenu(GfxRenderer& renderer, Rect rect, int buttonCount, int selectedIndex,
+                              const std::function<std::string(int index)>& buttonLabel,
+                              const std::function<UIIcon(int index)>& rowIcon, int rowSpacing = -1) const;
+  // Touch geometry exactly as drawButtonMenu paints it. Activities that draw a
+  // button menu must drive their row hit-testing from this, never from a fixed
+  // metrics table: Lyra draws from rect.y without the vertical offset, and the
+  // RoundedRaff / Inx themes derive the row height from the font and page the
+  // rows, so a Base-only assumption drifts from the visuals.
+  struct MenuRowGeometry {
+    int firstRowY = 0;  // y of the first visible row (theme offset applied)
+    int rowStep = 0;    // y step between visible rows
+    int rowHeight = 0;  // drawn row height (rows with a smaller height than
+                        // the step don't accept taps in the gap)
+    int pageStart = 0;  // first visible index (paging themes); 0 otherwise
+    int pageCount = 0;  // visible rows on this page; the full count otherwise
+    int xStart = 0;     // horizontal tap bounds of the row
+    int xEnd = INT32_MAX;
+  };
+  virtual MenuRowGeometry getMenuRowGeometry(const GfxRenderer& renderer, const Rect& rect, int selectedIndex,
+                                             int rowCount) const;
+  virtual void drawHomeMenu(GfxRenderer& renderer, Rect rect, int buttonCount, int selectedIndex,
+                            const std::function<std::string(int index)>& buttonLabel,
+                            const std::function<UIIcon(int index)>& rowIcon) const;
+  virtual Rect drawPopup(const GfxRenderer& renderer, const char* message) const;
+  // drawPopup() with room for fillPopupProgress() below the message and an empty track,
+  // so a long task shows how far it has come.
+  Rect drawProgressPopup(const GfxRenderer& renderer, const char* message) const;
+  // `message`, when set, is a wrapped body under the title (themes without one ignore it).
+  virtual void drawOptionPopup(const GfxRenderer& renderer, const char* title, const std::vector<std::string>& options,
+                               int selectedIndex, const char* message = nullptr) const;
+  virtual void fillPopupProgress(const GfxRenderer& renderer, const Rect& layout, const int progress) const;
+
+ private:
+  Rect drawPopupBox(const GfxRenderer& renderer, const char* message, int extraHeight) const;
+  static Rect popupProgressBar(const Rect& layout);
+
+ public:
+  static void drawStatusBar(GfxRenderer& renderer, const float bookProgress, const int currentPage, const int pageCount,
+                            std::string title, const int paddingBottom = 0, const int textYOffset = 0,
+                            const bool fillMargin = true, const bool isPageBookmarked = false,
+                            const bool pageCountEstimated = false);
+  static void drawHelpText(const GfxRenderer& renderer, Rect rect, const char* label);
+  virtual void drawTextField(const GfxRenderer& renderer, Rect rect, const int textWidth, bool cursorMode = false,
+                             int contentStartX = 0, int contentWidth = 0) const;
+  bool drawSelectionBackground(const GfxRenderer& renderer, Rect rect) const;
+  virtual bool showsFileIcons() const { return false; }
+  // Thumb generation height for home covers; 0 means use metrics.homeCoverHeight.
+  // Themes with slots wider than 0.6 aspect override this so covers still fill.
+  virtual int homeCoverThumbHeight(const GfxRenderer&) const { return 0; }
+
+  // Shared constants and helpers for battery drawing (used by all themes)
+  static constexpr int batteryPercentSpacing = 4;
+  static void drawDitherMask(const GfxRenderer& renderer, int x, int y, int width, int height);
+  static void drawBatteryOutline(const GfxRenderer& renderer, int x, int y, int battWidth, int rectHeight);
+  static void drawBatteryLightningBolt(const GfxRenderer& renderer, int boltX, int boltY);
+};

@@ -1,0 +1,15 @@
+{
+  "file": "RickyOS-1.2.0-plus-tx-power-acceptance.bin",
+  "bytes": 4894128,
+  "sha256": "449b42a905c2ddf0d9c02106ca4a2e159bd739f851a09c65535e1b5b6543db98",
+  "elf_sha256": "30abd420fa7c42776ba43b2ee114f2ab5048e2860be69555fb61e9150fe80369",
+  "idf_commit": "9a97f6c5",
+  "diagnostic": true,
+  "network_acceptance": true,
+  "auto_join_visible_saved": true,
+  "dns_bypassed": false,
+  "tx_power_cap_quarter_dbm": 20,
+  "normal_http_downloader": true,
+  "owned_temporary_sd_files": true,
+  "currently_installed": false
+}

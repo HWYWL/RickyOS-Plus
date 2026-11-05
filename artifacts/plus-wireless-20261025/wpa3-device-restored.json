@@ -1,0 +1,12 @@
+{
+  "restored_version": "1.2.7-bt4",
+  "restored_elf_sha256": "39b2c1095605a9ffdbcb8f5dee2719369ff55c922e5995fbe50598f86a294490",
+  "complete_app_slot_digest_verified": true,
+  "outside_app_slot_unchanged": true,
+  "startup_version_elf_home_confirmed": true,
+  "unattended_test_seen": false,
+  "panic_seen": false,
+  "sd_init_crc_failure_seen": false,
+  "serial_capture_closed": true,
+  "published": false
+}
